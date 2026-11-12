@@ -425,6 +425,9 @@ function openDrawer(id){
       <dt>${T().rating}</dt><dd>${x.rating?`★${x.rating} <span class="tag2">${esc(x.ratingSrc||"")}</span>`:U()}</dd>
       <dt>${T().ea}</dt><dd>${eaTxt}</dd>
       <dt>${T().cp}</dt><dd>${tri(x.cpC)} ${tri(x.cpF)}</dd>
+      <dt>${T().news}</dt><dd>${tri(x.newsC)} <span class="tag2">${T().ev}</span> ${tri(x.newsF)} <span class="tag2">${T().fd}</span></dd>
+      <dt>${T().ovn}</dt><dd>${tri(x.onC)} <span class="tag2">${T().ev}</span> ${tri(x.onF)} <span class="tag2">${T().fd}</span></dd>
+      <dt>${T().wkd}</dt><dd>${(x.wk==="yes"||x.wk===true)?tri(true):((x.wk==="no"||x.wk===false)?tri(false):(x.wk==="cond"?tri("cond"):tri(null)))}</dd>
       <dt>${T().kr}</dt><dd>${x.korea==="no"?T().no:(x.korea==="yes"?'<span class="b b-ok">✓</span>':'<span class="b b-un">?</span>')}</dd>
     </dl>
     <div class="sec">${T().price}</div>
@@ -441,12 +444,6 @@ function openDrawer(id){
     <dl class="kv"><dt>${T().val}</dt><dd>${x.val?("×"+x.val.toLocaleString()+"  ("+(x.size?x.size.toLocaleString():"?")+" / "+money(x.total)+")"):U()}</dd></dl>
     ${(x.addons&&x.addons.length)?`<div class="sec">${T().addons}</div><div class="note">${x.addons.map(a=>"• "+esc(a)).join("<br>")}</div>`:""}
     <div class="sec">${T().eacp}</div><dl class="kv"><dt>${lang==="ko"?"요약":"Summary"}</dt><dd>${comboCell(x)} ${lang==="ko"?(comboState(x)==="both"?"둘 다 허용":comboState(x)==="partial"?"일부만 허용":comboState(x)==="none"?"둘 다 금지":"미확인"):comboState(x)}</dd></dl>
-    <div class="sec">${T().rules}</div>
-    <dl class="kv">
-      <dt>${T().news}</dt><dd>${tri(x.newsC)} <span class="tag2">${T().ev}</span> ${tri(x.newsF)} <span class="tag2">${T().fd}</span></dd>
-      <dt>${T().ovn}</dt><dd>${tri(x.onC)} <span class="tag2">${T().ev}</span> ${tri(x.onF)} <span class="tag2">${T().fd}</span></dd>
-      <dt>${T().wkd}</dt><dd>${(x.wk==="yes"||x.wk===true)?tri(true):((x.wk==="no"||x.wk===false)?tri(false):tri(null))}</dd>
-    </dl>
     ${x.code?`<div class="sec">${T().promoCode}</div><div class="note"><b>${esc(x.code)}</b>${x.promoText?" · "+esc(x.promoText):""}</div>`:""}
     <div class="sec">${T().note}</div>
     <div class="note">${esc(x.note||T().none)}</div>
