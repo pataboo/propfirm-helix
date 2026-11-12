@@ -422,7 +422,7 @@ function openDrawer(id){
       <dt>${T().rating}</dt><dd>${x.rating?`★${x.rating} <span class="tag2">${esc(x.ratingSrc||"")}</span>`:U()}</dd>
       <dt>${T().ea}</dt><dd>${eaTxt}</dd>
       <dt>${T().cp}</dt><dd>${tri(x.cpC)} ${tri(x.cpF)}</dd>
-      <dt>${T().kr}</dt><dd>${x.korea==="no"?T().no:'<span class="b b-ok">?</span>'}</dd>
+      <dt>${T().kr}</dt><dd>${x.korea==="no"?T().no:(x.korea==="yes"?'<span class="b b-ok">✓</span>':'<span class="b b-un">?</span>')}</dd>
     </dl>
     <div class="sec">${T().price}</div>
     <dl class="kv">
