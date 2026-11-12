@@ -182,8 +182,9 @@ function money(v, cur){
   return (eu?"€":"$")+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function tri(v){
-  if(v===true) return '<span class="b b-ok">✓</span>';
-  if(v===false) return '<span class="b b-no">✕</span>';
+  if(v===true||v==="yes") return '<span class="b b-ok">✓</span>';
+  if(v===false||v==="no") return '<span class="b b-no">✕</span>';
+  if(v==="cond") return '<span class="b b-cond">~</span>';
   return '<span class="b b-un">?</span>';
 }
 function ddPair(x){
@@ -348,6 +349,7 @@ function ruleCode(x){
 function flagCell(v){
   if(v===true||v==="yes") return '<span class="b b-ok">✓</span>';
   if(v===false||v==="no") return '<span class="b b-no">✕</span>';
+  if(v==="cond") return '<span class="b b-cond">~</span>';
   return U();
 }
 function render(){
