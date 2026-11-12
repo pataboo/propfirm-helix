@@ -40,9 +40,9 @@ thead th[data-k="act"]{max-width:86px}
 main{padding:0 14px 120px}
 .wrap{overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:10px;margin-top:10px}
 tr.krno td.firm,tr.krno td.plan{color:#dc2626 !important;text-decoration:line-through}
-tr.krno{opacity:.72} tr.dead td.firm,tr.dead td.plan{color:#dc2626 !important;text-decoration:line-through} tr.dead{opacity:.62} .mt5ok{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:rgba(22,163,74,.12);color:#16a34a;font-weight:800;font-size:11px;text-align:center} .mt5no{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:rgba(220,38,38,.10);color:#dc2626;font-weight:800;font-size:11px;text-align:center} .b-cond{background:rgba(217,119,6,.12)!important;color:#d97706!important;font-weight:800}
-.mt5un{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;border:1px dashed #c2c6cc;color:#98a2b3;font-size:10px;text-align:center} tr.planned td.firm,tr.planned td.plan{color:#d97706 !important;text-decoration:line-through} tr.planned{opacity:.72} .krTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid #dc2626;border-radius:5px;font-size:10px;font-weight:800;color:#fff;background:#dc2626;vertical-align:middle}
-.planTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px dashed #d97706;border-radius:5px;font-size:10px;font-weight:800;color:#d97706;vertical-align:middle} .deadTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px dashed #dc2626;border-radius:5px;font-size:10px;font-weight:800;color:#dc2626;vertical-align:middle}
+tr.krno{opacity:.72} tr.dead td.firm,tr.dead td.plan{color:#dc2626 !important;text-decoration:line-through} tr.dead{opacity:.62} .mt5ok{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:rgba(22,163,74,.12);color:#16a34a;font-weight:800;font-size:11px;text-align:center} .mt5no{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;background:rgba(220,38,38,.10);color:#dc2626;font-weight:800;font-size:11px;text-align:center} .b-cond{background:rgba(234,179,8,.16)!important;color:#eab308!important;font-weight:800;box-shadow:inset 0 0 0 1px rgba(234,179,8,.85)}
+.mt5un{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:4px;border:1px dashed #c2c6cc;color:#98a2b3;font-size:10px;text-align:center} tr.planned td.firm,tr.planned td.plan{color:#a16207 !important;text-decoration:line-through} tr.planned{opacity:.72} .krTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid #dc2626;border-radius:5px;font-size:10px;font-weight:800;color:#fff;background:#dc2626;vertical-align:middle}
+.planTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px dashed #a16207;border-radius:5px;font-size:10px;font-weight:800;color:#a16207;vertical-align:middle} .deadTag{display:inline-block;margin-left:6px;padding:0 5px;border:1px dashed #dc2626;border-radius:5px;font-size:10px;font-weight:800;color:#dc2626;vertical-align:middle}
 table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
 thead th{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);text-align:center;padding:8px 8px;font-weight:600;white-space:nowrap;cursor:pointer;z-index:2}
 thead th:hover{color:var(--acc)}
@@ -236,7 +236,9 @@ function tgtCell(x){
   if(!t.length) return (x.stepType==="instant"||/instant/i.test(x.plan||"")||/instant/i.test(x.type||""))?`<span class="tag2">없음</span> <span class="tag2">Instant</span>`:U();
   const st=`<span class="tag2">${x.stepType==="instant"?"Instant":x.stepType+(lang==="ko"?"단계":"-step")}</span>`;
   if(t.every(v=>v===0)) return `<span class="tag2">${lang==="ko"?"없음":"none"}</span> `+st;
-  return t.map(v=>v+"%").join(" / ")+" "+st;
+  const fmt = v => ddUnit==="usd" ? "$"+Math.round(x.size*v/100).toLocaleString() : v+"%";
+  const hint = ddUnit==="usd" ? ` title="${esc(t.map(v=>v+"%").join(" / "))}"` : "";
+  return `<span${hint}>`+t.map(fmt).join(" / ")+"</span> "+st;
 }
 function ruleBadges(x){
   const b=(lab,v)=>{const cls=v===true?"b-ok":v===false?"b-no":(v==="cond"?"b-cond":"b-un"); const sym=v===true?"✓":v===false?"✕":(v==="cond"?"~":"?");
@@ -340,9 +342,10 @@ function ruleCode(x){
   const base="display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 3px;margin-right:3px;border-radius:5px;font-size:11px;font-weight:800;line-height:1";
   const st=v=> v===true ? base+";background:rgba(22,163,74,.12);color:#16a34a;border:1px solid rgba(22,163,74,.45)"
             : v===false ? base+";background:rgba(220,38,38,.10);color:#dc2626;border:1px solid rgba(220,38,38,.45)"
+            : v==="cond" ? base+";background:rgba(234,179,8,.16);color:#eab308;border:1px solid rgba(234,179,8,.85)"
             : base+";color:#c2c6cc;border:1px dashed #d5d9de";
-  const bad=items.filter(i=>i[1]!==true).map(i=>i[2]+(i[1]===false?" 금지":" 미확인"));
-  const title=(bad.length? "제한/미확인: "+bad.join(", ") : "EA·카피·뉴스·오버나이트·주말 모두 허용");
+  const bad=items.filter(i=>i[1]!==true).map(i=>i[2]+(i[1]===false?" 금지":(i[1]==="cond"?" 조건부/애드온":" 미확인")));
+  const title=(bad.length? "제한·조건부·미확인: "+bad.join(", ") : "EA·카피·뉴스·오버나이트·주말 모두 허용");
   return `<span class="rc" title="${esc(title)}" style="white-space:nowrap">`+
     items.map(([ch,v])=>`<span style="${st(v)}">${ch}</span>`).join("")+`</span>`;
 }
@@ -402,7 +405,7 @@ function openDrawer(id){
     <div class="sec">${T().facts}</div>
     <dl class="kv">
       <dt>${T().eaccount}</dt><dd>${x.size?x.size.toLocaleString():T().none}</dd>
-      <dt>${T().etarget}</dt><dd>${(x.targets&&x.targets.length)?(x.targets.every(v=>v===0)?(lang==="ko"?"없음":"none"):x.targets.map(v=>v+"%").join(" / ")+" ("+x.stages+(lang==="ko"?"단계":" stages")+")"):((x.targetOpts&&x.targetOpts.length)?(lang==="ko"?"선택 ":"any ")+x.targetOpts.join("/")+"%":((x.stepType==="instant"||/instant/i.test(x.plan||""))?"없음 (인스턴트)":"?"))}</dd>
+      <dt>${T().etarget}</dt><dd>${(x.targets&&x.targets.length)?(x.targets.every(v=>v===0)?(lang==="ko"?"없음":"none"):x.targets.map(v=> ddUnit==="usd" ? ("$"+Math.round(x.size*v/100).toLocaleString()+" ("+v+"%)") : (v+"%")).join(" / ")+" ("+x.stages+(lang==="ko"?"단계":" stages")+")"):((x.targetOpts&&x.targetOpts.length)?(lang==="ko"?"선택 ":"any ")+x.targetOpts.join("/")+"%":((x.stepType==="instant"||/instant/i.test(x.plan||""))?"없음 (인스턴트)":"?"))}</dd>
       <dt>${T().edd}</dt><dd>${ddCell(x)}${(x.ddSrc&&ddPair(x)&&ddPair(x).p[0]!=null)?`  <span class="tag2">(${ddPair(x).p[0]}% = ${money(ddPair(x).u[0])})</span>`:""}</dd>
       <dt>${lang==="ko"?"DD 출처":"DD source"}</dt><dd>${x.ddSrc?(x.ddSrcType?`<span class="tag2">${esc(x.ddSrcType)}</span>`:(lang==="ko"?"확인됨":"verified")):(lang==="ko"?"미확인":"unverified")}</dd>
       <dt>${T().consist}</dt><dd>${x.consist? (x.consist==="없음" ? (lang==="ko"?"없음 (제한 없음)":"None (no rule)") : `<b>${esc(x.consist)}</b>`) : T().unk}</dd>
