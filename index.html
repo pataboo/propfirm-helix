@@ -383,7 +383,7 @@ function openDrawer(id){
       <div class="firm" style="font-size:14px">${esc(x.firm)}</div>
       <div class="plan">${esc(x.plan)} · ${x.size?x.size.toLocaleString():""} · <span class="pill">${esc(x.type)}</span></div>
       <div class="sub">${T().eid}: ${x.id}</div></div>
-    <button onclick="document.getElementById('drawer').classList.remove('open')">✕</button>`;
+    <button onclick="closeDrawer()">✕</button>`;
   const eaTxt = `${tri(x.eaC)} ${tri(x.eaF)}`;
   $("#dbody").innerHTML = `
     <div class="sec">${T().facts}</div>
@@ -437,7 +437,7 @@ function openDrawer(id){
     <div class="sec">${T().src}</div>
     <div class="note"><a href="${esc(x.url||"#")}" target="_blank" rel="noopener">${esc(x.url||U())}</a></div>
     <div class="sub" style="margin-top:8px">${T().koreaWarn}</div>
-    <div style="margin-top:14px"><button class="on" data-add="${x.id}">+ ${T().compare}</button></div>`;
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="on" data-add="${x.id}">+ ${T().compare}</button><button onclick="copyLink('${x.id}')">🔗 ${lang==="ko"?"링크 복사":"Copy link"}</button></div>`;
   $("#drawer").classList.add("open");
   const b=$("#dbody").querySelector("[data-add]"); if(b) b.onclick=()=>toggleSel(x.id);
 }
@@ -562,6 +562,33 @@ $("#modal").onclick = e=>{ if(e.target.id==="modal") $("#modal").classList.remov
 document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#modal").classList.remove("on"); $("#drawer").classList.remove("open"); }});
 bindFilters();
 applyLang();
+
+/* ---- deep links: #id=<rowId> ---- */
+const _openDrawer = openDrawer;
+openDrawer = function(id){
+  _openDrawer(id);
+  try { history.replaceState(null, "", "#id=" + encodeURIComponent(id)); } catch(e){}
+};
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  try { history.replaceState(null, "", location.pathname + location.search); } catch(e){}
+}
+function copyLink(id){
+  const u = location.origin + location.pathname + "#id=" + encodeURIComponent(id);
+  const done = () => { try{ navigator.clipboard.writeText(u); }catch(e){} };
+  done();
+  const b = event && event.target; if(b){ const o=b.textContent; b.textContent="✅"; setTimeout(()=>b.textContent=o,1200); }
+}
+function openFromHash(){
+  const m = /^#id=(.+)$/.exec(location.hash || "");
+  if(!m) return;
+  const id = decodeURIComponent(m[1]);
+  if(!DATA.rows.some(r=>r.id===id)) return;
+  f.q=""; f.preset=""; const q=document.getElementById('q'); if(q) q.value="";
+  fillPresets(); render(); openDrawer(id);
+}
+window.addEventListener('hashchange', openFromHash);
+openFromHash();
 </script>
 </body>
 </html>
