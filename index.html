@@ -397,7 +397,7 @@ function render(){
   }).join("") || `<tr><td colspan="16" class="empty">${T().none}</td></tr>`;
 
   $("#tbody").querySelectorAll("tr[data-id]").forEach(tr=>{
-    tr.onclick = ()=> openDrawer(tr.dataset.id);
+    tr.onclick = (e)=>{ if(e.target.closest && e.target.closest("a")) return; openDrawer(tr.dataset.id); };
   });
   drawTray();
 }
