@@ -176,10 +176,13 @@ const $ = s => document.querySelector(s);
 // ---------- helpers ----------
 const fmt = n => (n===null||n===undefined||n==="") ? T().none : n.toLocaleString(undefined,{maximumFractionDigits:2});
 function money(v, cur){
-  const eu = arguments[2]==="EUR";
+  const unit = String((arguments.length>2 ? arguments[2] : cur) || "USD").toUpperCase();
   if(v===null||v===undefined||v==="") return T().none;
+  const n = v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(unit==="EUR") return "€"+n;                 // 유로는 항상 € 표기, USD 환율로 환산하지 않음
+  if(unit==="GBP") return "£"+n;
   if(ccy==="KRW") return "₩"+Math.round(v*rate).toLocaleString();
-  return (eu?"€":"$")+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  return "$"+n;
 }
 function tri(v){
   if(v===true||v==="yes") return '<span class="b b-ok">✓</span>';
