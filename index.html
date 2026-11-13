@@ -150,7 +150,7 @@ const I18N = {
     presets:{ea:"EA+카피 허용",cheap:"총액 낮은 순",kr:"사용 가능",tot:"총액 확인됨",buy:"★ 실구매 후보",sale:"할인 40%↑",best:"가성비 순",paf:"Pay Later $5",gap:"미확인 항목 있음",src:"1차 출처만"},
     yes:"허용",no:"금지",unk:"미확인",cond:"조건부",none:"?",
     koreaWarn:"제한국 목록에 '한국' 미기재 = 허용 확정 아님(가입 심사로만 확정)",
-    currency:"통화",rate:"환율(1 USD =)",eaccount:"계좌 규모",etarget:"목표",edd:"손실한도",emin:"최소 거래일",elev:"최대 레버리지",
+    currency:"통화",rate:"환율(1 USD =)",rateEur:"환율(1 EUR =)",eaccount:"계좌 규모",etarget:"목표",edd:"손실한도",emin:"최소 거래일",elev:"최대 레버리지",
     eprice:"가격",elist:"정가",eact:"활성화비",etotal:"총비용",epromo:"프로모",etier:"근거 등급",eid:"ID"},
   en:{tagline:"Prop firm comparison — rules × price",search:"Firm · plan · size",sizeAll:"Size: all",typeAll:"Type: all",
     reset:"Reset",firm:"Firm",consist:"Consistency",asOf:"Price as of",promoExp:"Promo expires",news:"News",on:"Overnight",wk:"Weekend",plan:"Plan",size:"Size",target:"Target",dd:"Daily/Max loss",days:"Min days",
@@ -161,12 +161,13 @@ const I18N = {
     presets:{ea:"EA+copy allowed",cheap:"Lowest total",kr:"Available",tot:"Total known",buy:"★ Buy shortlist",sale:"40%+ off",best:"Best value",paf:"Pay Later $5",gap:"Has gaps",src:"Primary only"},
     yes:"Allowed",no:"Prohibited",unk:"Unknown",cond:"Conditional",none:"?",
     koreaWarn:"'Korea' absent from restricted list is NOT proof of acceptance — only onboarding approval is",
-    currency:"Currency",rate:"Rate (1 USD =)",eaccount:"Account size",etarget:"Target",edd:"Loss limits",emin:"Min trading days",elev:"Max leverage",
+    currency:"Currency",rate:"Rate (1 USD =)",rateEur:"Rate (1 EUR =)",eaccount:"Account size",etarget:"Target",edd:"Loss limits",emin:"Min trading days",elev:"Max leverage",
     eprice:"Price",elist:"List price",eact:"Activation",etotal:"Total cost",epromo:"Promo",etier:"Evidence tier",eid:"ID"}
 };
 let lang = localStorage.getItem("helix_lang") || "ko";
 let ccy = localStorage.getItem("helix_ccy") || "USD";
 let rate = Number(localStorage.getItem("helix_rate") || 1400);
+let rateEur = Number(localStorage.getItem("helix_eur_rate") || 1600);
 let ddUnit = localStorage.getItem("helix_dd") || "pct";
 let sortKey="total", sortDir=1;
 let sel = [];
@@ -179,7 +180,7 @@ function money(v, cur){
   const unit = String((arguments.length>2 ? arguments[2] : cur) || "USD").toUpperCase();
   if(v===null||v===undefined||v==="") return T().none;
   const n = v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(unit==="EUR") return "€"+n;                 // 유로는 항상 € 표기, USD 환율로 환산하지 않음
+  if(unit==="EUR") return ccy==="KRW" ? ("₩"+Math.round(v*rateEur).toLocaleString()) : ("€"+n);  // EUR→KRW는 EUR 환율 사용
   if(unit==="GBP") return "£"+n;
   if(ccy==="KRW") return "₩"+Math.round(v*rate).toLocaleString();
   return "$"+n;
@@ -500,11 +501,13 @@ function fillSelects(){
 function fillPresets(){
   const p=T().presets;
   $("#presets").innerHTML = Object.entries(p).map(([k,v])=>`<button data-p="${k}" class="${f.preset===k?"on":""}">${v}</button>`).join("")
-    + `<button data-p="rate">${T().rate} ${rate}</button>`;
+    + `<button data-p="rate">${T().rate} ${rate}</button>`
+    + `<button data-p="rateEur">${T().rateEur} ${rateEur}</button>`;
   $("#presets").querySelectorAll("[data-p]").forEach(b=>{
     b.onclick = ()=>{
       const p=b.dataset.p;
       if(p==="rate"){ const v=prompt(T().rate, rate); if(v){ rate=Number(v)||rate; localStorage.setItem("helix_rate",rate); render(); } return; }
+      if(p==="rateEur"){ const v=prompt(T().rateEur, rateEur); if(v){ rateEur=Number(v)||rateEur; localStorage.setItem("helix_eur_rate",rateEur); render(); } return; }
       f.preset = (f.preset===p)?"":p; fillPresets(); render();
     };
   });
