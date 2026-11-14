@@ -414,6 +414,37 @@
   .rating{display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:15px;color:var(--ink)}
   .rating small{font-weight:500;font-size:12px;color:var(--muted)}
   .fbtns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  /* firm page: three-panel split (rules · platforms/EA · payout) */
+  .fjump{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .fjump button{background:var(--panel2);border:1px solid var(--line2);color:var(--ink2);font:inherit;
+    font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:9999px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px}
+  .fjump button:hover{border-color:var(--accent);color:var(--ink)}
+  .fjump button b{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--bg);
+    border:1px solid var(--line);border-radius:99px;padding:1px 6px}
+  .fjump button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .fpanel{scroll-margin-top:70px}
+  /* the firm page track must be allowed to shrink, or nowrap tables inside the
+     panels push the whole page wider than a phone viewport */
+  #pageFirm{grid-template-columns:minmax(0,1fr)}
+  #firmMain{min-width:0}
+  #firmMain .panel{min-width:0}
+  .fpanel h3 .ct{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+  .rst{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    padding:8px 0;border-bottom:1px dashed var(--line)}
+  .rst:last-child{border-bottom:0}
+  .rstd{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .plrow{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .plrow:last-child{border-bottom:0}
+  .plrow .k{flex:none;width:132px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);font-weight:800;padding-top:2px}
+  .plrow .v{font-size:12.5px;line-height:1.65;color:var(--ink2);min-width:0}
+  @media(max-width:760px){.plrow{flex-direction:column;gap:4px}.plrow .k{width:auto}}
+  @media(max-width:760px){
+    #firmMain table.fx td,#firmMain table.fx th{white-space:normal}
+    #firmMain .prog dl{grid-template-columns:104px 1fr}
+    #firmMain .kpis[style]{grid-template-columns:1fr !important}
+  }
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
   .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:-.01em;font-weight:800;display:flex;align-items:center;gap:8px}
@@ -1576,7 +1607,7 @@ function applyStatics(){
 el("theme").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setItem("helix-theme",theme);applyTheme();};
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
   lang=b.dataset.lang;localStorage.setItem("helix-lang",lang);
-  applyStatics();render();if(activeId)openDrawer(activeId);});
+  applyStatics();render();if(activeId)openDrawer(activeId);route();});
 el("gq").addEventListener("input",e=>{q=e.target.value.toLowerCase().trim();render();});
 document.querySelectorAll("thead th[data-sort]").forEach(th=>th.onclick=()=>{
   const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();});
@@ -1857,7 +1888,7 @@ function cycDays(v){
 }
 const cycLabel=d=>d===0?(lang==="ko"?"수시/즉시":"On demand")
   :d===1?(lang==="ko"?"매일":"Daily")
-  :(d+" "+(lang==="ko"?"일":"days"));
+  :(lang==="ko"?d+"일":d+" days");
 
 function renderDiscover(){
   const byRating=[...rows].filter(r=>Number(r.rt)>0).sort((a,b)=>Number(b.rt)-Number(a.rt));
@@ -2379,7 +2410,7 @@ function renderFirm(name){
 
   /* payout by program */
   const plans=[...new Set(rs.map(r=>r.p).filter(Boolean))];
-  const payBlocks=plans.slice(0,6).map(pl=>{
+  const payBlockOf=pl=>{
     const g=rs.filter(r=>r.p===pl);
     const sp=modeOf(g.map(r=>r.sp)), pc=modeOf(g.map(r=>r.pc)), pf=modeOf(g.map(r=>r.pf));
     const pn=g.map(r=>r.pn).find(Boolean), yk=g.map(r=>r.yk).find(v=>v!=null);
@@ -2390,13 +2421,46 @@ function renderFirm(name){
       ${yk!=null?`<dt>${esc(t("cCap"))}</dt><dd>${yk===0?"무제한":money(yk,"USD")}</dd>`:""}
       ${pn?`<dt>${esc(t("cMin"))}</dt><dd style="white-space:normal">${esc(pn)}</dd>`:""}
     </dl></div>`;
-  }).join("");
+  };
+  const payBlocks=plans.slice(0,6).map(payBlockOf).join("");
+  const payRest=plans.length>6?plans.slice(6).map(payBlockOf).join(""):"";
 
-  /* rules */
-  const ruleLine=(label,vals)=>{const st=ruleState(vals);
-    return `<span class="rstate ${st.k}"><i></i>${esc(label)} ${esc(st.lbl)}</span>`;};
-  const rulesHtml=[["EA",'ec'],["뉴스",'nc'],["오버나이트",'oc'],["카피",'cc'],["주말",'wk']]
-    .map(([lb,k])=>ruleLine(lb,rs.map(r=>flagOf(r[k])))).join("");
+  /* ---- three-panel split: 규칙 · EA/플랫폼 · 지급 (all from recorded data) ----
+     Nothing here is estimated: a value that is not recorded renders as — and the
+     denominator is the number of products recorded for this brand. */
+  const ruleStat=(label,k)=>{
+    const vals=rs.map(r=>flagOf(r[k]));
+    const st=ruleState(vals);
+    const y=vals.filter(v=>v==="y").length, c=vals.filter(v=>v==="c").length,
+          n=vals.filter(v=>v==="n").length, u=vals.filter(v=>v==="u").length, tot=vals.length;
+    const rec=tot-u, bits=[(lang==="ko"?"기록 ":"recorded ")+rec+"/"+tot];
+    if(c) bits.push((lang==="ko"?"조건부 ":"conditional ")+c);
+    if(n) bits.push((lang==="ko"?"금지 ":"banned ")+n);
+    return `<div class="rst"><span class="rstate ${st.k}"><i></i>${esc(label)} ${esc(st.lbl)}</span>
+      <span class="rstd">${esc(bits.join(" · "))}</span></div>`;
+  };
+  const rulesHtml=[["EA","ec"],[lang==="ko"?"뉴스":"News","nc"],[lang==="ko"?"오버나이트":"Overnight","oc"],
+    [lang==="ko"?"카피":"Copy","cc"],[lang==="ko"?"주말":"Weekend","wk"]]
+    .map(([lb,k])=>ruleStat(lb,k)).join("");
+  const pfmRule=(DB.pfmRules||{})[name]||"";
+
+  /* platforms · EA · copy trading (PFM, per firm) */
+  const eap=(DB.eap||{})[name]||{};
+  const plats=eap.platforms||[], usPlats=eap.us_platforms||[];
+  const eapRows=[[lang==="ko"?"EA 정책":"EA policy", eap.ea],
+    [lang==="ko"?"카피 트레이딩":"Copy trading", eap.copy]]
+    .filter(p=>p[1]!=null&&String(p[1]).trim());
+  const eapEmpty=!plats.length&&!usPlats.length&&!eapRows.length&&!(eap.comment||"").trim();
+
+  /* payout: recorded cycle text -> days, recorded caps, recorded splits, methods */
+  const cds=rs.map(r=>cycDays(r.pc)).filter(v=>v!=null);
+  const fastest=cds.length?Math.min.apply(null,cds):null;
+  const caps=rs.map(r=>num(r.yk)).filter(v=>v!=null);
+  const capMax=caps.length?Math.max.apply(null,caps):null;
+  const capOpen=caps.indexOf(0)>=0;
+  const sps=rs.map(r=>num(r.sp)).filter(v=>v!=null);
+  const payInfo=(DB.pay||{})[name]||{};
+  const payMethods=payInfo.methods||[];
 
   /* promos + addons */
   const promos=[...new Set(rs.filter(r=>r.co||r.pt).map(r=>`${r.co||""}||${r.pt||r.po||""}||${r.px||""}`))]
@@ -2434,40 +2498,92 @@ function renderFirm(name){
       </div>
     </div>
 
-    <div class="panel"><h3>${lang==="ko"?"개요":"Overview"} <span>summary</span></h3>
-      <table class="fx"><tbody>
-        <tr><td style="color:var(--muted)">${lang==="ko"?"계좌 규모":"Account size"}</td>
-            <td>${sizes.length?money(Math.min(...sizes),"USD")+" – "+money(Math.max(...sizes),"USD"):"—"}</td></tr>
-        <tr><td style="color:var(--muted)">${lang==="ko"?"프로그램":"Programs"}</td>
-            <td>${progs.map(p=>esc(enumv(p)||p)).join(" · ")||"—"}</td></tr>
-        <tr><td style="color:var(--muted)">${lang==="ko"?"참가비 범위":"Entry fee range"}</td>
-            <td>${fees.length?money(Math.min(...fees),"USD")+" – "+money(Math.max(...fees),"USD"):"—"}</td></tr>
-        <tr><td style="color:var(--muted)">${lang==="ko"?"자산군":"Assets"}</td>
-            <td>${assets.map(mkName).join(" · ")||"—"}</td></tr>
-      </tbody></table>
+    <div class="fjump" role="group" aria-label="${lang==="ko"?"브랜드 섹션":"Brand sections"}">
+      <button type="button" data-go="fRules">${lang==="ko"?"규칙":"Rules"} <b>5</b></button>
+      <button type="button" data-go="fPlat">${lang==="ko"?"EA · 플랫폼":"EA · platforms"} <b>${plats.length}</b></button>
+      <button type="button" data-go="fPay">${lang==="ko"?"지급":"Payout"} <b>${plans.length}</b></button>
+    </div>
+
+    <div class="panel fpanel" id="fRules">
+      <h3>${lang==="ko"?"규칙":"Rules"} <span class="ct">${lang==="ko"?"상품 단위 집계":"per-product aggregate"}</span></h3>
+      <div>${rulesHtml}</div>
+      <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+        ?"조건부는 일부 상품만 허용, 혼합은 상품 간 기록이 갈리는 경우입니다. 분모는 이 브랜드에 기록된 상품 수입니다."
+        :"Conditional = some programmes allow it; mixed = the records disagree. The denominator is the products recorded for this brand."}</div>
+      ${pfmRule?`<details style="margin-top:12px">
+        <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--ink2)">${lang==="ko"?"PFM 규칙 요약 (원문 영어)":"PFM rule summary (original English)"}</summary>
+        <div style="white-space:pre-wrap;font-size:12px;line-height:1.75;color:var(--ink2);margin-top:10px;max-height:340px;overflow:auto">${esc(pfmRule)}</div>
+        <div class="empty-inline" style="margin-top:6px;font-size:11px">${lang==="ko"?"출처: propfirmmatch.com/prop-firm-rules":"Source: propfirmmatch.com/prop-firm-rules"}</div></details>`:""}
+    </div>
+
+    <div class="panel fpanel" id="fPlat">
+      <h3>${lang==="ko"?"EA · 플랫폼":"Platforms · EA"} <span class="ct">${lang==="ko"?`플랫폼 ${plats.length}개`:`${plats.length} platform${plats.length===1?"":"s"}`}</span></h3>
+      ${eapEmpty?`<div class="empty-inline">${lang==="ko"
+          ?"이 브랜드의 플랫폼·EA 정책은 아직 수집되지 않았습니다. 비어 있는 값을 추정해 채우지 않습니다."
+          :"Platforms and EA policy for this brand are not collected yet. Empty values are not estimated."}</div>`:`
+        ${plats.length?`<div class="chips" style="margin-bottom:10px">${plats.map(x=>`<span class="chip2">${esc(x)}</span>`).join("")}</div>`:""}
+        ${usPlats.length?`<div class="plrow"><div class="k">${lang==="ko"?"미국 트레이더":"US traders"}</div><div class="v">${usPlats.map(x=>esc(x)).join(" · ")}</div></div>`:""}
+        ${eapRows.map(p=>`<div class="plrow"><div class="k">${esc(p[0])}</div><div class="v">${esc(String(p[1]).slice(0,600))}</div></div>`).join("")}
+        ${(eap.comment||"").trim()?`<details style="margin-top:10px">
+          <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--ink2)">${lang==="ko"?"원문 메모":"Source note"}</summary>
+          <div style="white-space:pre-wrap;font-size:12px;line-height:1.7;color:var(--ink2);margin-top:8px">${esc(String(eap.comment).slice(0,1400))}</div></details>`:""}
+        <div style="margin-top:10px;font-size:11px;color:var(--muted)">${lang==="ko"?"출처: propfirmmatch.com/prop-firm-ea-copy-trading-platforms":"Source: propfirmmatch.com/prop-firm-ea-copy-trading-platforms"}</div>`}
+    </div>
+
+    <div class="panel fpanel" id="fPay">
+      <h3>${lang==="ko"?"지급":"Payout"} <span class="ct">${lang==="ko"?"프로그램별 · 기록값만":"by program · recorded values only"}</span></h3>
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+        <div class="kpi"><div class="v g">${fastest!=null?esc(cycLabel(fastest)):'<span class="dim">—</span>'}</div>
+          <div class="k">${lang==="ko"?"최단 지급 주기":"fastest cycle"}</div></div>
+        <div class="kpi"><div class="v a">${capMax!=null?(capMax===0?(lang==="ko"?"무제한":"unlimited"):money(capMax,"USD")):'<span class="dim">—</span>'}</div>
+          <div class="k">${lang==="ko"?"최대 지급 상한":"largest cap"}</div></div>
+        <div class="kpi"><div class="v c">${sps.length?(Math.min.apply(null,sps)===Math.max.apply(null,sps)?sps[0]+"%":Math.min.apply(null,sps)+"–"+Math.max.apply(null,sps)+"%")+"" :'<span class="dim">—</span>'}</div>
+          <div class="k">${lang==="ko"?"수익 분배 범위":"profit split"}</div></div>
+      </div>
+      ${payBlocks||`<div class="empty-inline">${lang==="ko"?"프로그램별 지급 기록이 없습니다.":"No per-program payout records."}</div>`}
+      ${payRest?`<details style="margin-top:4px">
+        <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--ink2)">${lang==="ko"?`나머지 ${plans.length-6}개 프로그램`:`${plans.length-6} more programmes`}</summary>
+        <div style="margin-top:10px">${payRest}</div></details>`:""}
+      ${capOpen?`<div class="empty-inline" style="margin-top:6px">${lang==="ko"?"일부 상품은 지급 상한이 0(무제한)으로 기록되어 있습니다.":"Some products record a payout cap of 0 (unlimited)."}</div>`:""}
+      <div style="margin-top:14px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;margin-bottom:8px">${lang==="ko"?"지급 수단":"Payout methods"}</div>
+        ${payMethods.length?`<div class="chips">${payMethods.map(x=>`<span class="chip2">${esc(x)}</span>`).join("")}</div>`:
+          `<div class="empty-inline">${lang==="ko"?"지급 수단은 아직 수집되지 않았습니다.":"Payout methods are not collected yet."}</div>`}
+        ${payInfo.quote?`<details style="margin-top:10px">
+          <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--ink2)">${lang==="ko"?"근거 원문":"Source quote"}</summary>
+          <div style="font-size:12px;line-height:1.7;color:var(--ink2);margin-top:8px">${esc(String(payInfo.quote).slice(0,900))}</div>
+          ${payInfo.source?`<div style="font-size:11px;color:var(--muted);margin-top:6px;word-break:break-all">${esc(payInfo.source)}</div>`:""}</details>`:""}
+      </div>
     </div>
 
     <div class="grid2">
+      <div class="panel"><h3>${lang==="ko"?"개요":"Overview"} <span>summary</span></h3>
+        <div style="overflow-x:auto">
+        <table class="fx"><tbody>
+          <tr><td style="color:var(--muted)">${lang==="ko"?"계좌 규모":"Account size"}</td>
+              <td>${sizes.length?money(Math.min(...sizes),"USD")+" – "+money(Math.max(...sizes),"USD"):"—"}</td></tr>
+          <tr><td style="color:var(--muted)">${lang==="ko"?"프로그램":"Programs"}</td>
+              <td>${progs.map(p=>esc(enumv(p)||p)).join(" · ")||"—"}</td></tr>
+          <tr><td style="color:var(--muted)">${lang==="ko"?"참가비 범위":"Entry fee range"}</td>
+              <td>${fees.length?money(Math.min(...fees),"USD")+" – "+money(Math.max(...fees),"USD"):"—"}</td></tr>
+          <tr><td style="color:var(--muted)">${lang==="ko"?"자산군":"Assets"}</td>
+              <td>${assets.map(mkName).join(" · ")||"—"}</td></tr>
+        </tbody></table>
+        </div>
+      </div>
+
       <div class="panel"><h3>${lang==="ko"?"레버리지":"Leverage"} <span>${lang==="ko"?"자산 × 프로그램":"asset × program"}</span></h3>
+        <div style="overflow-x:auto">
         <table class="fx"><thead><tr><th>${lang==="ko"?"자산":"Asset"}</th>
           ${cols.map(c=>`<th class="num">${esc(enumv(c)||c)}</th>`).join("")}</tr></thead>
           <tbody>${levRows.map(o=>`<tr><td>${esc(mkName(o.a))}</td>
             ${o.cells.map(v=>typeof v==="object"&&v.raw
               ?`<td class="num mono dim" title="${esc(lang==="ko"?"원본 표기 · 미검증":"raw recorded value · unverified")}">${esc(v.raw)}*</td>`
               :`<td class="num mono">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>
+        </div>
         <div class="empty-inline" style="margin-top:8px">${lang==="ko"
           ?"상품 기록에서 자산·프로그램별 최빈값입니다. * 는 검증되지 않은 원본 표기입니다.":"Most frequent recorded value per asset and program. * marks an unverified raw value."}</div>
       </div>
-
-      <div class="panel"><h3>${lang==="ko"?"규칙":"Rules"} <span>${lang==="ko"?"상품 단위 집계":"per-product aggregate"}</span></h3>
-        <div class="chips">${rulesHtml}</div>
-        <div class="empty-inline" style="margin-top:10px">${lang==="ko"
-          ?"조건부는 일부 상품만 허용, 혼합은 상품 간 기록이 갈리는 경우입니다.":"Conditional = some programs allow; mixed = records disagree."}</div>
-      </div>
-    </div>
-
-    <div class="panel"><h3>${lang==="ko"?"지급 정책":"Payout policy"} <span>${lang==="ko"?"프로그램별":"by program"}</span></h3>
-      ${payBlocks||`<div class="empty-inline">${lang==="ko"?"기록 없음":"Not recorded"}</div>`}
     </div>
 
     <div class="grid2">
@@ -2520,6 +2636,10 @@ function renderFirm(name){
     <footer>${t("foot")}</footer>`;
 
   el("firmCh").onclick=()=>{F.firm.clear();F.firm.add(name);location.hash="#challenges";route();render();};
+  el("firmMain").querySelectorAll(".fjump button[data-go]").forEach(b=>{
+    b.onclick=()=>{const box=document.getElementById(b.dataset.go);
+      if(box) box.scrollIntoView({behavior:"smooth",block:"start"});};
+  });
   el("firmMain").querySelectorAll("tr[data-id]").forEach(tr=>tr.onclick=()=>openDrawer(tr.dataset.id));
 }
 
@@ -2617,6 +2737,9 @@ function route(){
   const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
   Object.entries(PAGES).forEach(([k,id])=>{ el(id).style.display=(k===page)?"grid":"none"; });
   el("pageFirm").style.display=isFirm?"grid":"none";
+  /* a firm page reuses the "challenges" key to keep the nav highlight, but the
+     challenges table itself must not stay stacked above the brand page */
+  if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
   const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",
