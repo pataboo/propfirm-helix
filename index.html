@@ -484,6 +484,7 @@
     thead th{padding:6px 5px}
     td{padding:7px 5px}
     .panel{padding:12px}
+    #discoverMain .grid2{grid-template-columns:1fr}
     .cmpslots{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
   }
 </style></head><body>
@@ -1278,6 +1279,7 @@ function render(){
   F.dd.forEach(v=>pushChip(v,"dd:"+v));
   F.vf.forEach(v=>pushChip(t("grade")+" "+v,"vf:"+v));
   F.cycle.forEach(v=>pushChip(v,"cycle:"+v));
+  F.fee.forEach(v=>pushChip(fclassLabel(v),"fee:"+v));
   F.flags.forEach(v=>pushChip(v==="promo"?t("fPromo"):t("f"+v.charAt(0).toUpperCase()+v.slice(1)).replace("f",""),"flags:"+v));
   const SIZE_LBL={"0-25000":"≤ 25K","25000-50000":"25–50K","50000-100000":"50–100K","100000-null":"100K+"};
   if(F.sizeMin!=null||F.sizeMax!=null){
@@ -1827,11 +1829,54 @@ function renderChallenge(id){
   const add=el("chAdd"); if(add) add.onclick=()=>{if(addPick(r.i)) add.textContent=lang==="ko"?"비교에 추가됨":"Added"; else flashCmpFull(); renderBar();};
 }
 
+/* ---------- payout cycle: recorded text -> shortest interval in days ----------
+   Only day/week/month words already present in the recorded cycle text are read.
+   A row whose text carries no interval stays out of the ranking — nothing is guessed. */
+function cycDays(v){
+  if(v==null||v==="") return null;
+  let t=String(v).toLowerCase()
+    .replace(/(?:winning|qualifying|active trading|trading|profitable|profit)\s+days?/g," ");
+  const d=[]; let m;
+  if(/on[\s-]?demand|수시|instant|즉시|same[\s-]day/.test(t)) d.push(0);
+  if(/\bdaily\b|매일|per (?:et )?(?:calendar )?day|per 24h|\b24h\b/.test(t)) d.push(1);
+  let re=/(\d+(?:\.\d+)?)\s*(?:-|–|\/|~|or|,)\s*(\d+(?:\.\d+)?)\s*(?:business |calen\w+ )?(?:days?|일)/g;
+  while((m=re.exec(t))){ d.push(Number(m[1]),Number(m[2])); }
+  re=/(\d+(?:\.\d+)?)\s*(?:business |calen\w+ )?(?:days?|일|영업일)/g;
+  while((m=re.exec(t))) d.push(Number(m[1]));
+  re=/every\s+(\d+(?:\.\d+)?)/g;
+  while((m=re.exec(t))) d.push(Number(m[1]));
+  re=/(\d+(?:\.\d+)?)\s*(?:weeks?|주)/g;
+  while((m=re.exec(t))) d.push(Number(m[1])*7);
+  re=/(\d+(?:\.\d+)?)\s*months?/g;
+  while((m=re.exec(t))) d.push(Number(m[1])*30);
+  if(/bi-?weekly|격주/.test(t)) d.push(14);
+  if(/\bweekly\b|매주/.test(t)) d.push(7);
+  if(/monthly|매월/.test(t)) d.push(30);
+  const ok=d.filter(x=>isFinite(x)&&x>=0);
+  return ok.length?Math.min.apply(null,ok):null;
+}
+const cycLabel=d=>d===0?(lang==="ko"?"수시/즉시":"On demand")
+  :d===1?(lang==="ko"?"매일":"Daily")
+  :(d+" "+(lang==="ko"?"일":"days"));
+
 function renderDiscover(){
   const byRating=[...rows].filter(r=>Number(r.rt)>0).sort((a,b)=>Number(b.rt)-Number(a.rt));
   const cheapest=[...rows].filter(r=>Number(r.s)>=100000&&Number(r.pr)>0)
     .sort((a,b)=>(Number(a.pr)/Number(a.s))-(Number(b.pr)/Number(b.s)));
-  const free=rows.filter(r=>feeClass(r)==="free");
+  const free=rows.filter(r=>feeClass(r)==="free").sort((a,b)=>Number(b.s||0)-Number(a.s||0));
+  const freeFirms=[...new Set(free.map(r=>r.f))];
+  /* fastest recorded cycle per brand (leaderboard, one row per brand) */
+  const cycRows=rows.filter(r=>cycDays(r.pc)!=null);
+  const cycBest={};
+  cycRows.forEach(r=>{ const d=cycDays(r.pc), b=cycBest[r.f];
+    if(!b||d<b.d||(d===b.d&&Number(r.sp||0)>Number(b.r.sp||0))) cycBest[r.f]={d,r}; });
+  const cycLead=Object.values(cycBest).sort((a,b)=>a.d-b.d||Number(b.r.sp||0)-Number(a.r.sp||0)).slice(0,6);
+  /* largest recorded per-request payout cap per brand */
+  const capRows=rows.filter(r=>num(r.yk)!=null&&num(r.yk)>0);
+  const capBest={};
+  capRows.forEach(r=>{ const v=num(r.yk), b=capBest[r.f];
+    if(!b||v>b.v) capBest[r.f]={v,r}; });
+  const capLead=Object.values(capBest).sort((a,b)=>b.v-a.v).slice(0,6);
   const later=rows.filter(r=>feeClass(r)==="later");
   const promos=rows.filter(r=>r.px).sort((a,b)=>String(a.px).localeCompare(String(b.px)));
   const top=[...rows].sort((a,b)=>Number(b.sp||0)-Number(a.sp||0)).slice(0,5);
@@ -1843,9 +1888,9 @@ function renderDiscover(){
     <div class="hero2"><h1>${lang==="ko"?"둘러보기":"Discover"}</h1>
       <p>${lang==="ko"?"실제 기록에서 뽑은 출발점 — 평점, 가성비, 무료·후불, 프로모션 마감.":"Practical starting points from the records: rating, value, free and pay-later, closing promos."}</p></div>
     <div class="stats">
-      <a class="stat statlink" href="#challenges" data-fee="free"><div class="n">${free.length}</div><div class="l">${lang==="ko"?"무료":"Free"} <span class="go">→</span></div></a>
-      <a class="stat statlink" href="#challenges" data-fee="normal"><div class="n">${rows.filter(r=>feeClass(r)==="normal").length}</div><div class="l">${lang==="ko"?"일반":"Normal"} <span class="go">→</span></div></a>
-      <a class="stat statlink" href="#challenges" data-fee="later"><div class="n">${later.length}</div><div class="l">${lang==="ko"?"후불":"Pay Later"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges?fee=free"><div class="n">${free.length}</div><div class="l">${lang==="ko"?"무료":"Free"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges?fee=normal"><div class="n">${rows.filter(r=>feeClass(r)==="normal").length}</div><div class="l">${lang==="ko"?"일반":"Normal"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges?fee=later"><div class="n">${later.length}</div><div class="l">${lang==="ko"?"후불":"Pay Later"} <span class="go">→</span></div></a>
       <a class="stat statlink" href="#offers"><div class="n">${promos.length}</div><div class="l">${lang==="ko"?"마감 임박 프로모션":"closing promos"} <span class="go">→</span></div></a>
     </div>
     <div class="grid2">
@@ -1854,8 +1899,40 @@ function renderDiscover(){
     </div>
     <div class="grid2">
       ${card(lang==="ko"?"분배 리더":"Highest split","split",top,r=>r.sp+"%")}
-      ${card(lang==="ko"?"무료 챌린지":"Free challenges","fee 0",free.slice(0,5),r=>"$0")}
+      <div class="panel"><h3>${lang==="ko"?"최단 지급 주기":"Fastest payout cycle"} <span>${lang==="ko"?"지급 주기 문구에서 읽은 일수":"days read from the recorded cycle"}</span></h3>
+        ${cycLead.length?`<table class="fx"><tbody>${cycLead.map(({d,r},i)=>`<tr>
+          <td style="width:26px;color:var(--muted)">${i+1}</td>
+          <td style="white-space:normal"><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p||"")}</span></a>
+            <div class="dim" style="font-size:11px;line-height:1.45;margin-top:2px">${esc(r.pc)}</div></td>
+          <td class="num" style="color:var(--accent);font-weight:800;vertical-align:top">${cycLabel(d)}</td></tr>`).join("")}</tbody></table>`
+          :`<div class="empty-inline">${lang==="ko"?"주기 문구가 기록된 상품이 없습니다.":"No recorded cycle text."}</div>`}
+        <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+          ?`${cycRows.length.toLocaleString('en-US')}/${rows.length.toLocaleString('en-US')}행에서 일수 판독 · ${(rows.length-cycRows.length)}행은 주기 문구에 일수가 없어 순위 제외. 브랜드당 가장 짧은 주기 1개만 표시.`
+          :`${cycRows.length.toLocaleString('en-US')} of ${rows.length.toLocaleString('en-US')} rows carry an interval · ${(rows.length-cycRows.length)} rows have no day count in their cycle text and are excluded. One (fastest) row per brand.`}</div></div>
     </div>
+    <div class="panel"><h3>${lang==="ko"?"지급 상한 큰 순":"Largest payout cap"} <span>${lang==="ko"?"1회 지급 상한이 기록된 브랜드":"brands with a recorded per-request cap"}</span></h3>
+      ${capLead.length?`<table class="fx"><tbody>${capLead.map(({v,r},i)=>`<tr>
+        <td style="width:26px;color:var(--muted)">${i+1}</td>
+        <td style="white-space:normal"><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p||"")}</span></a>
+          ${r.ykn?`<div class="dim" style="font-size:11px;line-height:1.45;margin-top:2px">${esc(r.ykn)}</div>`:""}</td>
+        <td class="num" style="color:var(--accent);font-weight:800;vertical-align:top">${money(v,r.cu)}</td></tr>`).join("")}</tbody></table>`
+        :`<div class="empty-inline">${lang==="ko"?"지급 상한이 기록된 상품이 없습니다.":"No recorded payout caps."}</div>`}
+      <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+        ?`상한이 숫자로 기록된 상품 ${capRows.length}개 · 브랜드 ${capLead.length}개 / 전체 ${rows.length.toLocaleString('en-US')}행. 상한 미기록은 추정하지 않고 순위에서 제외.`
+        :`${capRows.length} products and ${capLead.length} brands record a numeric cap out of ${rows.length.toLocaleString('en-US')} rows. Unrecorded caps are not estimated and stay out of the ranking.`}</div></div>
+    <div class="panel"><h3>${lang==="ko"?"무료 (참가비 0)":"Free (entry fee 0)"} <span>${lang==="ko"?`${free.length}개 상품 · ${freeFirms.length}개 브랜드`:`${free.length} product${free.length===1?"":"s"} · ${freeFirms.length} brand${freeFirms.length===1?"":"s"}`}</span></h3>
+      ${free.length?`<table class="fx"><tbody>
+        <tr><th style="text-align:left">${lang==="ko"?"브랜드 · 플랜":"Brand · plan"}</th><th class="num">${lang==="ko"?"계좌":"Size"}</th><th class="num">${lang==="ko"?"분배":"Split"}</th><th>${lang==="ko"?"지급 주기":"Cycle"}</th><th class="num">${lang==="ko"?"참가비":"Fee"}</th></tr>
+        ${free.map(r=>`<tr>
+        <td><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p||"")}</span></a></td>
+        <td class="num">${r.s?Number(r.s).toLocaleString('en-US'):"—"}</td>
+        <td class="num">${r.sp?r.sp+"%":"—"}</td>
+        <td class="dim">${esc(tx(r.pc)||"—")}</td>
+        <td class="num" style="color:var(--accent);font-weight:800">${money(r.pr,r.cu)}</td></tr>`).join("")}</tbody></table>`
+        :`<div class="empty-inline">${lang==="ko"?"참가비 0으로 기록된 상품이 없습니다.":"No product records a zero entry fee."}</div>`}
+      <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+        ?`참가비가 0으로 기록된 상품만 표시합니다(미기록·유료는 제외, 추정 없음). 최대 계좌 ${free.length?Number(free[0].s||0).toLocaleString('en-US'):"—"} · 무료 상품도 지급 조건과 계좌 회수 규정이 있습니다. <a href="#challenges?fee=free" style="color:var(--accent);font-weight:700">표에서 보기 →</a>`
+        :`Only products recorded at a zero entry fee (unknown or paid fees are excluded, nothing estimated). Largest size ${free.length?Number(free[0].s||0).toLocaleString('en-US'):"—"} · free products still carry payout conditions and account-recovery rules. <a href="#challenges?fee=free" style="color:var(--accent);font-weight:700">See in table →</a>`}</div></div>
     <div class="panel"><h3>${lang==="ko"?"후불 (Pay Later)":"Pay Later"} <span>${later.length}</span></h3>
       ${later.length?`<table class="fx"><tbody>${later.slice(0,8).map(r=>`<tr>
         <td><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p)}</span></a></td>
@@ -1863,7 +1940,6 @@ function renderDiscover(){
         <td class="num" style="color:var(--accent);font-weight:800">${r.s?Number(r.s).toLocaleString('en-US'):"—"}</td></tr>`).join("")}</tbody></table>`
         :`<div class="empty-inline">${lang==="ko"?"후불 상품이 없습니다.":"No pay-later products."}</div>`}</div>
     ${faqBlock(FAQ.home)}`;
-  el("discoverMain").querySelectorAll("[data-fee]").forEach(a=>a.onclick=()=>{ feeFilter=a.dataset.fee; });
 }
 
 /* ---------- table preferences ---------- */
@@ -2532,7 +2608,10 @@ function renderRules(){
 const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
-  const h=(location.hash||"").replace(/^#/,"")||"home";
+  let h=(location.hash||"").replace(/^#/,"")||"home";
+  const _q=h.indexOf("?");
+  if(_q>=0){ const _p=new URLSearchParams(h.slice(_q+1)); const _f=_p.get("fee");
+    if(_f){ F.fee.clear(); F.fee.add(_f); feeFilter=_f; } h=h.slice(0,_q); }
   const isFirm=h.startsWith("firm/");
   const isCh=h.startsWith("challenge/");
   const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
@@ -2551,6 +2630,7 @@ function route(){
   else if(page==="docs") renderDocs();
   else if(page==="discover") renderDiscover();
   else if(page==="challenge") renderChallenge(decodeURIComponent(h.slice(10)));
+  else if(page==="challenges"){ if(_q>=0) render(); }
   else if(page==="compare") renderCompare();
   else if(page==="payouts") renderPayouts();
   else if(page==="spreads") renderSpreads();
