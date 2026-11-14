@@ -4,23 +4,26 @@
 <title>SilentFam Helix — 프랍펌 및 브로커 데이터베이스</title>
 <meta name="description" content="SilentFam Helix — 프랍펌 및 브로커 데이터베이스. 참가비·낙폭·지급조건·근거 링크까지 상품별로 추적합니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   html[data-theme="dark"]{
-    --bg:#0b0e13;--panel:#11161f;--panel2:#151b26;--line:#222a38;--line2:#303a4d;
-    --ink:#eef2f8;--ink2:#c2cddd;--muted:#93a0b4;
-    --pink:#e74694;--cyan:#00e5ff;--purple:#9d7bfb;--blue:#5b95ff;
-    --green:#3ddc97;--amber:#ffc247;--red:#ff6b5e;--shadow:0 18px 50px rgba(0,0,0,.55);
+    --bg:#03080a;--panel:#050b0d;--panel2:#0b1215;--line:#171e21;--line2:#242d31;
+    --ink:#fcfcfe;--ink2:#c9cbcd;--muted:#8b8f93;
+    --accent:#a78bfa;
+    --pink:#a78bfa;--cyan:#a78bfa;--purple:#a78bfa;--blue:#a78bfa;
+    --green:#34dfaa;--amber:#ffab00;--red:#ff2d55;
+    --shadow:0 18px 50px rgba(0,0,0,.75);
   }
   html[data-theme="light"]{
-    --bg:#fff;--panel:#fff;--panel2:#f8fafc;--line:#e5e7eb;--line2:#d1d5db;
-    --ink:#111827;--ink2:#374151;--muted:#6b7280;
-    --pink:#d6357f;--cyan:#0089a3;--purple:#6d3ff0;--blue:#2265f2;
-    --green:#0a9d68;--amber:#a67400;--red:#c8392c;--shadow:0 18px 40px rgba(17,24,39,.14);
+    --bg:#fff;--panel:#fff;--panel2:#f7f6f9;--line:#e7e5ea;--line2:#d5d2da;
+    --ink:#0b0f10;--ink2:#3a3f42;--muted:#6d7276;
+    --accent:#6d3ff0;
+    --pink:#6d3ff0;--cyan:#6d3ff0;--purple:#6d3ff0;--blue:#6d3ff0;
+    --green:#0a9d68;--amber:#a67400;--red:#c8392c;--shadow:0 18px 40px rgba(11,15,16,.12);
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",Roboto,sans-serif;
+    font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;word-break:keep-all}
   a{color:var(--blue)}
   .top{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
@@ -40,8 +43,8 @@
   .mcard .sub{color:var(--muted);font-size:11.5px}
   .mcard .metrics{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--muted)}
   .mcard .metrics b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-  .best{background:rgba(157,123,251,.22)!important;color:var(--ink)!important;font-weight:800;
-    box-shadow:inset 0 0 0 1px rgba(157,123,251,.45);border-radius:6px}
+  .best{background:rgba(167,139,250,.20)!important;color:var(--ink)!important;font-weight:800;
+    box-shadow:inset 0 0 0 1px rgba(167,139,250,.5);border-radius:6px}
   .cmpwrap{display:grid;gap:0}
   .cmpslots{display:grid;grid-auto-flow:column;gap:10px;margin:16px 0}
   .slotcard{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:11px 13px;min-width:0}
@@ -59,7 +62,7 @@
   .cmptable td.diff{background:rgba(231,70,148,.08)}
   .hlbar{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink2)}
   .switch{width:38px;height:21px;border-radius:9999px;background:var(--line2);position:relative;cursor:pointer;flex:none;transition:.15s}
-  .switch.on{background:var(--purple)}
+  .switch.on{background:var(--accent)}
   .switch::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:99px;background:#fff;transition:.15s}
   .switch.on::after{left:19px}
   .picker{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:10px;margin:10px 0;max-height:300px;overflow:auto}
@@ -86,15 +89,15 @@
   .chips2{display:flex;flex-wrap:wrap;gap:6px;padding-top:2px}
   .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
-  .chips2 button.on{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+  .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
   .cats{display:flex;gap:2px;align-items:center}
   .cats a{font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px}
   .cats a:hover{color:var(--ink);background:var(--panel2)}
   .cats a.off{opacity:.45;cursor:not-allowed}
   .cats a.on{color:var(--ink);background:var(--panel2)}
   .subnav{border-top:1px solid var(--line);background:var(--panel)}
-  .subnav .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;gap:2px;align-items:center;height:44px;overflow-x:auto}
-  .subnav a{font-size:12.5px;font-weight:700;color:var(--muted);text-decoration:none;padding:7px 12px;border-radius:9px;white-space:nowrap}
+  .top .subnav .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;gap:2px;align-items:center;height:34px;overflow-x:auto}
+  .subnav a{font-size:12px;font-weight:600;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:7px;white-space:nowrap}
   .subnav a:hover{color:var(--ink);background:var(--panel2)}
   .subnav a.on{color:var(--ink);background:var(--panel2)}
   .faq{margin-top:22px}
@@ -109,15 +112,15 @@
     font-size:11.5px;line-height:1.7;color:var(--muted)}
   .src b{color:var(--ink2)}
   .src a{color:var(--blue)}
-  .hero2{padding:26px 0 10px}
-  .hero2 h1{margin:0 0 8px;font-size:30px;letter-spacing:-.03em;font-weight:800}
+  .hero2{padding:16px 0 6px}
+  .hero2 h1{margin:0 0 6px;font-size:26px;letter-spacing:-.025em;font-weight:700}
   .hero2 p{margin:0;color:var(--muted);font-size:13.5px;max-width:760px;line-height:1.65}
-  .top .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:16px;height:64px}
+  .top .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:16px;height:54px}
   .brand{display:flex;align-items:center;gap:11px}
-  .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));
-    display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff}
-  .brand b{font-size:17px;letter-spacing:-.02em;font-weight:800}
-  .brand span{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
+  .brand .mark{width:17px;height:17px;border-radius:9999px;border:2px solid var(--accent);position:relative}
+  .brand .mark::after{content:"";position:absolute;inset:3.5px;border-radius:9999px;background:var(--accent)}
+  .brand .wm{font-size:17px;letter-spacing:-.01em;font-weight:700;text-transform:lowercase}
+  .brand span{display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:-1px}
   .grow{flex:1}
   .meta{display:flex;gap:18px;font-size:12px;color:var(--muted)}
   .meta b{color:var(--ink);font-weight:700}
@@ -126,7 +129,7 @@
   .iconbtn:hover{color:var(--ink);border-color:var(--muted)}
   .lang{display:flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
   .lang button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer}
-  .lang button.on{background:var(--ink);color:var(--bg)}
+  .lang button.on{background:var(--accent);color:#0b0f10}
   .shell{max-width:1500px;margin:0 auto;padding:22px;display:grid;grid-template-columns:262px 1fr;gap:22px;align-items:start}
   .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;position:sticky;top:86px}
   .filters h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
@@ -136,7 +139,7 @@
   .opt{font-size:12px;padding:5px 10px;border-radius:9999px;border:1px solid var(--line2);color:var(--ink2);
     background:transparent;cursor:pointer;font-family:inherit;white-space:nowrap}
   .opt:hover{border-color:var(--muted);color:var(--ink)}
-  .opt.on{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+  .opt.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
   .range{display:flex;gap:8px;align-items:center}
   .range input{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);
     font:inherit;font-size:12.5px;padding:7px 9px}
@@ -147,7 +150,7 @@
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
   .stat .n{font-size:19px;font-weight:800}
   .stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-top:3px}
-  h1{margin:0 0 6px;font-size:26px;letter-spacing:-.03em;font-weight:800}
+  h1{margin:0 0 4px;font-size:22px;letter-spacing:-.02em;font-weight:700}
   .hero p{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.6;max-width:720px}
   .searchrow{display:flex;gap:10px;align-items:center;margin-bottom:12px}
   .search{flex:1;display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line2);
@@ -197,9 +200,9 @@
   .pop .pb{display:flex;gap:7px}
   .pop button{flex:1;border-radius:9px;padding:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--line2);
     background:transparent;color:var(--ink2)}
-  .pop button.primary{background:var(--pink);border-color:var(--pink);color:#fff}
+  .pop button.primary{background:var(--accent);border-color:var(--accent);color:#0b0f10}
   .pop button:hover{color:var(--ink)}
-  .pop button.primary:hover{color:#fff;filter:brightness(1.06)}
+  .pop button.primary:hover{color:#0b0f10;filter:brightness(1.08)}
   /* compare bar + modal */
   .cbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line2);
     transform:translateY(120%);transition:transform .22s;z-index:48;padding:11px 0}
@@ -209,7 +212,7 @@
     border-radius:9999px;padding:6px 12px;font-size:12px;white-space:nowrap}
   .cchip b{font-weight:700}
   .cchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 2px}
-  .btn{background:var(--pink);border:0;color:#fff;border-radius:9px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .btn{background:var(--accent);border:0;color:#0b0f10;border-radius:9px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .btn:disabled{background:var(--line2);color:var(--muted);cursor:not-allowed}
   .btn.g{background:transparent;border:1px solid var(--line2);color:var(--ink2)}
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:40}
@@ -265,13 +268,13 @@
   .ev a{word-break:break-all}
   .ev .meta{color:var(--muted);font-size:11px;margin-top:2px}
   .evall{margin-top:8px;font-size:11.5px;color:var(--muted)}
-  .promo{background:linear-gradient(135deg,rgba(231,70,148,.13),rgba(157,123,251,.10));
-    border:1px solid rgba(231,70,148,.38);border-radius:12px;padding:13px 14px;margin-bottom:16px}
+  .promo{background:linear-gradient(135deg,rgba(167,139,250,.10),rgba(167,139,250,.04));
+    border:1px solid rgba(167,139,250,.30);border-radius:12px;padding:13px 14px;margin-bottom:16px}
   .promo .ph{display:flex;align-items:center;gap:8px;font-size:10.5px;text-transform:uppercase;
     letter-spacing:.09em;color:var(--pink);font-weight:800;margin-bottom:9px}
   .promo .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;font-weight:800;letter-spacing:.04em;
-    background:var(--bg);border:1px dashed rgba(231,70,148,.55);border-radius:9px;padding:6px 12px;color:var(--ink)}
+    background:transparent;border:1px dashed rgba(167,139,250,.5);border-radius:9px;padding:6px 12px;color:var(--ink)}
   .copy{border:1px solid var(--line2);background:transparent;color:var(--ink2);border-radius:8px;
     padding:6px 10px;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer}
   .copy:hover{color:var(--ink);border-color:var(--muted)}
@@ -358,7 +361,7 @@
 </style></head><body>
 
 <div class="top"><div class="in">
-  <a href="#home" class="brand" style="text-decoration:none;color:inherit"><div class="mark">H</div><div><b>SilentFam Helix</b><span id="brandSub"></span></div></a>
+  <a href="#home" class="brand" style="text-decoration:none;color:inherit"><div class="mark"></div><div><b class="wm">helix</b><span id="brandSub"></span></div></a>
   <nav class="cats" id="cats">
     <a href="#challenges" data-mk="cfd">Forex</a>
     <a href="#challenges" data-mk="fut">Futures</a>
