@@ -26,6 +26,14 @@
     font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;word-break:keep-all}
   a{color:var(--blue)}
+  a:hover{color:var(--accent)}
+  .brand:hover .wm,.brand:hover svg.mark{color:var(--accent)}
+  .brand:hover .mark{filter:drop-shadow(0 0 8px rgba(167,139,250,.55))}
+  .navpill a:hover{color:var(--accent)}
+  .navpill a:hover span{color:var(--accent)}
+  .subnav a:hover{color:var(--accent)}
+  .statlink:hover .n,.statlink:hover .l{color:var(--accent)}
+  tbody tr:hover .firm a{color:var(--accent)}
   .top{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
   .hsearch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line2);
     border-radius:9999px;padding:6px 13px;min-width:190px;width:315px;flex:0 0 315px;margin-right:8px}
@@ -248,7 +256,7 @@
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:40}
   .scrim.on{opacity:1;pointer-events:auto}
   /* drawer */
-  .drawer{position:fixed;top:0;right:0;height:100%;width:min(580px,100vw);background:var(--bg);
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(50vw,900px);min-width:420px;background:var(--bg);
     border-left:1px solid var(--line2);box-shadow:var(--shadow);transform:translateX(102%);
     transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:50;display:flex;flex-direction:column}
   .drawer.on{transform:none}
@@ -316,6 +324,12 @@
   .exp.soon{background:rgba(255,194,71,.16);color:var(--amber)}
   .exp.done{background:rgba(255,107,94,.16);color:var(--red)}
   .exp.none{background:rgba(147,160,180,.16);color:var(--muted)}
+  .fclass{display:inline-block;border-radius:6px;padding:1px 7px;font-size:9.5px;font-weight:800;letter-spacing:.04em;
+    border:1px solid var(--line2);color:var(--ink2)}
+  .fclass.free{border-color:rgba(52,223,170,.5);color:var(--green)}
+  .fclass.later{border-color:rgba(255,171,0,.5);color:var(--amber)}
+  .selsort{background:var(--panel2);border:1px solid var(--line2);color:var(--ink2);border-radius:9px;
+    font:inherit;font-size:12px;font-weight:600;padding:7px 10px;cursor:pointer}
   .tagpromo{display:inline-block;border-radius:5px;padding:1px 6px;font-size:9px;font-weight:800;letter-spacing:.05em;
     background:rgba(231,70,148,.16);color:var(--pink);margin-left:6px;vertical-align:middle}
   .chart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -376,7 +390,7 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare,#pageDocs{grid-template-columns:1fr}
+  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare,#pageDocs,#pageDiscover,#pageChallenge{grid-template-columns:1fr}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -407,7 +421,7 @@
       <div class="dropdown" id="chMenu">
         <a href="#challenges" data-all="1"><b>전체 챌린지</b><span>693</span></a>
         <a href="#firms"><b>프랍펌</b><span>29</span></a>
-        <a href="#challenges" data-discover="1"><b>둘러보기</b><span>→</span></a>
+        <a href="#discover"><b>둘러보기</b><span>→</span></a>
         <a href="#challenges" data-cmp="1"><b>비교</b><span>⇄</span></a>
       </div>
     </span>
@@ -446,6 +460,7 @@
     </div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
       <div class="resbar" id="resbar" style="flex:1;margin:0"></div>
+      <select class="selsort" id="sortSel"></select>
       <div class="navitem" id="tsWrap">
         <button class="iconbtn" id="tsBtn" title="Table settings">⚙</button>
         <div class="dropdown" id="tsMenu" style="right:0;left:auto;min-width:250px"></div>
@@ -473,6 +488,8 @@
 <div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
 <div class="shell" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
 <div class="shell" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
+<div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
+<div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
 <div class="shell" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
@@ -635,10 +652,10 @@ let theme = localStorage.getItem("helix-theme") || "dark";
 let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="", offersFilter="all",
      colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,1,1,1,1,1,1],
      dense=localStorage.getItem("helix-dense")==="1";
-const ALL_GROUPS=["firm","mk","st","size","price","split","dd","flags","ver","cycle","target","days","lev","rating"];
+const ALL_GROUPS=["firm","fee","mk","st","size","price","split","dd","flags","ver","cycle","target","days","lev","rating"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
 const picked = new Set();
-const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
+const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
            sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
 const el=id=>document.getElementById(id);
 const t=k=>(I18N[lang][k] ?? k);
@@ -732,6 +749,7 @@ function matches(r){
   const sp=num(r.sp); if(F.splitMin!=null&&(sp==null||sp<F.splitMin))return false;
   const dy=num(r.mf??r.md); if(F.daysMax!=null&&(dy==null||dy>F.daysMax))return false;
   const lv=num(r.lv); if(F.levMin!=null&&(lv==null||lv<F.levMin))return false;
+  if(F.fee.size && !F.fee.has(feeClass(r))) return false;
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
   if(F.daysBand){ const d2=num(r.mf??r.md);
@@ -774,7 +792,7 @@ function chk(label, checked, k, v, count){
 function buildFilterSettings(){
   const box=el("filterSettings"); if(!box) return;
   const NAMES={firm:t("firm"),mk:t("mkt"),st:t("step"),size:t("size"),price:t("price"),split:t("fSplit"),
-    dd:t("ddF"),flags:t("flags"),ver:t("ver"),cycle:t("fCycleL"),target:t("fTarget"),days:t("fDays"),
+    dd:t("ddF"),flags:t("flags"),ver:t("ver"),cycle:t("fCycleL"),target:t("fTarget"),days:t("fDays"),fee:lang==="ko"?"결제 유형":"Payment",
     lev:t("fLev"),rating:t("fRating")};
   box.innerHTML=`<div class="tshead">${lang==="ko"?"표시할 필터":"Visible filters"}</div>`+
     ALL_GROUPS.map(g=>`<label class="tsrow"><input type="checkbox" data-g="${g}" ${visGroups.includes(g)?"checked":""}> ${esc(NAMES[g]||g)}</label>`).join("")+
@@ -817,6 +835,8 @@ function buildFilters(){
     ${DB.tiers.map(v=>chk(t("grade")+" "+v,F.vf.has(v),"vf",v,rowCount(r=>r.vf===v))).join("")}</div></details>`);
   add("cycle", `<details class="fgroup" data-g="cycle" ${OPEN.cycle?"open":""}><summary title="${esc((TIPS.cycle)[lang])}">${esc(t("fCycleL"))}</summary><div class="body">
     ${cyc.map(v=>chk(v,F.cycle.has(v),"cycle",v,rowCount(r=>r.pc===v))).join("")}</div></details>`);
+  add("fee", `<details class="fgroup" data-g="fee" ${OPEN.fee?"open":""}><summary>${lang==="ko"?"결제 유형":"Payment"}</summary><div class="body"><div class="chips2">
+    ${["free","normal","later"].map(k=>`<button data-fee="${k}" class="${F.fee.has(k)?"on":""}">${esc(fclassLabel(k))}</button>`).join("")}</div></div></details>`);
   add("target", `<details class="fgroup" data-g="target" ${OPEN.target?"open":""}><summary title="${esc((TIPS.split)[lang])}">${esc(t("fTarget"))}</summary><div class="body"><div class="chips2">
     <button data-target="yes" class="${F.target==="yes"?"on":""}">${lang==="ko"?"목표 있음":"has target"}</button>
     <button data-target="no" class="${F.target==="no"?"on":""}">${lang==="ko"?"목표 없음":"no target"}</button></div></div></details>`);
@@ -856,6 +876,8 @@ function buildFilters(){
   host.querySelectorAll("button[data-split]").forEach(b=>b.onclick=()=>{
     const v=Number(b.dataset.split); F.splitMin = F.splitMin===v?null:v; render();
   });
+  host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.fee; F.fee.has(k)?F.fee.delete(k):F.fee.add(k); render();});
   host.querySelectorAll("button[data-target]").forEach(b=>b.onclick=()=>{
     F.target = F.target===b.dataset.target?null:b.dataset.target; render();});
   host.querySelectorAll("button[data-days]").forEach(b=>b.onclick=()=>{
@@ -878,6 +900,7 @@ function render(){
         <span class="sub">${esc(r.p)}</span>
         <span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span>
         ${r.co?`<span class="tagpromo">PROMO ${esc(r.co)}</span>`:""}
+        ${fclassBadge(r)}
         <span class="pill p-${esc(g)}" style="margin-left:auto">${esc(t("grade"))} ${esc(g)}</span>
       </div>
       <div class="metrics">
@@ -888,6 +911,7 @@ function render(){
         <span>${esc(t("fDaily"))} <b>${r.dl!=null?esc(r.dl)+"%":"—"}</b></span>
         <span>${esc(t("fDays"))} <b>${(r.mf??r.md)!=null?esc(r.mf??r.md):"—"}</b></span>
         <span>${esc(t("fCycle"))} <b>${esc(tx(r.pc)||"—")}</b></span>
+        <a href="#challenge/${encodeURIComponent(r.i)}" onclick="event.stopPropagation()" style="margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none">${lang==="ko"?"자세히 →":"Details →"}</a>
       </div></div>`;
   }).join("");
   el("listView").querySelectorAll(".mcard").forEach(c=>{
@@ -952,6 +976,7 @@ function render(){
   const ca=el("clrAll"); if(ca) ca.onclick=()=>el("reset").click();
   el("s4").textContent=rows.filter(r=>r.vf==="A").length.toLocaleString('en-US');
   buildFilters();
+  buildSort();
 }
 
 /* ---------- hover popover ---------- */
@@ -1152,7 +1177,8 @@ function openDrawer(id){
   const mb=el("noteMore");
   if(mb) mb.onclick=()=>{const L=el("noteList");const exp=L.classList.toggle("exp");
     mb.textContent=exp?t("less"):t("more");};
-  el("dCta").innerHTML=r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:"";
+  el("dCta").innerHTML=`<a class="btn g" href="#challenge/${encodeURIComponent(r.i)}" style="text-decoration:none;margin-right:6px">${lang==="ko"?"자세히 보기":"Full page"}</a>`+
+    (r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:"");
   el("drawer").classList.add("on"); el("drawer").setAttribute("aria-hidden","false");
   el("scrim").classList.add("on");
   document.querySelectorAll("#tb tr").forEach(tr=>tr.classList.toggle("open",tr.dataset.id===id));
@@ -1327,6 +1353,142 @@ function renderHome(){
       </div></div>
     ${faqBlock(FAQ.home)}
     ${srcNote(lang==="ko"?"상품·수수료·규칙 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product, fee and rule values are HELIX records; check the evidence links in each product detail.")}`;
+}
+
+
+/* ---------- fee class / sort / discover / challenge detail ---------- */
+function feeClass(r){
+  const pr=Number(r.pr||0), ac=Number(r.ac||0), nm=(r.p||"")+" "+(r.pm||"");
+  if(/pay\s*later|후불/i.test(nm) || (ac>0 && pr<=5)) return "later";
+  if(pr===0) return "free";
+  return "normal";
+}
+const FCLASS={ko:{free:"무료",normal:"일반",later:"후불"},en:{free:"Free",normal:"Normal",later:"Pay Later"}};
+const fclassLabel=k=>(FCLASS[lang]||FCLASS.en)[k]||k;
+const fclassBadge=r=>{const k=feeClass(r);return `<span class="fclass ${k}">${esc(fclassLabel(k))}</span>`;};
+let feeFilter=null;
+
+const SORTS=[["f","회사","Firm"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
+  ["ml","최대 손실","Max loss"],["s","계좌 규모","Size"],["rt","평점","Rating"],["mf","최소일수","Min days"]];
+function buildSort(){
+  const sel=el("sortSel"); if(!sel) return;
+  sel.innerHTML=SORTS.map(([k,ko,en])=>`<option value="${k}">${esc(lang==="ko"?ko:en)}</option>`).join("");
+  sel.value=sortKey;
+  sel.onchange=()=>{ sortKey=sel.value; sortDir = (sortKey==="pr"||sortKey==="mf") ? 1 : -1; render(); };
+}
+
+function bars(items){
+  const max=Math.max(...items.map(i=>i.v),1);
+  return `<div style="display:flex;flex-direction:column;gap:10px">${items.map(it=>`
+    <div><div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:4px">
+      <span>${esc(it.k)}</span><b style="color:${it.c}">${esc(it.t)}</b></div>
+      <div style="height:8px;background:var(--panel2);border-radius:99px;overflow:hidden">
+        <div style="width:${Math.max(3,Math.round(it.v/max*100))}%;height:100%;background:${it.c};border-radius:99px"></div>
+      </div></div>`).join("")}</div>`;
+}
+
+function renderChallenge(id){
+  const r=rows.find(x=>x.i===id);
+  if(!r){ el("challengeMain").innerHTML=`<p class="dim">not found</p>`; return; }
+  const kDays=(r.mf??r.md);
+  const tg=Number(r.tg||0), dl=Number(r.dl||0), ml=Number(r.ml||0);
+  el("challengeMain").innerHTML=`
+    <div style="margin:6px 0 14px"><a href="#challenges" style="font-size:12px">← ${lang==="ko"?"챌린지 목록":"All challenges"}</a></div>
+    <div class="fhero">
+      <div>
+        <h1>${esc(r.f)} <span class="dim" style="font-weight:400">· ${esc(r.p)}</span></h1>
+        <div class="fmeta">
+          <span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span>
+          ${fclassBadge(r)}
+          <span class="pill p-${esc(r.vf||"C")}">${esc(t("grade"))} ${esc(r.vf||"—")}</span>
+          ${r.co?`<span class="tagpromo">PROMO ${esc(r.co)}</span>`:""}
+          <span>${r.s?Number(r.s).toLocaleString('en-US'):"—"} ${esc(r.cu||"")}</span>
+        </div>
+      </div>
+      <div class="fbtns">
+        <button class="btn g" id="chAdd">${lang==="ko"?"비교에 추가":"Add to compare"}</button>
+        ${r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:""}
+      </div>
+    </div>
+
+    <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi"><div class="v g">${tg?tg+"%":"—"}</div><div class="k">${esc(t("kTarget"))}</div></div>
+      <div class="kpi"><div class="v r">${dl?dl+"%":"—"}</div><div class="k">${esc(t("kDaily"))}</div></div>
+      <div class="kpi"><div class="v a">${ml?ml+"%":"—"}</div><div class="k">${esc(t("kMax"))}</div></div>
+      <div class="kpi"><div class="v c">${kDays!=null?esc(kDays)+" d":"—"}</div><div class="k">${esc(t("kDays"))}</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel"><h3>${lang==="ko"?"조건 비교":"Rule shape"} <span>%</span></h3>
+        ${bars([{k:t("kTarget"),v:tg,t:tg?tg+"%":"—",c:"var(--green)"},
+                {k:t("kDaily"),v:dl,t:dl?dl+"%":"—",c:"var(--red)"},
+                {k:t("kMax"),v:ml,t:ml?ml+"%":"—",c:"var(--amber)"}])}
+        <div class="empty-inline" style="margin-top:10px">${lang==="ko"?"같은 상품의 목표·일일손실·최대손실을 상대 비교한 그래프입니다.":"Target, daily loss and max loss for this product, relative to each other."}</div>
+      </div>
+      <div class="panel"><h3>${esc(t("sectFloor"))}</h3>${floorChart(r.dd==="Trailing"?"Trailing":"Static")}</div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel"><h3>${esc(t("sectCost"))}</h3>
+        <div class="kv">${drawerRow(t("cPrice"),money(r.pr,r.cu))}${drawerRow(t("cAct"),money(r.ac,r.cu))}
+        ${drawerRow(t("cTotal"),money(r.to,r.cu))}${r.po?drawerRow(t("cPromo"),esc(r.po)):""}</div></div>
+      <div class="panel"><h3>${esc(t("sectPay"))}</h3>
+        <div class="kv">${drawerRow(t("cSplit"),r.sp?r.sp+"%":"—")}${drawerRow(t("cCycle"),esc(tx(r.pc)||"—"))}
+        ${drawerRow(t("cFirst"),esc(tx(r.pf)||"—"))}</div></div>
+    </div>
+
+    <div class="panel"><h3>${esc(t("sectCond"))}</h3>
+      <div class="rules">${ruleChip(t("fEa"),r.ec)}${ruleChip(t("fNews"),r.nc)}${ruleChip(t("fOn"),r.oc)}
+      ${ruleChip(t("fCp"),r.cc)}${ruleChip(t("fWk"),r.wk)}</div>
+      <div class="kv" style="margin-top:12px">${drawerRow(t("cLev"),esc(r.lv||r.lvp||"—"))}
+      ${drawerRow(t("cKorea"),esc(enumv(r.kr)||"—"))}${drawerRow(t("cMt5"),r.m5===true?"✓":"?")}</div></div>
+
+    <div class="panel"><h3>${esc(t("sectNotes"))}</h3>${notesBlock(r.no)}</div>
+    <div class="panel"><h3>${esc(t("sectEv"))}</h3>${evidenceBlock(r)}</div>
+    ${faqBlock([[lang==="ko"?"이 상품은 어떤 기준으로 표시되나요?":"How is this product shown?",
+      lang==="ko"?"값은 기록된 원문이며 unknown은 미조사입니다. 자금 투입 전 공식 사이트에서 확인하세요.":"Values are records; unknown means not researched. Verify on the official site before funding."],
+      [lang==="ko"?"비교하려면?":"How do I compare?",
+      lang==="ko"?"‘비교에 추가’를 누른 뒤 챌린지의 비교 버튼으로 이동하세요.":"Add to compare, then open the compare button on the challenges page."]])}`;
+  const add=el("chAdd"); if(add) add.onclick=()=>{picked.add(r.i); renderBar(); add.textContent=lang==="ko"?"비교에 추가됨":"Added";};
+}
+
+function renderDiscover(){
+  const byRating=[...rows].filter(r=>Number(r.rt)>0).sort((a,b)=>Number(b.rt)-Number(a.rt));
+  const cheapest=[...rows].filter(r=>Number(r.s)>=100000&&Number(r.pr)>0)
+    .sort((a,b)=>(Number(a.pr)/Number(a.s))-(Number(b.pr)/Number(b.s)));
+  const free=rows.filter(r=>feeClass(r)==="free");
+  const later=rows.filter(r=>feeClass(r)==="later");
+  const promos=rows.filter(r=>r.px).sort((a,b)=>String(a.px).localeCompare(String(b.px)));
+  const top=[...rows].sort((a,b)=>Number(b.sp||0)-Number(a.sp||0)).slice(0,5);
+  const card=(title,sub,items,render)=>`<div class="panel"><h3>${esc(title)} <span>${esc(sub)}</span></h3>
+    <table class="fx"><tbody>${items.map((r,i)=>`<tr><td style="width:28px;color:var(--muted)">${i+1}</td>
+      <td><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p)}</span></a></td>
+      <td class="num" style="color:var(--accent);font-weight:800">${render(r)}</td></tr>`).join("")}</tbody></table></div>`;
+  el("discoverMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"둘러보기":"Discover"}</h1>
+      <p>${lang==="ko"?"실제 기록에서 뽑은 출발점 — 평점, 가성비, 무료·후불, 프로모션 마감.":"Practical starting points from the records: rating, value, free and pay-later, closing promos."}</p></div>
+    <div class="stats">
+      <a class="stat statlink" href="#challenges" data-fee="free"><div class="n">${free.length}</div><div class="l">${lang==="ko"?"무료":"Free"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges" data-fee="normal"><div class="n">${rows.filter(r=>feeClass(r)==="normal").length}</div><div class="l">${lang==="ko"?"일반":"Normal"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges" data-fee="later"><div class="n">${later.length}</div><div class="l">${lang==="ko"?"후불":"Pay Later"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#offers"><div class="n">${promos.length}</div><div class="l">${lang==="ko"?"마감 임박 프로모션":"closing promos"} <span class="go">→</span></div></a>
+    </div>
+    <div class="grid2">
+      ${card(lang==="ko"?"평점 리더":"Top rated","rating",byRating.slice(0,5),r=>"★ "+r.rt)}
+      ${card(lang==="ko"?"가성비 (100K 기준)":"Best value (100K)","price/size",cheapest.slice(0,5),r=>"$"+Number(r.pr).toLocaleString('en-US'))}
+    </div>
+    <div class="grid2">
+      ${card(lang==="ko"?"분배 리더":"Highest split","split",top,r=>r.sp+"%")}
+      ${card(lang==="ko"?"무료 챌린지":"Free challenges","fee 0",free.slice(0,5),r=>"$0")}
+    </div>
+    <div class="panel"><h3>${lang==="ko"?"후불 (Pay Later)":"Pay Later"} <span>${later.length}</span></h3>
+      ${later.length?`<table class="fx"><tbody>${later.slice(0,8).map(r=>`<tr>
+        <td><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p)}</span></a></td>
+        <td class="num">${money(r.pr,r.cu)}</td><td class="num">${money(r.ac,r.cu)}</td>
+        <td class="num" style="color:var(--accent);font-weight:800">${r.s?Number(r.s).toLocaleString('en-US'):"—"}</td></tr>`).join("")}</tbody></table>`
+        :`<div class="empty-inline">${lang==="ko"?"후불 상품이 없습니다.":"No pay-later products."}</div>`}</div>
+    ${faqBlock(FAQ.home)}`;
+  el("discoverMain").querySelectorAll("[data-fee]").forEach(a=>a.onclick=()=>{ feeFilter=a.dataset.fee; });
 }
 
 /* ---------- table preferences ---------- */
@@ -1920,14 +2082,16 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   const h=(location.hash||"").replace(/^#/,"")||"home";
   const isFirm=h.startsWith("firm/");
-  const page=isFirm?"challenges":(PAGES[h]?h:"challenges");
+  const isCh=h.startsWith("challenge/");
+  const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
   Object.entries(PAGES).forEach(([k,id])=>{ el(id).style.display=(k===page)?"grid":"none"; });
   el("pageFirm").style.display=isFirm?"grid":"none";
+  if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
   const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
@@ -1938,6 +2102,8 @@ function route(){
   else if(page==="offers") renderOffers();
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
+  else if(page==="discover") renderDiscover();
+  else if(page==="challenge") renderChallenge(decodeURIComponent(h.slice(10)));
   else if(page==="compare") renderCompare();
   else if(page==="payouts") renderPayouts();
   else if(page==="spreads") renderSpreads();
@@ -1963,6 +2129,6 @@ document.getElementById("fsetBtn").onclick=()=>{
 document.querySelectorAll("#chMenu a").forEach(a=>{
   if(a.dataset.discover||a.dataset.cmp){ a.addEventListener("click",()=>{ location.hash="#challenges"; setTimeout(()=>openPicker(),300); }); }
 });
-applyTheme();applyTablePrefs();buildTableSettings();applyStatics();render();route();
+applyTheme();applyTablePrefs();buildTableSettings();buildSort();applyStatics();render();route();
 </script>
 </body></html>
