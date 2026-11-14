@@ -479,7 +479,14 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare,#pageDocs,#pageDiscover,#pageChallenge{grid-template-columns:1fr}
+  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare,#pageDocs,#pageDiscover,#pageChallenge,#pageMethod{grid-template-columns:1fr}
+  /* method page: a single-column grid track sized by minmax(0,1fr) so the
+     long dictionary cells cannot blow the track out on narrow screens */
+  #pageMethod{grid-template-columns:minmax(0,1fr)}
+  #methodMain{min-width:0}
+  #methodMain .panel,#methodMain .scroll,#methodMain .kv{min-width:0}
+  #methodMain table.fx td{white-space:normal}
+  #methodMain table.fx td:first-child{white-space:nowrap}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -603,6 +610,7 @@
 <div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
 <div class="shell" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
 <div class="shell" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
+<div class="shell" id="pageMethod" style="display:none"><main id="methodMain"></main></div>
 <div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
 <div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
@@ -714,7 +722,7 @@ const I18N = {
   fSplit:"수익 분배", fDaily:"일일 손실", fMax:"최대 손실", fTarget:"목표", fDd:"낙폭 방식",
   fLev:"레버리지", fSteps:"방식", fDays:"최소 거래일", fCycle:"지급 주기", fEa:"EA", fNews:"뉴스",
   fKorea:"한국 계좌", fVer:"검증 등급", fSrc:"출처 유형", fSite:"공식 사이트",
-  foot:'<b>SilentFam Helix</b> — 프랍펌 및 브로커 데이터베이스. 값은 상품 단위로 기록되며, <b>미확인</b>은 조사하지 않았다는 뜻으로 0이나 허용을 의미하지 않습니다. 각 상품의 상세에서 근거 링크를 확인하고, 자금 투입 전 반드시 업체 공식 사이트에서 규칙을 다시 확인하세요.'
+  foot:'<b>SilentFam Helix</b> — 프랍펌 및 브로커 데이터베이스. 값은 상품 단위로 기록되며, <b>미확인</b>은 조사하지 않았다는 뜻으로 0이나 허용을 의미하지 않습니다. 각 상품의 상세에서 근거 링크를 확인하고, 자금 투입 전 반드시 업체 공식 사이트에서 규칙을 다시 확인하세요. · <a href="#method">방법론 · 필드 사전</a>'
  },
  en:{
   brandSub:"Prop firm & broker database",
@@ -768,7 +776,7 @@ const I18N = {
   fSplit:"Profit split", fDaily:"Daily loss", fMax:"Max loss", fTarget:"Target", fDd:"Drawdown",
   fLev:"Leverage", fSteps:"Step type", fDays:"Min days", fCycle:"Payout cycle", fEa:"EA", fNews:"News",
   fKorea:"Korea", fVer:"Grade", fSrc:"Source type", fSite:"Official site",
-  foot:'<b>SilentFam Helix</b> — prop firm & broker database. Values are recorded per product; <b>unknown</b> means not researched and never implies zero or permission. Check the evidence links in each product detail and verify rules on the firm\u2019s own site before funding.'
+  foot:'<b>SilentFam Helix</b> — prop firm & broker database. Values are recorded per product; <b>unknown</b> means not researched and never implies zero or permission. Check the evidence links in each product detail and verify rules on the firm\u2019s own site before funding. · <a href="#method">Method &amp; field dictionary</a>'
  }
 };
 
@@ -2047,6 +2055,163 @@ function renderDocs(){
     ${srcNote(lang==="ko"?"문서는 HELIX 데이터 구조를 설명합니다.":"These docs describe the HELIX data model.")}`;
 }
 
+/* ---------- method & field dictionary ---------- */
+const FDICT=[
+ ["i","상품 ID","Product ID"],
+ ["f","브랜드(회사)","Brand / firm"],
+ ["p","프로그램명","Programme"],
+ ["s","계좌 명목 규모 (USD)","Nominal account size (USD)"],
+ ["pr","참가비","Entry fee"],
+ ["ac","활성화비","Activation fee"],
+ ["to","확인된 총비용 (참가비+활성화비)","Total cost where both parts are known"],
+ ["sp","수익 분배율 %","Profit split %"],
+ ["dl","일일 손실 한도 %","Daily loss limit %"],
+ ["ml","최대 손실 한도 %","Max loss limit %"],
+ ["dd","낙폭 계산 방식 (Static·Trailing)","Drawdown type (static / trailing)"],
+ ["tg","이익 목표 %","Profit target %"],
+ ["md","최소 거래일","Minimum trading days"],
+ ["pc","지급 주기","Payout cycle"],
+ ["pf","첫 지급 조건","First payout condition"],
+ ["ty","평가 방식 (instant·1·2·3단계)","Evaluation type (instant / 1-2-3 step)"],
+ ["sg","평가 페이즈 수","Number of phases"],
+ ["lv","레버리지","Leverage"],
+ ["cs","일관성 규칙","Consistency rule"],
+ ["ec","EA 허용 (평가 단계)","EA allowed in evaluation"],
+ ["ef","EA 허용 (펀딩 단계)","EA allowed when funded"],
+ ["nc","뉴스 거래 (평가 단계)","News trading in evaluation"],
+ ["oc","오버나이트 보유 (평가 단계)","Overnight holding in evaluation"],
+ ["cc","카피 트레이딩 (평가 단계)","Copy trading in evaluation"],
+ ["wk","주말 보유","Weekend holding"],
+ ["kr","한국 거주자 계좌","Korean-resident accounts"],
+ ["vf","검증 등급 A/B/C","Verification grade"],
+ ["sy","출처 유형","Source type"],
+ ["ao","기록일 (as-of)","Record date (as-of)"],
+ ["no","원본 기록 노트","Verbatim notes captured at record time"]
+];
+function mdHas(r,k){
+  const v=r[k];
+  if(v===undefined||v===null) return false;
+  if(Array.isArray(v)) return v.length>0;
+  return v!=="";
+}
+function renderMethod(){
+  const ko=lang==="ko";
+  const total=rows.length, nFirms=new Set(rows.map(r=>r.f)).size;
+  const g={A:0,B:0,C:0};
+  rows.forEach(r=>{ if(g[r.vf]!=null) g[r.vf]++; });
+  const pct=n=>total?((n/total)*100).toFixed(1)+"%":"—";
+  const cnt=k=>rows.filter(r=>mdHas(r,k)).length;
+  const stale=rows.filter(r=>staleDays(r)!=null).length;
+  const usd=v=>(v!=null&&v!=="")?"$"+Number(v).toLocaleString("en-US"):"—";
+  const srcCnt={}; rows.forEach(r=>{const k=r.sy||"?"; srcCnt[k]=(srcCnt[k]||0)+1;});
+  const SRC={official:["업체 공식 사이트·구성기","Firm site / configurator"],
+             store:["업체 스토어 조회 (정가)","Firm store, list price"],
+             pfm:["Prop Firm Match 카탈로그","Prop Firm Match catalogue"],
+             "pfm-local":["Prop Firm Match 수집 스냅샷","Prop Firm Match snapshot"],
+             wayback:["아카이브 스냅샷","Archived snapshot"]};
+  const ex=rows.find(r=>r.vf==="A"&&r.ur&&r.pr!=null)||rows[0]||{};
+  const exCite=ex.i?("HELIX "+ex.i+" · "+ex.f+" — "+ex.p+(ex.s?" ("+usd(ex.s)+")":"")+" · "+(ko?"참가비 ":"entry ")+usd(ex.pr)+" · "+(ko?"분배 ":"split ")+(ex.sp!=null?ex.sp+"%":"—")+" · as-of "+String(ex.ao||"—").slice(0,10)+" · "+(ko?"등급 ":"grade ")+(ex.vf||"—")):"";
+  const kv=(k,v)=>`<div class="kv"><div>${esc(k)}</div><div>${v}</div></div>`;
+  const G=[["A",ko?"공식 사이트·구성기에서 직접 확인한 값":"Read directly from the firm's own site or configurator"],
+           ["B",ko?"2차·간접 자료(제휴 사이트·리뷰·스냅샷)에서 온 값":"From secondary or indirect material (partner sites, reviews, snapshots)"],
+           ["C",ko?"추정했거나 검증하지 못한 값 — 14일이 지나면 ⚠":"Inferred or not verified — flagged ⚠ after 14 days"]];
+  const missKeys=["dl","ml","ac","tg","lv","cs","md","pc"];
+  const UL="margin:8px 0 0 18px;padding:0;font-size:13px;line-height:1.75;color:var(--ink2)";
+  el("methodMain").innerHTML=`
+    <div class="hero2"><h1>${ko?"방법론 · 필드 사전":"Method & field dictionary"}</h1>
+      <p>${ko?"HELIX의 숫자가 어떻게 만들어지고, 무엇을 뜻하며, 어디까지 믿을 수 있는지 정리했습니다. 모든 값은 상품 단위 기록입니다.":"How HELIX numbers are produced, what they mean and how far they can be trusted. Every value is a per-product record."}</p></div>
+
+    <div class="panel"><h3>${ko?"세 가지 원칙":"Three rules"}</h3>
+      ${kv(ko?"상품 단위":"Per product", ko?"행 1개 = 브랜드 × 프로그램 × 계좌 규모. 같은 브랜드도 규모와 단계에 따라 규칙이 달라 한 행으로 합치지 않습니다. 현재 <b>"+total.toLocaleString("en-US")+"</b>개 행 · <b>"+nFirms+"</b>개 브랜드.":"One row = brand × programme × account size. Rules differ by size and phase, so rows are never merged. Currently <b>"+total.toLocaleString("en-US")+"</b> rows across <b>"+nFirms+"</b> brands.")}
+      ${kv(ko?"기록 시점 고정":"Dated records", ko?"모든 행은 기록일(as-of)을 갖습니다. 등급 A·B는 30일, 미검증 C는 14일이 지나면 표에 ⚠가 붙습니다. 지금 <b>"+stale.toLocaleString("en-US")+"</b>개 행이 기준을 넘었습니다.":"Every row carries an as-of date. Grade A/B expire at 30 days, unverified C at 14; past that the table shows ⚠. <b>"+stale.toLocaleString("en-US")+"</b> rows are past their limit right now.")}
+      ${kv(ko?"모르면 비운다":"Empty when unknown", ko?"확인하지 못한 값은 null로 두고 추정하지 않습니다. 화면에서는 — 로 보입니다.":"Unconfirmed values stay null and are never estimated; they render as —.")}
+    </div>
+
+    <div class="panel"><h3>${ko?"검증 등급 A/B/C":"Verification grades"}</h3>
+      <div class="scroll"><table class="fx"><thead><tr>
+        <th>${ko?"등급":"Grade"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"행":"Rows"}</th><th class="num">${ko?"비율":"Share"}</th>
+      </tr></thead><tbody>
+        ${G.map(([k,d])=>`<tr><td><span class="pill p-${k}">${k}</span></td><td class="dim">${esc(d)}</td>
+          <td class="num mono">${g[k].toLocaleString("en-US")}</td><td class="num mono">${pct(g[k])}</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="empty-inline" style="margin-top:10px">${ko
+        ?"등급은 값마다가 아니라 행 단위로 매깁니다. 한 행의 핵심 값이 공식 출처에서 확인되면 A, 2차 자료뿐이면 B, 추정·미검증이면 C입니다. 등급이 낮을수록 신선도 기준이 짧습니다."
+        :"The grade belongs to the row, not to each value: A when its key values were read on an official source, B when only secondary sources existed, C when inferred or unverified. A lower grade means a shorter freshness limit."}</div>
+    </div>
+
+    <div class="panel"><h3>${ko?"필드 사전":"Field dictionary"}</h3>
+      <div class="empty-inline" style="margin-bottom:10px">${ko
+        ?"오른쪽 두 열은 실제 데이터에서 계산한 값입니다 — 이 필드가 채워진 행 수와 비율. 빈 칸은 그만큼 확인되지 않았다는 뜻입니다."
+        :"The last two columns are computed from the live data — how many rows carry this field. An empty field is simply a field not yet confirmed."}</div>
+      <div class="scroll"><table class="fx"><thead><tr>
+        <th>${ko?"필드":"Field"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"기록된 행":"Rows with value"}</th><th class="num">${ko?"비율":"Share"}</th>
+      </tr></thead><tbody>
+        ${FDICT.map(([k,koD,enD])=>{const c=cnt(k);return `<tr>
+          <td style="font-family:ui-monospace,monospace;font-size:12px;color:var(--ink)">${esc(k)}</td>
+          <td class="dim">${esc(ko?koD:enD)}</td>
+          <td class="num mono">${c.toLocaleString("en-US")}<span class="dim" style="font-size:11px"> / ${total.toLocaleString("en-US")}</span></td>
+          <td class="num mono">${pct(c)}</td></tr>`;}).join("")}
+      </tbody></table></div>
+    </div>
+
+    <div class="panel"><h3>${ko?"미기록(null) 처리 원칙":"How unknowns are handled"}</h3>
+      <ul style="${UL}">
+        <li>${ko?"<b>null은 0이 아니고, 불가도 허용도 아닙니다.</b> 조사하지 않았다는 뜻입니다.":"<b>null is not zero, and neither forbidden nor allowed.</b> It means not researched."}</li>
+        <li>${ko?"숫자 상한 필터(예: 일일 손실 ≤ 5%)를 걸면 미기록 행은 결과에서 빠집니다. 모른다고 통과시키지 않습니다.":"With a numeric cap filter (e.g. daily loss ≤ 5%) rows without that value drop out. Unknown never passes as a match."}</li>
+        <li>${ko?"추정으로 빈칸을 채우지 않습니다. 확인되면 값·출처·기록일을 함께 저장하고 등급을 올립니다.":"Blanks are never filled by estimation. When a value is confirmed, value, source and date are stored together and the grade is raised."}</li>
+        <li>${ko?"PFM 참고값(지급 상한·최소 지급액 등)은 ‘PFM 참고(미검증)’로 따로 표기하고 등급을 올리지 않습니다.":"PFM reference values (payout cap, minimum payout…) are labelled ‘PFM reference (unverified)’ and never raise the grade."}</li>
+        <li>${ko?"값이 비어 있으면 조사 과제로 남깁니다 — 백로그 9번(결측 보완 조사)이 그 목록입니다.":"A missing value becomes a research task; backlog item 9 is that list."}</li>
+      </ul>
+      <div class="scroll" style="margin-top:12px"><table class="fx"><thead><tr>
+        <th>${ko?"필드":"Field"}</th><th class="num">${ko?"기록":"Recorded"}</th><th class="num">${ko?"미기록":"Missing"}</th><th class="num">${ko?"미기록 비율":"Missing share"}</th>
+      </tr></thead><tbody>
+        ${missKeys.map(k=>{const c=cnt(k);return `<tr><td style="font-family:ui-monospace,monospace;font-size:12px">${esc(k)}</td>
+          <td class="num mono">${c.toLocaleString("en-US")}</td><td class="num mono">${(total-c).toLocaleString("en-US")}</td>
+          <td class="num mono">${pct(total-c)}</td></tr>`;}).join("")}
+      </tbody></table></div>
+    </div>
+
+    <div class="panel"><h3>${ko?"출처 정책":"Source policy"}</h3>
+      <div class="scroll"><table class="fx"><thead><tr>
+        <th>${ko?"출처 유형":"Source type"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"행":"Rows"}</th>
+      </tr></thead><tbody>
+        ${Object.entries(srcCnt).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{
+          const s=SRC[k]||[k,k];
+          return `<tr><td style="font-family:ui-monospace,monospace;font-size:12px">${esc(k)}</td>
+            <td class="dim">${esc(ko?s[0]:s[1])}</td><td class="num mono">${n.toLocaleString("en-US")}</td></tr>`;}).join("")}
+      </tbody></table></div>
+      <ul style="${UL}">
+        <li>${ko?"1차 출처(업체 공식 사이트·구성기·스토어)를 먼저 봅니다. 2차 자료만 있으면 B, 추정이면 C로 내립니다.":"Primary sources (the firm's own site, configurator, store) come first. Secondary-only values are graded B, inferred ones C."}</li>
+        <li>${ko?"PFM에서 가져온 값은 화면에 PFM으로 표기하고, 각 페이지 하단에 원문 출처를 남깁니다. 원문은 번역하지 않고 인용합니다.":"PFM-derived values are labelled PFM and attributed at the foot of each page. Source text is quoted, not translated."}</li>
+        <li>${ko?"가격은 기록 시점의 정가이며 프로모션이 적용되지 않을 수 있습니다. 프로모션 코드는 별도 필드(po/pt)에 기록합니다.":"Prices are list prices at record time and may exclude promotions; promo codes live in their own fields (po/pt)."}</li>
+        <li>${ko?"규칙은 업체가 바꿀 수 있습니다. 기록일 이후 변경이 있으면 이 사이트 값이 틀릴 수 있으므로 자금 투입 전 업체 공식 사이트에서 다시 확인하세요.":"Firms change rules. A value can be stale after its as-of date, so verify on the firm's own site before funding."}</li>
+      </ul>
+    </div>
+
+    <div class="panel"><h3>${ko?"한 값이 A등급이 되는 절차":"How a value reaches grade A"}</h3>
+      <ul style="${UL}">
+        <li>${ko?"① 결측·노후 행을 먼저 고릅니다(⚠ 표시가 붙은 행).":"1. Pick the missing or ageing rows first (the ones showing ⚠)."}</li>
+        <li>${ko?"② 업체 공식 사이트·구성기에서 값을 직접 읽습니다. 제휴 사이트 수치는 참고만 합니다.":"2. Read the value on the firm's own site or configurator; partner-site numbers are reference only."}</li>
+        <li>${ko?"③ 값·출처 문구·기록일을 한 번에 기록합니다. 셋 중 하나라도 없으면 등급을 올리지 않습니다.":"3. Store value, source text and date together. If any one is missing the grade does not rise."}</li>
+        <li>${ko?"④ 30일이 지나면 다시 확인 대상이 됩니다(미검증 C는 14일).":"4. After 30 days it becomes due for re-checking (14 for unverified C)."}</li>
+      </ul>
+    </div>
+
+    <div class="panel"><h3>${ko?"인용 형식":"Citation format"}</h3>
+      <div class="empty-inline" style="margin-bottom:8px">${ko?"이 사이트의 값을 인용할 때는 상품 ID·기록일·등급을 함께 적어 주세요. 아래는 실제 데이터에서 만든 예시입니다.":"When citing a value, include the product ID, as-of date and grade. The example below is generated from live data."}</div>
+      <div class="note" style="font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap">${esc(exCite)}</div>
+    </div>
+
+    <div class="panel"><h3>${ko?"한계":"Limits"}</h3>
+      <div class="empty-inline">${ko
+        ?"정보 제공용 데이터베이스이며 투자 조언이 아닙니다. 스프레드·랏당 커미션·리뷰 점수 분포는 아직 수집하지 않았습니다. 값이 비어 있는 항목은 ‘없음’이 아니라 ‘미확인’입니다."
+        :"An informational database, not investment advice. Spreads, per-lot commissions and review distributions are not collected yet. An empty value means ‘not confirmed’, never ‘none’."}</div>
+    </div>
+
+    <div style="margin-top:16px;font-size:12px"><a href="#docs">${ko?"데이터 구조 문서":"Docs"}</a> · <a href="#challenges">${ko?"챌린지 보기":"Challenges"}</a> · <a href="#discover">Discover</a></div>
+    ${srcNote(ko?"이 페이지의 수치는 로드된 데이터에서 실시간으로 계산됩니다.":"The figures on this page are computed live from the loaded data.")}`;
+}
+
 /* ---------- Prop Firms list ---------- */
 function renderFirms(){
   const agg={};
@@ -2719,13 +2884,14 @@ function renderRules(){
       <td>${cell(o.cp)}</td><td>${cell(o.wk)}</td><td>${cell(o.kr)}</td><td>${cell(o.m5)}</td>
       <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
     </tr>`).join("");
+  if(el("foot2")) el("foot2").innerHTML=t("foot");
   if(el("rPfm")) el("rPfm").innerHTML=pfmRulesBlock();
   if(el("rChanges")) el("rChanges").innerHTML=changesBlock();
   el("rulesBody").querySelectorAll("tr[data-firm]").forEach(tr=>tr.onclick=()=>{
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
@@ -2742,7 +2908,7 @@ function route(){
   if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else if(!isCh) setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
@@ -2751,6 +2917,7 @@ function route(){
   else if(page==="offers") renderOffers();
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
+  else if(page==="method") renderMethod();
   else if(page==="discover") renderDiscover();
   else if(page==="challenge") renderChallenge(decodeURIComponent(h.slice(10)));
   else if(page==="challenges"){ if(_q>=0) render(); }
