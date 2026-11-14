@@ -106,6 +106,8 @@
   .fgroup[open] summary{color:var(--ink)}
   .fgroup .body{padding:8px 0 2px;display:flex;flex-direction:column;gap:1px;max-height:230px;overflow:auto}
   .frow{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--ink2)}
+  .frow:hover,.frow:hover *,.opt:hover,.chips2 button:hover,.tsrow:hover,.tsrow:hover *,
+  .fgroup summary:hover,.fgroup summary:hover *{color:var(--accent)}
   .frow:hover{background:var(--panel2);color:var(--ink)}
   .frow input{accent-color:var(--pink);width:14px;height:14px;cursor:pointer;flex:none}
   .frow .n{margin-left:auto;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -668,7 +670,7 @@ let theme = localStorage.getItem("helix-theme") || "dark";
 let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="", offersFilter="all",
      colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,1,1,1,1,1,1],
      dense=localStorage.getItem("helix-dense")==="1";
-const ALL_GROUPS=["firm","fee","mk","st","size","price","split","dd","flags","ver","cycle","target","days","lev","rating"];
+const ALL_GROUPS=["firm","mk","size","price","split","dd","st","cycle","flags","ver","target","days","lev","rating","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
 const picked = new Set();
 const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
@@ -1303,7 +1305,7 @@ el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags","cycle"].forEach(k=
   ["sizeMin","sizeMax","priceMax","splitMin"].forEach(k=>{F[k]=null;});
   q="";el("gq").value="";firmSearch="";render();};
 el("cGo").onclick=()=>{location.hash="#compare";route();};
-document.getElementById("cmpGo").onclick=()=>{location.hash="#compare";route();};
+{const _c=document.getElementById("cmpGo"); if(_c) _c.onclick=()=>{location.hash="#compare";route();};}
 ["st1","st3"].forEach(id=>{const a=document.getElementById(id); if(a) a.onclick=e=>{e.preventDefault();
   ["firm","mk","st","dd","vf","flags","cycle","fee"].forEach(k=>F[k].clear());
   F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null;
@@ -1864,6 +1866,7 @@ function cmpPresets(){
     .filter(([,l])=>l.length>=2);
 }
 function renderCompare(){
+ try{
   const arr=[...picked].map(id=>rows.find(r=>r.i===id)).filter(Boolean);
   const presets=cmpPresets();
   const slots=arr.map(r=>`<div class="slotcard">
@@ -1921,7 +1924,8 @@ function renderCompare(){
     const list=presets[Number(c.dataset.preset)][1];
     picked.clear(); list.forEach(r=>picked.add(r.i)); renderBar(); renderCompare();
   });
-  if(!arr.length) openPicker();
+  if(!arr.length && el("pickerHost")) openPicker();
+ }catch(err){ el("compareMain").innerHTML=`<div class="panel"><h3>${lang==="ko"?"비교를 불러오지 못했습니다":"Comparison failed"}</h3><p class="meta">${esc(String(err))}</p></div>`; }
   el("compareMain").querySelectorAll(".pickrow").forEach(x=>x.onclick=()=>{
     picked.add(x.dataset.id); renderBar(); renderCompare();
   });
@@ -2225,11 +2229,11 @@ document.querySelectorAll("#chMenu a").forEach(a=>a.onclick=e=>{
   }
   if(a.dataset.all){ e.preventDefault(); F.mk.clear(); location.hash="#challenges"; route(); render(); }
 });
-document.getElementById("fsetBtn").onclick=()=>{
+{const _fs=document.getElementById("fsetBtn"); if(_fs) _fs.onclick=()=>{
   const b=el("filterSettings");
   b.style.display = b.style.display==="none" ? "block" : "none";
   if(b.style.display==="block") buildFilterSettings();
-};
+};}
 document.querySelectorAll("#chMenu a").forEach(a=>{
   if(a.dataset.discover||a.dataset.cmp){ a.addEventListener("click",()=>{ location.hash="#challenges"; setTimeout(()=>openPicker(),300); }); }
 });
