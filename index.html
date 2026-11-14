@@ -24,6 +24,31 @@
     -webkit-font-smoothing:antialiased;word-break:keep-all}
   a{color:var(--blue)}
   .top{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .cats{display:flex;gap:2px;align-items:center}
+  .cats a{font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px}
+  .cats a:hover{color:var(--ink);background:var(--panel2)}
+  .cats a.off{opacity:.45;cursor:not-allowed}
+  .cats a.on{color:var(--ink);background:var(--panel2)}
+  .subnav{border-top:1px solid var(--line);background:var(--panel)}
+  .subnav .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;gap:2px;align-items:center;height:44px;overflow-x:auto}
+  .subnav a{font-size:12.5px;font-weight:700;color:var(--muted);text-decoration:none;padding:7px 12px;border-radius:9px;white-space:nowrap}
+  .subnav a:hover{color:var(--ink);background:var(--panel2)}
+  .subnav a.on{color:var(--ink);background:var(--panel2)}
+  .faq{margin-top:22px}
+  .faq h3{font-size:14px;margin:0 0 10px;font-weight:800}
+  .faq details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:8px}
+  .faq summary{cursor:pointer;font-size:13px;font-weight:700;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::before{content:"＋";color:var(--muted);margin-right:8px}
+  .faq details[open] summary::before{content:"－"}
+  .faq p{margin:9px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink2)}
+  .src{margin-top:20px;padding:12px 14px;border:1px dashed var(--line2);border-radius:11px;
+    font-size:11.5px;line-height:1.7;color:var(--muted)}
+  .src b{color:var(--ink2)}
+  .src a{color:var(--blue)}
+  .hero2{padding:26px 0 10px}
+  .hero2 h1{margin:0 0 8px;font-size:30px;letter-spacing:-.03em;font-weight:800}
+  .hero2 p{margin:0;color:var(--muted);font-size:13.5px;max-width:760px;line-height:1.65}
   .top .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:16px;height:64px}
   .brand{display:flex;align-items:center;gap:11px}
   .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));
@@ -252,7 +277,7 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules,#pageFirm{grid-template-columns:1fr}
+  #pageRules,#pageFirm,#pageHome,#pageOffers,#pagePayouts,#pageSpreads,#pageTools{grid-template-columns:1fr}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -270,17 +295,30 @@
 </style></head><body>
 
 <div class="top"><div class="in">
-  <div class="brand"><div class="mark">H</div><div><b>SilentFam Helix</b><span id="brandSub"></span></div></div>
-  <nav class="nav" id="nav">
-    <button data-page="challenges" class="on">Challenges</button>
-    <button data-page="rules">Rules</button>
+  <a href="#home" class="brand" style="text-decoration:none;color:inherit"><div class="mark">H</div><div><b>SilentFam Helix</b><span id="brandSub"></span></div></a>
+  <nav class="cats" id="cats">
+    <a href="#challenges" data-mk="cfd">Forex</a>
+    <a href="#challenges" data-mk="fut">Futures</a>
+    <a href="#challenges" data-mk="crypto">Crypto</a>
+    <a class="off" title="데이터 미수집" href="#challenges">Perps</a>
+    <a class="off" title="데이터 미수집" href="#challenges">Brokers</a>
   </nav>
   <div class="grow"></div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
   <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
   <button class="iconbtn" id="theme" title="theme">☾</button>
+</div>
+<div class="subnav"><div class="in" id="subnav">
+  <a href="#home" data-page="home">Home</a>
+  <a href="#offers" data-page="offers">Offers</a>
+  <a href="#challenges" data-page="challenges">Challenges</a>
+  <a href="#tools" data-page="tools">Trading Tools</a>
+  <a href="#rules" data-page="rules">Prop Firm Rules</a>
+  <a href="#spreads" data-page="spreads">Spreads</a>
+  <a href="#payouts" data-page="payouts">Payouts</a>
 </div></div>
+</div>
 
 <div class="shell" id="pageChallenges">
   <aside class="filters">
@@ -322,10 +360,16 @@
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
     <footer id="foot"></footer>
+    <div id="chFaq"></div>
   </main>
 </div>
 
 <div class="shell" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
+<div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
+<div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
+<div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
+<div class="shell" id="pageSpreads" style="display:none"><main id="spreadsMain"></main></div>
+<div class="shell" id="pageTools" style="display:none"><main id="toolsMain"></main></div>
 
 <div class="shell" id="pageRules" style="display:none">
   <main>
@@ -339,6 +383,7 @@
       </tr></thead><tbody id="rulesBody"></tbody></table>
     </div></div>
     <footer id="foot2"></footer>
+    <div id="rFaq"></div>
   </main>
 </div>
 
@@ -872,13 +917,13 @@ function applyStatics(){
   el("fDailyL").textContent=t("fDailyL");el("fMaxllL").textContent=t("fMaxllL");
   el("fSplitL").textContent=t("fSplitL");el("fDaysL").textContent=t("fDaysL");
   el("fLevL").textContent=t("fLevL");el("fCycleL").textContent=t("fCycleL");
-  el("nav").querySelector('[data-page="challenges"]').textContent=t("navCh");
-  el("nav").querySelector('[data-page="rules"]').textContent=t("navRules");
   el("rulesH1").textContent=t("rulesH1");el("rulesSub").textContent=t("rulesSub");
   el("rFirm").textContent=t("rFirm");el("rN").textContent=t("rN");el("rEa").textContent=t("fEa");
   el("rNews").textContent=t("fNews");el("rOn").textContent=t("fOn");el("rCp").textContent=t("fCp");
   el("rWk").textContent=t("fWk");el("rKr").textContent=t("fKorea");el("rM5").textContent="MT5";
-  el("rGrade").textContent=t("rGrade");el("foot2").innerHTML=t("foot");el("fSizeL").textContent=t("size");el("fPriceL").textContent=t("price");
+  el("rGrade").textContent=t("rGrade");el("foot2").innerHTML=t("foot");
+  if(el("rFaq")) el("rFaq").innerHTML=faqBlock(FAQ.rules)+
+    srcNote(lang==="ko"?"규칙 집계는 HELIX 상품 기록 기반입니다. 거래 전 업체 공식 규정을 확인하세요.":"Rule aggregates come from HELIX product records. Check the firm's official terms before trading.");el("fSizeL").textContent=t("size");el("fPriceL").textContent=t("price");
   el("priceUnit").textContent="USD";el("reset").textContent=t("reset");
   el("q").placeholder=t("search");el("empty").textContent=t("empty");
   el("thFirm").textContent=t("thFirm");el("thPlan").textContent=t("thPlan");el("thMkt").textContent=t("thMkt");
@@ -886,6 +931,8 @@ function applyStatics(){
   el("thDaily").textContent=t("thDaily");el("thMax").textContent=t("thMax");el("thTarget").textContent=t("thTarget");
   el("thDd").textContent=t("thDd");el("thEa").textContent=t("thEa");el("thVer").textContent=t("thVer");
   el("foot").innerHTML=t("foot");
+  if(el("chFaq")) el("chFaq").innerHTML=faqBlock(FAQ.challenges)+
+    srcNote(lang==="ko"?"상품 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product values are HELIX records; verify via the evidence links in each product.");
   document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
   renderBar();
 }
@@ -909,6 +956,183 @@ el("cmpmod").onclick=e=>{if(e.target.id==="cmpmod")el("cmpmod").classList.remove
 el("dClose").onclick=closeDrawer;el("scrim").onclick=closeDrawer;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");}});
 document.addEventListener("scroll",()=>hidePop(),true);
+
+/* ---------- shared page bits ---------- */
+const PFM_CODES={
+ "The5ers":{d:"10%",c:"MATCH"},"E8 Markets":{d:"15%",c:"MATCH"},"AquaFunded":{d:"25%",c:"MATCH"},
+ "Crypto Fund Trader":{d:"7%",c:"MATCH"},"Moneta Funded":{d:"50%",c:"MATCHFIRST"},
+ "Blueberry Funded":{d:"30%",c:"MATCH"},"Maven":{d:"10%",c:"MATCH"},"WSFunded":{d:"50%",c:"MATCH50"},
+ "Top One Trader":{d:"80%",c:"MATCH"},"Hola Prime":{d:"10%",c:"MATCH10"},"Fintokei":{d:"20%",c:"MATCH"},
+ "City Traders Imperium":{d:"15%",c:"MATCH"},"Atmos Funded":{d:"35%",c:"MATCH"},
+ "Funded Trading Plus":{d:"20%",c:"MATCHBOGOF"},"Instant Funding":{d:"40%",c:"MATCH40"},
+ "Leveraged":{d:"60%",c:"MATCH"},"BEM Funding":{d:"40%",c:"MATCH"},"ThinkCapital":{d:"20%",c:"MATCH"},
+ "RZR Funded":{d:"50%",c:"MATCH"},"The Trading Pit":{d:"40%",c:"MATCH"},"Lark Funding":{d:"5%",c:"MATCH"},
+ "Orion Funded":{d:"60%",c:"MATCH60"},"FundedNext":{d:"bulk",c:"MATCH"}
+};
+const FAQ={
+ home:[["이 데이터는 어디서 왔나요?","HELIX는 공식 사이트와 공개 자료를 상품 단위로 기록한 로컬 데이터베이스를 바탕으로 만들어졌습니다. 각 상품 상세의 ‘근거 · 출처 링크’에서 원문을 확인할 수 있습니다."],
+       ["미확인(unknown)은 무슨 뜻인가요?","아직 조사하지 않았다는 뜻입니다. 0도 아니고 허용도 아닙니다. 반드시 업체 공식 사이트에서 확인해야 합니다."],
+       ["검증 등급 A/B/C는 무엇인가요?","A는 1차 확인(공식 사이트 직접 확인), B는 2차·간접 자료, C는 추정입니다."]],
+ offers:[["MATCH 코드는 무엇인가요?","Prop Firm Match가 각 업체와 제휴해 제공하는 파트너 코드입니다. HELIX는 이를 참고용으로 함께 표기합니다."],
+         ["공식 프로모와 PFM 코드가 다르면?","둘 다 표기합니다. 업체 공식 코드는 ‘공식 코드’ 열에, PFM 파트너 코드는 ‘PFM 코드’ 열에 나옵니다. 결제 전 업체 결제창에서 최종 확인하세요."],
+         ["할인율은 언제 기준인가요?","PFM 파트너 할인율은 PFM offers 페이지(2026-11) 기준이며, 업체 프로모는 HELIX 기록 시점 기준입니다."]],
+ challenges:[["상품이 693개인데 왜 업체는 29개인가요?","한 업체가 여러 상품(계좌 규모 × 프로그램)을 운영하기 때문입니다. 한 행이 하나의 상품입니다."],
+             ["왜 어떤 상품은 금액이 비어 있나요?","해당 값을 아직 기록하지 못한 경우입니다. 0으로 채우지 않습니다."],
+             ["비교는 어떻게 하나요?","행에 마우스를 올리면 뜨는 카드에서 ‘비교에 추가’를 누르고 2개 이상 담으면 하단 바에서 나란히 비교할 수 있습니다."]],
+ rules:[["규칙 집계는 어떤 기준인가요?","상품 단위 기록을 회사별로 묶어 허용/조건부/혼합/불가/미확인으로 판정합니다."],
+        ["조건부와 혼합의 차이는?","조건부는 특정 조건에서만 허용된다는 기록이고, 혼합은 상품마다 기록이 서로 다른 경우입니다."],
+        ["규칙은 자주 바뀌나요?","네. 프랍펌 규칙은 자주 바뀌므로 거래 전 반드시 공식 규정을 확인하세요."]],
+ spreads:[["스프레드 데이터가 비어 있는 이유는?","아직 수집하지 않았습니다. PFM의 스프레드 표도 현재 MT5 기준 일부만 채워져 있습니다."],
+          ["언제 채워지나요?","업체별 MT5 스프레드 공개 자료를 수집한 뒤 자산군별로 표시할 예정입니다."]],
+ payouts:[["지급 주기는 어떻게 비교하나요?","프로그램별 지급 주기·첫 지급·최소 지급액을 회사 단위로 묶어 표시합니다."],
+          ["분배율이 여러 개인 경우는?","상품별 기록에서 가장 많이 나타난 값을 대표로 표시합니다. 정확한 조건은 상품 상세를 확인하세요."]],
+ tools:[["Trading Tools에는 무엇이 올라오나요?","SilentFam이 실제로 사용하는 도구를 순차적으로 공개할 예정입니다."],
+        ["지금 사용할 수 있는 것은?","HELIX 데이터베이스가 첫 번째 도구입니다."]],
+};
+function faqBlock(list){
+  return `<div class="faq"><h3>${lang==="ko"?"자주 묻는 질문":"FAQ"}</h3>` +
+    list.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("") + `</div>`;
+}
+function srcNote(extra){
+  return `<div class="src"><b>${lang==="ko"?"출처":"Source"}</b> ${extra}</div>`;
+}
+const PFM_SRC = lang==="ko"
+ ? `PFM 파트너 코드·할인율은 <a href="https://propfirmmatch.com/offers" target="_blank" rel="noopener">propfirmmatch.com/offers</a> (2026-11) 에서 가져왔습니다. 상품·수수료·규칙 수치는 HELIX 자체 기록입니다.`
+ : `PFM partner codes and discounts come from <a href="https://propfirmmatch.com/offers" target="_blank" rel="noopener">propfirmmatch.com/offers</a> (Nov 2026). Product, fee and rule values are HELIX records.`;
+
+/* ---------- Home ---------- */
+function renderHome(){
+  const promoFirms=[...new Set(rows.filter(r=>r.co||r.pt).map(r=>r.f))];
+  const graded=rows.filter(r=>r.vf==="A").length;
+  el("homeMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"프랍펌과 브로커를, 기록된 숫자로 비교하세요.":"Compare prop firms and brokers on recorded numbers."}</h1>
+      <p>${lang==="ko"?"상품 693개 · 브랜드 29개 · 자산군 5개. 참가비·낙폭·지급조건·규칙을 상품 단위로 기록하고, 근거 링크까지 함께 보관합니다.":"693 products · 29 brands · 5 assets. Fees, drawdown, payouts and rules recorded per product, with source links."}</p></div>
+    <div class="stats">
+      <div class="stat"><div class="n">${rows.length.toLocaleString('en-US')}</div><div class="l">${esc(t("rows"))}</div></div>
+      <div class="stat"><div class="n">${DB.firms.length}</div><div class="l">${esc(t("firms"))}</div></div>
+      <div class="stat"><div class="n">${promoFirms.length}</div><div class="l">${lang==="ko"?"프로모 진행 브랜드":"brands with promo"}</div></div>
+      <div class="stat"><div class="n">${graded}</div><div class="l">${lang==="ko"?"A등급 상품":"grade-A products"}</div></div>
+    </div>
+    <div class="panel"><h3>${lang==="ko"?"바로가기":"Jump to"} <span>pages</span></h3>
+      <div class="chips">
+        <a class="chip2" href="#offers" style="text-decoration:none;color:inherit">${lang==="ko"?"프로모 코드 모아보기":"All offers"}</a>
+        <a class="chip2" href="#challenges" style="text-decoration:none;color:inherit">${lang==="ko"?"챌린지 비교":"Challenges"}</a>
+        <a class="chip2" href="#rules" style="text-decoration:none;color:inherit">${lang==="ko"?"회사별 규칙":"Rules by firm"}</a>
+        <a class="chip2" href="#payouts" style="text-decoration:none;color:inherit">${lang==="ko"?"지급 조건":"Payouts"}</a>
+      </div></div>
+    ${faqBlock(FAQ.home)}
+    ${srcNote(lang==="ko"?"상품·수수료·규칙 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product, fee and rule values are HELIX records; check the evidence links in each product detail.")}`;
+}
+
+/* ---------- Offers ---------- */
+function renderOffers(){
+  const byFirm={};
+  rows.forEach(r=>{
+    if(!r.co&&!r.pt&&!PFM_CODES[r.f]) return;
+    const o=byFirm[r.f]||(byFirm[r.f]={code:null,text:null,exp:null,pfm:PFM_CODES[r.f]||null});
+    if(!o.code&&r.co) o.code=r.co;
+    if(!o.text&&(r.pt||r.po)) o.text=r.pt||r.po;
+    if(!o.exp&&r.px) o.exp=r.px;
+  });
+  const list=Object.entries(byFirm).sort((a,b)=>a[0].localeCompare(b[0]));
+  const withPfm=list.filter(([,o])=>o.pfm).length;
+  el("offersMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"프로모 코드 한눈에 보기":"All current offers"}</h1>
+      <p>${lang==="ko"?`${list.length}개 브랜드의 프로모션을 모았습니다. 공식 코드와 PFM 파트너 코드를 나란히 표기합니다.`:`${list.length} brands. Official codes and PFM partner codes side by side.`}</p></div>
+    <div class="stats">
+      <div class="stat"><div class="n">${list.length}</div><div class="l">${lang==="ko"?"프로모 브랜드":"promo brands"}</div></div>
+      <div class="stat"><div class="n">${list.filter(([,o])=>o.code).length}</div><div class="l">${lang==="ko"?"공식 코드 기록":"official codes"}</div></div>
+      <div class="stat"><div class="n">${withPfm}</div><div class="l">PFM ${lang==="ko"?"파트너 코드":"partner codes"}</div></div>
+      <div class="stat"><div class="n">${list.filter(([,o])=>o.exp).length}</div><div class="l">${lang==="ko"?"만료일 기록":"with expiry"}</div></div>
+    </div>
+    <div class="card"><div class="scroll" style="max-height:calc(100vh - 340px)">
+      <table class="fx" style="min-width:920px"><thead><tr>
+        <th>${lang==="ko"?"브랜드":"Brand"}</th><th>${lang==="ko"?"공식 코드":"Official code"}</th>
+        <th>${lang==="ko"?"할인 내용":"Discount"}</th><th>${lang==="ko"?"만료":"Expiry"}</th>
+        <th>PFM ${lang==="ko"?"코드":"code"}</th><th>PFM ${lang==="ko"?"할인":"discount"}</th><th></th>
+      </tr></thead><tbody>${list.map(([f,o])=>`<tr>
+        <td class="firm"><a href="#firm/${encodeURIComponent(f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(f)}</a></td>
+        <td>${o.code?`<span class="code" style="font-size:12px;padding:3px 8px">${esc(o.code)}</span>`:'<span class="dim">—</span>'}</td>
+        <td style="white-space:normal;max-width:280px">${o.text?esc(o.text):'<span class="dim">—</span>'}</td>
+        <td>${o.exp?expiryChip(o.exp):'<span class="dim">—</span>'}</td>
+        <td>${o.pfm?`<span class="code" style="font-size:12px;padding:3px 8px;border-color:var(--line2)">${esc(o.pfm.c)}</span>`:'<span class="dim">—</span>'}</td>
+        <td>${o.pfm?`<b>${esc(o.pfm.d)}</b>`:'<span class="dim">—</span>'}</td>
+        <td><a href="#challenges" onclick="window.__firmFilter='${esc(f)}'" style="font-size:12px">${lang==="ko"?"상품 보기":"Products"}</a></td>
+      </tr>`).join("")}</tbody></table></div></div>
+    ${faqBlock(FAQ.offers)}
+    ${srcNote(PFM_SRC)}`;
+  el("offersMain").querySelectorAll('a[onclick]').forEach(a=>a.onclick=()=>{
+    F.firm.clear(); F.firm.add(a.getAttribute("onclick").split("'")[1]);
+  });
+}
+
+/* ---------- Payouts ---------- */
+function renderPayouts(){
+  const agg={};
+  rows.forEach(r=>{
+    const o=agg[r.f]||(agg[r.f]={n:0,sp:{},pc:{},pf:null,ym:null,yk:null});
+    o.n++;
+    if(r.sp!=null) o.sp[r.sp]=(o.sp[r.sp]||0)+1;
+    if(r.pc) o.pc[r.pc]=(o.pc[r.pc]||0)+1;
+    if(!o.pf&&r.pf) o.pf=r.pf;
+    if(o.ym==null&&r.ym!=null) o.ym=r.ym;
+    if(o.yk==null&&r.yk!=null) o.yk=r.yk;
+  });
+  const mode=o=>{const e=Object.entries(o).sort((a,b)=>b[1]-a[1])[0];return e?e[0]:null;};
+  const list=Object.entries(agg).map(([f,o])=>({f,n:o.n,sp:mode(o.sp),pc:mode(o.pc),pf:o.pf,ym:o.ym,yk:o.yk}))
+    .sort((a,b)=>(Number(b.sp)||0)-(Number(a.sp)||0));
+  el("payoutsMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"지급 조건 비교":"Payout comparison"}</h1>
+      <p>${lang==="ko"?"회사별 수익 분배·지급 주기·첫 지급·최소 지급액·상한을 상품 기록에서 집계했습니다.":"Profit split, cycle, first payout, minimum and cap aggregated from product records."}</p></div>
+    <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
+      <table class="fx" style="min-width:860px"><thead><tr>
+        <th>${lang==="ko"?"회사":"Firm"}</th><th class="num">${lang==="ko"?"상품":"Products"}</th>
+        <th>${esc(t("cSplit"))}</th><th>${esc(t("cCycle"))}</th><th>${esc(t("cFirst"))}</th>
+        <th class="num">${esc(t("cMinPay"))}</th><th class="num">${esc(t("cCap"))}</th>
+      </tr></thead><tbody>${list.map(o=>`<tr>
+        <td class="firm"><a href="#firm/${encodeURIComponent(o.f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.f)}</a></td>
+        <td class="num">${o.n}</td>
+        <td>${o.sp?`<b>${esc(o.sp)}%</b>`:'<span class="dim">—</span>'}</td>
+        <td>${o.pc?esc(o.pc):'<span class="dim">—</span>'}</td>
+        <td>${o.pf?esc(o.pf):'<span class="dim">—</span>'}</td>
+        <td class="num">${o.ym!=null?money(o.ym,"USD"):'<span class="dim">—</span>'}</td>
+        <td class="num">${o.yk!=null?(o.yk===0?'<span class="dim">무제한</span>':money(o.yk,"USD")):'<span class="dim">—</span>'}</td>
+      </tr>`).join("")}</tbody></table></div></div>
+    ${faqBlock(FAQ.payouts)}
+    ${srcNote(lang==="ko"?"값은 HELIX 상품 기록에서 회사별 최빈값으로 집계했습니다. 정확한 조건은 상품 상세를 확인하세요.":"Values are the most frequent per-firm record in HELIX. Check product details for exact terms.")}`;
+}
+
+/* ---------- Spreads ---------- */
+function renderSpreads(){
+  el("spreadsMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"스프레드 비교":"Prop firm spreads"}</h1>
+      <p>${lang==="ko"?"업체별 EUR/USD · USD/JPY · GBP/USD · XAU/USD · US30 · BTC/USD 스프레드.":"Per-firm spreads across major symbols."}</p></div>
+    <div class="panel"><h3>${lang==="ko"?"아직 수집되지 않음":"Not collected yet"} <span>0 / ${DB.firms.length}</span></h3>
+      <div class="empty-inline">${lang==="ko"
+        ?"스프레드 데이터는 아직 수집하지 않았습니다. 업체별 MT5 스프레드 공개 자료를 확보한 뒤 자산군별로 표시할 예정입니다. 빈칸을 추정값으로 채우지 않습니다."
+        :"Spread data has not been collected. Once per-firm MT5 spread references are gathered, they will be shown by asset class. No estimates are filled in."}</div></div>
+    ${faqBlock(FAQ.spreads)}
+    ${srcNote(lang==="ko"?"스프레드는 계좌 유형·시간대·유동성에 따라 달라집니다. 표시되더라도 참고값으로만 사용하세요.":"Spreads vary by account type, session and liquidity. Treat any figure as indicative.")}`;
+}
+
+/* ---------- Tools ---------- */
+function renderTools(){
+  const tools=[
+    {n:"HELIX",d:lang==="ko"?"이 데이터베이스. 프랍펌·브로커 비교 및 근거 추적.":"This database. Prop firm comparison with evidence trails.",s:"live",u:"#home"},
+    {n:"MT5 Tools",d:lang==="ko"?"주문·리스크 관리 보조 스크립트.":"Order and risk helper scripts.",s:"planned"},
+    {n:"SQX Configs",d:lang==="ko"?"StrategyQuant X 빌더 설정 템플릿.":"StrategyQuant X builder templates.",s:"planned"},
+    {n:"Risk Calculator",d:lang==="ko"?"계좌 규모·낙폭 기준 포지션 크기 계산.":"Position sizing against account size and drawdown.",s:"planned"}
+  ];
+  el("toolsMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"SilentFam Trading Tools":"SilentFam Trading Tools"}</h1>
+      <p>${lang==="ko"?"우리가 실제로 쓰는 도구를 이곳에 올립니다. 준비된 것부터 순차 공개합니다.":"The tools we actually use, published as they are ready."}</p></div>
+    <div class="grid2">${tools.map(x=>`<div class="panel"><h3>${esc(x.n)} <span>${x.s==="live"?(lang==="ko"?"사용 가능":"live"):(lang==="ko"?"예정":"planned")}</span></h3>
+      <div class="empty-inline">${esc(x.d)}</div>
+      ${x.u?`<div style="margin-top:10px"><a class="btn g" href="${x.u}" style="text-decoration:none">${lang==="ko"?"열기":"Open"}</a></div>`:""}
+    </div>`).join("")}</div>
+    ${faqBlock(FAQ.tools)}
+    ${srcNote(lang==="ko"?"도구는 SilentFam 내부 사용 목적으로 개발되며, 공개 시점에 별도 안내합니다.":"Tools are built for internal SilentFam use and announced when public.")}`;
+}
 
 /* ---------- firm detail page (PFM-style) ---------- */
 const modeOf=arr=>{const c={};arr.forEach(v=>{if(v!=null&&v!=="")c[v]=(c[v]||0)+1;});
@@ -1055,7 +1279,7 @@ function renderFirm(name){
 
     <div class="panel"><h3>${lang==="ko"?"기록되지 않은 항목":"Not recorded"}</h3>
       <div class="empty-inline">${lang==="ko"
-        ?"수수료(로트당 커미션)·공지사항·리뷰 점수 분포는 아직 수집되지 않았습니다. PFM 페이지에는 있으나 HELIX 데이터에는 없으므로 비워 둡니다."
+        ?"수수료(랏당 커미션)·공지사항·리뷰 점수 분포는 아직 수집되지 않았습니다. PFM 페이지에는 있으나 HELIX 데이터에는 없으므로 비워 둡니다."
         :"Commissions per lot, announcements and review distribution are not collected yet. They exist on the PFM page but not in HELIX data, so they stay empty."}</div>
     </div>
 
@@ -1106,21 +1330,32 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
+const PAGES={home:"pageHome",offers:"pageOffers",challenges:"pageChallenges",tools:"pageTools",
+             rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
-  const h=(location.hash||"").replace(/^#/,"");
-  const isRules=h.startsWith("rules"), isFirm=h.startsWith("firm/");
-  el("pageChallenges").style.display=(!isRules&&!isFirm)?"grid":"none";
-  el("pageRules").style.display=isRules?"grid":"none";
+  const h=(location.hash||"").replace(/^#/,"")||"home";
+  const isFirm=h.startsWith("firm/");
+  const page=isFirm?"challenges":(PAGES[h]?h:"challenges");
+  Object.entries(PAGES).forEach(([k,id])=>{ el(id).style.display=(k===page)?"grid":"none"; });
   el("pageFirm").style.display=isFirm?"grid":"none";
-  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",(b.dataset.page==="rules")===isRules));
-  if(isRules) renderRules();
+  document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
   if(isFirm) renderFirm(decodeURIComponent(h.slice(5)));
+  else if(page==="home") renderHome();
+  else if(page==="offers") renderOffers();
+  else if(page==="payouts") renderPayouts();
+  else if(page==="spreads") renderSpreads();
+  else if(page==="tools") renderTools();
+  else if(page==="rules") renderRules();
+  window.scrollTo({top:0,behavior:"instant"});
 }
-document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{
-  location.hash="#"+b.dataset.page; route();
-});
 window.addEventListener("hashchange",route);
 
+document.querySelectorAll("#cats a").forEach(a=>a.onclick=e=>{
+  if(a.classList.contains("off")){e.preventDefault();return;}
+  e.preventDefault();
+  F.mk.clear(); F.mk.add(a.dataset.mk);
+  location.hash="#challenges"; route(); render();
+});
 applyTheme();applyStatics();render();route();
 </script>
 </body></html>
