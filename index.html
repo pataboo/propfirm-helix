@@ -24,6 +24,30 @@
     -webkit-font-smoothing:antialiased;word-break:keep-all}
   a{color:var(--blue)}
   .top{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .hsearch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line2);
+    border-radius:9999px;padding:7px 14px;min-width:240px;max-width:420px;flex:1}
+  .hsearch input{border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;width:100%}
+  .hsearch input::placeholder{color:var(--muted)}
+  .fpanel{display:flex;flex-direction:column;gap:2px}
+  .fgroup{border-bottom:1px solid var(--line);padding:9px 0}
+  .fgroup:last-child{border-bottom:0}
+  .fgroup summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted);padding:2px 0}
+  .fgroup summary::-webkit-details-marker{display:none}
+  .fgroup summary::after{content:"▾";margin-left:auto;font-size:9px;opacity:.7}
+  .fgroup[open] summary{color:var(--ink)}
+  .fgroup .body{padding:8px 0 2px;display:flex;flex-direction:column;gap:1px;max-height:230px;overflow:auto}
+  .frow{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--ink2)}
+  .frow:hover{background:var(--panel2);color:var(--ink)}
+  .frow input{accent-color:var(--pink);width:14px;height:14px;cursor:pointer;flex:none}
+  .frow .n{margin-left:auto;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .frow.on{color:var(--ink);font-weight:700}
+  .fsearch{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
+    color:var(--ink);font:inherit;font-size:12px;padding:6px 9px;margin-bottom:6px}
+  .chips2{display:flex;flex-wrap:wrap;gap:6px;padding-top:2px}
+  .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
+    background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .chips2 button.on{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
   .cats{display:flex;gap:2px;align-items:center}
   .cats a{font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px}
   .cats a:hover{color:var(--ink);background:var(--panel2)}
@@ -303,6 +327,7 @@
     <a class="off" title="데이터 미수집" href="#challenges">Perps</a>
     <a class="off" title="데이터 미수집" href="#challenges">Brokers</a>
   </nav>
+  <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
   <div class="grow"></div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
@@ -323,20 +348,7 @@
 <div class="shell" id="pageChallenges">
   <aside class="filters">
     <h3 id="fTitle"></h3>
-    <div class="fg"><label id="fFirmL"></label><div class="opts" id="fFirms"></div></div>
-    <div class="fg"><label id="fMktL"></label><div class="opts" id="fMkts"></div></div>
-    <div class="fg"><label id="fStepL"></label><div class="opts" id="fSteps"></div></div>
-    <div class="fg"><label id="fDdL"></label><div class="opts" id="fDd"></div></div>
-    <div class="fg"><label id="fVerL"></label><div class="opts" id="fVer"></div></div>
-    <div class="fg"><label id="fFlagL"></label><div class="opts" id="fFlags"></div></div>
-    <div class="fg"><label id="fSizeL"></label><div class="range"><input id="sizeMin" type="number"><span>–</span><input id="sizeMax" type="number"></div></div>
-    <div class="fg"><label id="fPriceL"></label><div class="range"><input id="priceMax" type="number"><span id="priceUnit"></span></div></div>
-    <div class="fg"><label id="fDailyL"></label><div class="range"><input id="dailyMax" type="number"><span>%</span></div></div>
-    <div class="fg"><label id="fMaxllL"></label><div class="range"><input id="maxlossMax" type="number"><span>%</span></div></div>
-    <div class="fg"><label id="fSplitL"></label><div class="range"><input id="splitMin" type="number"><span>%</span></div></div>
-    <div class="fg"><label id="fDaysL"></label><div class="range"><input id="daysMax" type="number"><span>d</span></div></div>
-    <div class="fg"><label id="fLevL"></label><div class="range"><input id="levMin" type="number"><span>:1</span></div></div>
-    <div class="fg"><label id="fCycleL"></label><div class="opts" id="fCycle"></div></div>
+    <div class="fpanel" id="filterPanel"></div>
     <button class="reset" id="reset"></button>
   </aside>
 
@@ -348,8 +360,6 @@
       <div class="stat"><div class="n" id="s3">—</div><div class="l" id="s3l"></div></div>
       <div class="stat"><div class="n" id="s4">—</div><div class="l" id="s4l"></div></div>
     </div>
-    <div class="searchrow"><label class="search"><span class="dim">⌕</span><input id="q" autocomplete="off"></label>
-      </div>
     <div class="resbar" id="resbar"></div>
     <div class="card"><div class="scroll"><table><thead><tr>
       <th data-sort="f" id="thFirm"></th><th data-sort="p" id="thPlan"></th><th data-sort="mk" id="thMkt"></th>
@@ -420,8 +430,8 @@ const ASSET_TIP = {ko:"Synthetic — 업체가 자체 산출하는 합성 지수
 const I18N = {
  ko:{
   brandSub:"프랍펌 및 브로커 데이터베이스",
-  h1:"프랍펌과 브로커를 한 화면에서 비교하세요.",
-  sub:"행에 마우스를 올리면 빠른 비교, 클릭하면 근거 링크까지 담긴 상세가 열립니다.",
+  h1:"Discover Challenges",
+  sub:"왼쪽 필터로 좁히고, 행을 클릭하면 근거 링크까지 담긴 상세가 열립니다. 마우스를 올리면 빠른 비교가 뜹니다.",
   rows:"개 상품", firms:"개 브랜드",
   s1:"상품", s2:"브랜드", s3:"자산군", s4:"검증 A등급",
   search:"회사 · 상품 검색…", filters:"필터", firm:"회사", mkt:"자산군", step:"단계", ddF:"낙폭 방식",
@@ -461,7 +471,7 @@ const I18N = {
   evHow:"근거는 상품을 기록할 때 확인한 출처입니다. 링크를 열어 원문에서 다시 확인하세요.",
   popAdd:"비교에 추가", popOpen:"상세 보기", popFull:"이미 추가됨",
   cbarL:"비교", cbarClear:"초기화", cbarGo:"비교하기", cbarPick:"2개 이상 선택",
-  cmpTitle:"나란히 비교", cmpDiff:"다른 항목만 강조됩니다.",
+  cmpTitle:"Compare Challenges", cmpDiff:"다른 항목만 강조됩니다.",
   fFirm:"회사", fPlan:"상품", fSize:"계좌 규모", fPrice:"참가비", fAct:"활성화", fTotal:"총비용",
   fSplit:"수익 분배", fDaily:"일일 손실", fMax:"최대 손실", fTarget:"목표", fDd:"낙폭 방식",
   fLev:"레버리지", fSteps:"방식", fDays:"최소 거래일", fCycle:"지급 주기", fEa:"EA", fNews:"뉴스",
@@ -470,8 +480,8 @@ const I18N = {
  },
  en:{
   brandSub:"Prop firm & broker database",
-  h1:"Compare prop firms and brokers in one place.",
-  sub:"Hover a row for a quick compare, click for the full detail with source links.",
+  h1:"Discover Challenges",
+  sub:"Narrow with the left filters; click a row for the full detail with source links. Hover for a quick compare.",
   rows:"products", firms:"brands",
   s1:"Products", s2:"Brands", s3:"Assets", s4:"Grade-A verified",
   search:"Search firm, product…", filters:"Filters", firm:"Firm", mkt:"Asset", step:"Step", ddF:"Drawdown",
@@ -617,19 +627,66 @@ function chipRow(host,values,set,labelFn){
     b.className="opt"+(set.has(v)?" on":""); b.textContent=labelFn?labelFn(v):v;
     b.onclick=()=>{set.has(v)?set.delete(v):set.add(v);render();}; host.appendChild(b);});
 }
+let firmSearch="";
+const OPEN={firm:true,mk:false,st:false,size:true,price:false,split:false,dd:false,flags:true,ver:false,cycle:false};
+const rowCount=(pred)=>rows.filter(pred).length;
+function chk(label, checked, k, v, count){
+  return `<label class="frow ${checked?"on":""}"><input type="checkbox" data-k="${k}" data-v="${esc(v)}" ${checked?"checked":""}><span>${esc(label)}</span>${count!=null?`<span class="n">${count}</span>`:""}</label>`;
+}
 function buildFilters(){
-  chipRow(el("fFirms"),DB.firms,F.firm);
-  chipRow(el("fMkts"),DB.mkts,F.mk,v=>assetLabel(v));
-  chipRow(el("fSteps"),DB.steps.concat(["—"]).filter((v,i,a)=>a.indexOf(v)===i),F.st,v=>enumv(v)||"—");
-  chipRow(el("fDd"),DB.dd,F.dd);
-  chipRow(el("fVer"),DB.tiers,F.vf);
-  const cycles=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
-  chipRow(el("fCycle"),cycles,F.cycle);
-  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["korea","fKorea"],["on","fOn"],["cp","fCp"],["wk","fWk"]];
-  const host=el("fFlags"); host.innerHTML="";
-  flags.forEach(([k,lab])=>{const b=document.createElement("button");
-    b.className="opt"+(F.flags.has(k)?" on":""); b.textContent=t(lab);
-    b.onclick=()=>{F.flags.has(k)?F.flags.delete(k):F.flags.add(k);render();}; host.appendChild(b);});
+  const host=el("filterPanel"); if(!host) return;
+  const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
+  const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
+  const parts=[];
+  parts.push(`<details class="fgroup" data-g="firm" ${OPEN.firm?"open":""}><summary>${esc(t("firm"))}</summary><div class="body">
+    <input class="fsearch" id="firmSearch" placeholder="${esc(lang==="ko"?"회사 검색":"search firm")}" value="${esc(firmSearch)}">
+    ${gf.map(f=>chk(f,F.firm.has(f),"firm",f,rowCount(r=>r.f===f))).join("")}</div></details>`);
+  parts.push(`<details class="fgroup" data-g="mk" ${OPEN.mk?"open":""}><summary>${esc(t("mkt"))}</summary><div class="body">
+    ${DB.mkts.map(m=>chk(assetLabel(m),F.mk.has(m),"mk",m,rowCount(r=>r.mk===m))).join("")}</div></details>`);
+  parts.push(`<details class="fgroup" data-g="st" ${OPEN.st?"open":""}><summary>${esc(t("step"))}</summary><div class="body">
+    ${[...new Set(rows.map(r=>r.st).filter(Boolean))].map(v=>chk(enumv(v)||v,F.st.has(v),"st",v,rowCount(r=>r.st===v))).join("")}</div></details>`);
+  const SIZES=[[0,25000,"≤ 25K"],[25000,50000,"25–50K"],[50000,100000,"50–100K"],[100000,null,"100K+"]];
+  parts.push(`<details class="fgroup" data-g="size" ${OPEN.size?"open":""}><summary>${esc(t("size"))}</summary><div class="body"><div class="chips2">
+    ${SIZES.map(([lo,hi,lb])=>`<button data-size="${lo}-${hi==null?"":hi}" class="${F.sizeMin===lo&&F.sizeMax===(hi??null)?"on":""}">${lb}</button>`).join("")}</div></div></details>`);
+  const FEES=[[null,100,"≤ $100"],[null,300,"≤ $300"],[null,600,"≤ $600"]];
+  parts.push(`<details class="fgroup" data-g="price" ${OPEN.price?"open":""}><summary>${esc(t("price"))}</summary><div class="body"><div class="chips2">
+    ${FEES.map(([,mx,lb])=>`<button data-fee="${mx}" class="${F.priceMax===mx?"on":""}">${lb}</button>`).join("")}</div></div></details>`);
+  parts.push(`<details class="fgroup" data-g="split" ${OPEN.split?"open":""}><summary>${esc(t("fSplit"))}</summary><div class="body"><div class="chips2">
+    ${[80,85,90,95].map(v=>`<button data-split="${v}" class="${F.splitMin===v?"on":""}">≥ ${v}%</button>`).join("")}</div></div></details>`);
+  parts.push(`<details class="fgroup" data-g="dd" ${OPEN.dd?"open":""}><summary>${esc(t("ddF"))}</summary><div class="body">
+    ${DB.dd.map(v=>chk(v,F.dd.has(v),"dd",v,rowCount(r=>r.dd===v))).join("")}</div></details>`);
+  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"]];
+  parts.push(`<details class="fgroup" data-g="flags" ${OPEN.flags?"open":""}><summary>${esc(t("flags"))}</summary><div class="body">
+    ${flags.map(([k,lab])=>chk(t(lab),F.flags.has(k),"flags",k)).join("")}</div></details>`);
+  parts.push(`<details class="fgroup" data-g="ver" ${OPEN.ver?"open":""}><summary>${esc(t("ver"))}</summary><div class="body">
+    ${DB.tiers.map(v=>chk(t("grade")+" "+v,F.vf.has(v),"vf",v,rowCount(r=>r.vf===v))).join("")}</div></details>`);
+  parts.push(`<details class="fgroup" data-g="cycle" ${OPEN.cycle?"open":""}><summary>${esc(t("fCycleL"))}</summary><div class="body">
+    ${cyc.map(v=>chk(v,F.cycle.has(v),"cycle",v,rowCount(r=>r.pc===v))).join("")}</div></details>`);
+  host.innerHTML=parts.join("");
+
+  host.querySelectorAll(".fgroup").forEach(d=>d.ontoggle=()=>{OPEN[d.dataset.g]=d.open;});
+  const fs=el("firmSearch");
+  if(fs){ fs.oninput=()=>{ firmSearch=fs.value; const sel=F.firm;
+      const body=fs.closest(".body"); const pos=fs.selectionStart;
+      buildFilters();
+      const nf=el("firmSearch"); if(nf){ nf.focus(); nf.setSelectionRange(pos,pos); } }; }
+  host.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.onchange=()=>{
+    const k=cb.dataset.k, v=cb.dataset.v;
+    if(cb.checked) F[k].add(v); else F[k].delete(v);
+    render();
+  });
+  host.querySelectorAll("button[data-size]").forEach(b=>b.onclick=()=>{
+    const [lo,hi]=b.dataset.size.split("-");
+    const on=F.sizeMin===Number(lo)&&F.sizeMax===(hi===""?null:Number(hi));
+    F.sizeMin=on?null:Number(lo); F.sizeMax=on?null:(hi===""?null:Number(hi));
+    render();
+  });
+  host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
+    const v=Number(b.dataset.fee); F.priceMax = F.priceMax===v?null:v; render();
+  });
+  host.querySelectorAll("button[data-split]").forEach(b=>b.onclick=()=>{
+    const v=Number(b.dataset.split); F.splitMin = F.splitMin===v?null:v; render();
+  });
 }
 function render(){
   const out=rows.filter(matches).sort((a,b)=>{
@@ -672,10 +729,13 @@ function render(){
   F.vf.forEach(v=>pushChip(t("grade")+" "+v,"vf:"+v));
   F.cycle.forEach(v=>pushChip(v,"cycle:"+v));
   F.flags.forEach(v=>pushChip(v==="promo"?t("fPromo"):t("f"+v.charAt(0).toUpperCase()+v.slice(1)).replace("f",""),"flags:"+v));
-  [["sizeMin","≥"+F.sizeMin],["sizeMax","≤"+F.sizeMax],["priceMax","≤$"+F.priceMax],
-   ["dailyMax","DL≤"+F.dailyMax+"%"],["maxlossMax","ML≤"+F.maxlossMax+"%"],
-   ["splitMin","Split≥"+F.splitMin+"%"],["daysMax","Days≤"+F.daysMax],["levMin","Lev≥"+F.levMin]]
-   .forEach(([k,lb])=>{ if(F[k]!=null) pushChip(lb,k); });
+  const SIZE_LBL={"0-25000":"≤ 25K","25000-50000":"25–50K","50000-100000":"50–100K","100000-null":"100K+"};
+  if(F.sizeMin!=null||F.sizeMax!=null){
+    const key=`${F.sizeMin}-${F.sizeMax}`;
+    pushChip(SIZE_LBL[key]||`${F.sizeMin??""}–${F.sizeMax??""}`,"size");
+  }
+  if(F.priceMax!=null) pushChip("≤ $"+F.priceMax,"priceMax");
+  if(F.splitMin!=null) pushChip("Split≥"+F.splitMin+"%","splitMin");
   if(q) pushChip("“"+q+"”","q");
   el("resbar").innerHTML =
     `<span class="big">${out.length.toLocaleString('en-US')}<span>${esc(t("resFound"))}</span></span>`+
@@ -684,8 +744,9 @@ function render(){
       `<button class="fchip" id="clrAll" style="cursor:pointer">${esc(t("clearAll"))}</button>`:"");
   el("resbar").querySelectorAll("[data-clr]").forEach(b=>b.onclick=()=>{
     const k=b.dataset.clr;
-    if(k==="q"){q="";el("q").value="";}
+    if(k==="q"){q="";el("gq").value="";}
     else if(k.includes(":")){const [g,v]=k.split(":");F[g].delete(v);}
+    else if(k==="size"){F.sizeMin=null;F.sizeMax=null;}
     else F[k]=null;
     render();});
   const ca=el("clrAll"); if(ca) ca.onclick=()=>el("reset").click();
@@ -911,25 +972,10 @@ function applyStatics(){
   el("s1").textContent=rows.length.toLocaleString('en-US');el("s2").textContent=DB.firms.length;
   el("s3").textContent=DB.mkts.length;
   el("s1l").textContent=t("s1");el("s2l").textContent=t("s2");el("s3l").textContent=t("s3");el("s4l").textContent=t("s4");
-  el("fTitle").textContent=t("filters");el("fFirmL").textContent=t("firm");el("fMktL").textContent=t("mkt");
-  el("fStepL").textContent=t("step");el("fDdL").textContent=t("ddF");el("fVerL").textContent=t("ver");
-  el("fFlagL").textContent=t("flags");
-  el("fDailyL").textContent=t("fDailyL");el("fMaxllL").textContent=t("fMaxllL");
-  el("fSplitL").textContent=t("fSplitL");el("fDaysL").textContent=t("fDaysL");
-  el("fLevL").textContent=t("fLevL");el("fCycleL").textContent=t("fCycleL");
-  el("rulesH1").textContent=t("rulesH1");el("rulesSub").textContent=t("rulesSub");
-  el("rFirm").textContent=t("rFirm");el("rN").textContent=t("rN");el("rEa").textContent=t("fEa");
-  el("rNews").textContent=t("fNews");el("rOn").textContent=t("fOn");el("rCp").textContent=t("fCp");
-  el("rWk").textContent=t("fWk");el("rKr").textContent=t("fKorea");el("rM5").textContent="MT5";
-  el("rGrade").textContent=t("rGrade");el("foot2").innerHTML=t("foot");
-  if(el("rFaq")) el("rFaq").innerHTML=faqBlock(FAQ.rules)+
-    srcNote(lang==="ko"?"규칙 집계는 HELIX 상품 기록 기반입니다. 거래 전 업체 공식 규정을 확인하세요.":"Rule aggregates come from HELIX product records. Check the firm's official terms before trading.");el("fSizeL").textContent=t("size");el("fPriceL").textContent=t("price");
-  el("priceUnit").textContent="USD";el("reset").textContent=t("reset");
-  el("q").placeholder=t("search");el("empty").textContent=t("empty");
-  el("thFirm").textContent=t("thFirm");el("thPlan").textContent=t("thPlan");el("thMkt").textContent=t("thMkt");
-  el("thSize").textContent=t("thSize");el("thPrice").textContent=t("thPrice");el("thSplit").textContent=t("thSplit");
-  el("thDaily").textContent=t("thDaily");el("thMax").textContent=t("thMax");el("thTarget").textContent=t("thTarget");
-  el("thDd").textContent=t("thDd");el("thEa").textContent=t("thEa");el("thVer").textContent=t("thVer");
+  el("fTitle").textContent=t("filters");
+  el("reset").textContent=t("reset");
+  el("gq").placeholder=t("search"); el("empty").textContent=t("empty");
+  el("h1").textContent=t("h1"); el("sub").textContent=t("sub");
   el("foot").innerHTML=t("foot");
   if(el("chFaq")) el("chFaq").innerHTML=faqBlock(FAQ.challenges)+
     srcNote(lang==="ko"?"상품 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product values are HELIX records; verify via the evidence links in each product.");
@@ -940,15 +986,12 @@ el("theme").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setIte
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
   lang=b.dataset.lang;localStorage.setItem("helix-lang",lang);
   applyStatics();render();if(activeId)openDrawer(activeId);});
-el("q").addEventListener("input",e=>{q=e.target.value.toLowerCase().trim();render();});
+el("gq").addEventListener("input",e=>{q=e.target.value.toLowerCase().trim();render();});
 document.querySelectorAll("thead th[data-sort]").forEach(th=>th.onclick=()=>{
   const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();});
-["sizeMin","sizeMax","priceMax","dailyMax","maxlossMax","splitMin","daysMax","levMin"].forEach(id=>el(id).addEventListener("input",e=>{
-  const v=e.target.value===""?null:Number(e.target.value);
-  F[id]=v; render();}));
 el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags","cycle"].forEach(k=>F[k].clear());
-  ["sizeMin","sizeMax","priceMax","dailyMax","maxlossMax","splitMin","daysMax","levMin"].forEach(k=>{F[k]=null; if(el(k)) el(k).value="";});
-  q="";el("q").value="";render();};
+  ["sizeMin","sizeMax","priceMax","splitMin"].forEach(k=>{F[k]=null;});
+  q="";el("gq").value="";firmSearch="";render();};
 el("cGo").onclick=openCompare;
 el("cClear").onclick=()=>{picked.clear();renderBar();render();};
 el("cmpClose").onclick=()=>el("cmpmod").classList.remove("on");
