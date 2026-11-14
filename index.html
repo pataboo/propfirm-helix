@@ -90,6 +90,21 @@
   .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
   .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
+  .navpill{display:flex;align-items:center;gap:1px;margin:0 auto;padding:4px;
+    border-radius:9999px;border:1px solid rgba(167,139,250,.38);
+    background:linear-gradient(90deg,rgba(167,139,250,.16),rgba(167,139,250,.05) 45%,rgba(167,139,250,.16));
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.35), 0 0 22px rgba(167,139,250,.10)}
+  .navpill a{font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
+    padding:6px 13px;border-radius:9999px;white-space:nowrap;transition:.15s}
+  .navpill a:hover{color:var(--ink);background:rgba(167,139,250,.14)}
+  .navpill a.on{color:#0b0f10;background:linear-gradient(90deg,#bda8ff,#a78bfa);font-weight:700;
+    box-shadow:0 0 16px rgba(167,139,250,.4)}
+  .statlink{text-decoration:none;color:inherit;display:block;border-radius:12px;transition:.15s;
+    border:1px solid rgba(167,139,250,.22)}
+  .statlink:hover{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 24px rgba(167,139,250,.18)}
+  .statlink:hover .n{color:var(--accent)}
+  .statlink .go{font-size:10px;color:var(--accent);font-weight:700;opacity:0;transition:.15s}
+  .statlink:hover .go{opacity:1}
   .cats{display:flex;gap:2px;align-items:center}
   .cats a{font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px}
   .cats a:hover{color:var(--ink);background:var(--panel2)}
@@ -340,7 +355,7 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules,#pageFirm,#pageHome,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare{grid-template-columns:1fr}
+  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare{grid-template-columns:1fr}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -363,13 +378,16 @@
       <path d="M16.6 21.4c3-.5 5.3-2.4 6.2-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".5"/>
       <path d="M10.1 8.1v9.4M10.1 12.6h4.6M14.7 8.1v9.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     </svg><div><b class="wm">helix</b><span id="brandSub"></span></div></a>
-  <nav class="cats" id="cats">
-    <a href="#challenges" data-mk="cfd">Forex</a>
-    <a href="#challenges" data-mk="fut">Futures</a>
-    <a href="#challenges" data-mk="crypto">Crypto</a>
-    <a class="off" title="데이터 미수집" href="#challenges">Perps</a>
-    <a class="off" title="데이터 미수집" href="#challenges">Brokers</a>
-  </nav>
+  <div class="navpill" id="subnav">
+    <a href="#home" data-page="home">Home</a>
+    <a href="#offers" data-page="offers">Offers</a>
+    <a href="#challenges" data-page="challenges">Challenges</a>
+    <a href="#compare" data-page="compare">Compare</a>
+    <a href="#tools" data-page="tools">Tools</a>
+    <a href="#rules" data-page="rules">Rules</a>
+    <a href="#spreads" data-page="spreads">Spreads</a>
+    <a href="#payouts" data-page="payouts">Payouts</a>
+  </div>
   <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
   <div class="grow"></div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
@@ -377,15 +395,12 @@
   <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
   <button class="iconbtn" id="theme" title="theme">☾</button>
 </div>
-<div class="subnav"><div class="in" id="subnav">
-  <a href="#home" data-page="home">Home</a>
-  <a href="#offers" data-page="offers">Offers</a>
-  <a href="#challenges" data-page="challenges">Challenges</a>
-  <a href="#compare" data-page="compare">Compare</a>
-  <a href="#tools" data-page="tools">Trading Tools</a>
-  <a href="#rules" data-page="rules">Prop Firm Rules</a>
-  <a href="#spreads" data-page="spreads">Spreads</a>
-  <a href="#payouts" data-page="payouts">Payouts</a>
+<div class="subnav"><div class="in" id="cats">
+  <a href="#challenges" data-mk="cfd">Forex</a>
+  <a href="#challenges" data-mk="fut">Futures</a>
+  <a href="#challenges" data-mk="crypto">Crypto</a>
+  <a class="off" title="데이터 미수집" href="#challenges">Perps</a>
+  <a class="off" title="데이터 미수집" href="#challenges">Brokers</a>
 </div></div>
 </div>
 
@@ -427,6 +442,7 @@
 
 <div class="shell" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
 <div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
+<div class="shell" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
 <div class="shell" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
@@ -506,7 +522,7 @@ const I18N = {
   fPromo:"프로모 있음",
   fDailyL:"일일 손실 최대", fMaxllL:"최대 손실 최대", fSplitL:"분배 최소", fDaysL:"최소일수 최대",
   fLevL:"레버리지 최소", fCycleL:"지급 주기",
-  navCh:"챌린지", navRules:"규칙",
+  navCh:"챌린지", navRules:"규칙", navHome:"홈", navOffers:"프로모", navCmp:"비교", navTools:"툴", navSpreads:"스프레드", navPayouts:"지급",
   rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
   rFirm:"회사", rN:"상품", rGrade:"검증 등급",
   stYes:"허용", stNo:"불가", stMix:"혼합", stUnk:"미확인", stCond:"조건부",
@@ -556,7 +572,7 @@ const I18N = {
   fPromo:"Has promo",
   fDailyL:"Max daily loss", fMaxllL:"Max total loss", fSplitL:"Min split", fDaysL:"Max min-days",
   fLevL:"Min leverage", fCycleL:"Payout cycle",
-  navCh:"Challenges", navRules:"Rules",
+  navCh:"Challenges", navRules:"Rules", navHome:"Home", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
   rulesH1:"Rules across firms", rulesSub:"Click a firm to filter its challenges. Allowed / conditional / not allowed / unknown aggregated from per-product records.",
   rFirm:"Firm", rN:"Products", rGrade:"Grade",
   stYes:"Allowed", stNo:"Not allowed", stMix:"Mixed", stUnk:"Unknown", stCond:"Conditional",
@@ -788,8 +804,6 @@ function render(){
   }).join("");
   el("listView").querySelectorAll(".mcard").forEach(c=>{
     c.onclick=()=>openDrawer(c.dataset.id);
-    c.onmouseenter=ev=>showPop(c.dataset.id, ev.currentTarget, ev);
-    c.onmousemove=ev=>{ if(el('pop').classList.contains('on')) showPop(c.dataset.id, ev.currentTarget, ev); };
   });
   el("listView").style.display = view==="list" ? "flex" : "none";
   el("tableView").style.display = view==="table" ? "block" : "none";
@@ -811,8 +825,6 @@ function render(){
   }).join("");
   document.querySelectorAll("#tb tr").forEach(tr=>{
     tr.onclick=()=>openDrawer(tr.dataset.id);
-    tr.onmouseenter=ev=>showPop(tr.dataset.id, ev.currentTarget, ev);
-    tr.onmousemove=ev=>{ if(el('pop').classList.contains('on')) showPop(tr.dataset.id, ev.currentTarget, ev); };
     tr.onmouseleave=hidePop;
   });
   document.querySelectorAll("thead th[data-sort]").forEach(th=>{
@@ -1077,12 +1089,22 @@ function applyStatics(){
   el("reset").textContent=t("reset");
   el("gq").placeholder=t("search"); el("empty").textContent=t("empty");
   el("h1").textContent=t("h1"); el("sub").textContent=t("sub");
+  {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
+             tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts"};
+   document.querySelectorAll("#subnav a").forEach(a=>{const k=NM[a.dataset.page]; if(k) a.textContent=t(k);});}
   el("thFirm").textContent=t("thFirm"); el("thPlan").textContent=t("thPlan");
   el("thMkt").textContent=t("thMkt"); el("thSize").textContent=t("thSize");
   el("thPrice").textContent=t("thPrice"); el("thSplit").textContent=t("thSplit");
   el("thDaily").textContent=t("thDaily"); el("thMax").textContent=t("thMax");
   el("thTarget").textContent=t("thTarget"); el("thDd").textContent=t("thDd");
   el("thEa").textContent=t("thEa"); el("thVer").textContent=t("thVer");
+  if(el("rFirm")){
+    el("rFirm").textContent=t("rFirm"); el("rN").textContent=t("rN");
+    el("rEa").textContent=t("fEa"); el("rNews").textContent=t("fNews");
+    el("rOn").textContent=t("fOn"); el("rCp").textContent=t("fCp");
+    el("rWk").textContent=t("fWk"); el("rKr").textContent=t("fKorea");
+    el("rM5").textContent="MT5"; el("rGrade").textContent=t("rGrade");
+  }
   el("foot").innerHTML=t("foot");
   if(el("chFaq")) el("chFaq").innerHTML=faqBlock(FAQ.challenges)+
     srcNote(lang==="ko"?"상품 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product values are HELIX records; verify via the evidence links in each product.");
@@ -1110,7 +1132,7 @@ el("cmpClose").onclick=()=>el("cmpmod").classList.remove("on");
 el("cmpmod").onclick=e=>{if(e.target.id==="cmpmod")el("cmpmod").classList.remove("on");};
 el("dClose").onclick=closeDrawer;el("scrim").onclick=closeDrawer;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");}});
-document.addEventListener("scroll",()=>hidePop(),true);
+
 
 /* ---------- shared page bits ---------- */
 const PFM_CODES={
@@ -1156,6 +1178,13 @@ const PFM_SRC = lang==="ko"
  : `PFM partner codes and discounts come from <a href="https://propfirmmatch.com/offers" target="_blank" rel="noopener">propfirmmatch.com/offers</a> (Nov 2026). Product, fee and rule values are HELIX records.`;
 
 /* ---------- Home ---------- */
+function bindHomeLinks(){
+  document.querySelectorAll('#homeMain .statlink').forEach(a=>a.onclick=()=>{
+    if(a.dataset.clear){ ["firm","mk","st","dd","vf","flags","cycle"].forEach(k=>F[k].clear());
+      q=""; const g=el("gq"); if(g) g.value=""; }
+    if(a.dataset.grade){ F.vf.clear(); F.vf.add(a.dataset.grade); }
+  });
+}
 function renderHome(){
   const promoFirms=[...new Set(rows.filter(r=>r.co||r.pt).map(r=>r.f))];
   const graded=rows.filter(r=>r.vf==="A").length;
@@ -1167,10 +1196,14 @@ function renderHome(){
       </div>
       <p>${lang==="ko"?"상품 693개 · 브랜드 29개 · 자산군 5개. 참가비·낙폭·지급조건·규칙을 상품 단위로 기록하고, 근거 링크까지 함께 보관합니다.":"693 products · 29 brands · 5 assets. Fees, drawdown, payouts and rules recorded per product, with source links."}</p></div>
     <div class="stats">
-      <div class="stat"><div class="n">${rows.length.toLocaleString('en-US')}</div><div class="l">${esc(t("rows"))}</div></div>
-      <div class="stat"><div class="n">${DB.firms.length}</div><div class="l">${esc(t("firms"))}</div></div>
-      <div class="stat"><div class="n">${promoFirms.length}</div><div class="l">${lang==="ko"?"프로모 진행 브랜드":"brands with promo"}</div></div>
-      <div class="stat"><div class="n">${graded}</div><div class="l">${lang==="ko"?"A등급 상품":"grade-A products"}</div></div>
+      <a class="stat statlink" href="#challenges" data-clear="1"><div class="n">${rows.length.toLocaleString('en-US')}</div>
+        <div class="l">${esc(t("rows"))} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#firms"><div class="n">${DB.firms.length}</div>
+        <div class="l">${esc(t("firms"))} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#offers"><div class="n">${promoFirms.length}</div>
+        <div class="l">${lang==="ko"?"프로모 진행 브랜드":"brands with promo"} <span class="go">→</span></div></a>
+      <a class="stat statlink" href="#challenges" data-grade="A"><div class="n">${graded}</div>
+        <div class="l">${lang==="ko"?"A등급 상품":"grade-A products"} <span class="go">→</span></div></a>
     </div>
     <div class="panel"><h3>${lang==="ko"?"바로가기":"Jump to"} <span>pages</span></h3>
       <div class="chips">
@@ -1181,6 +1214,42 @@ function renderHome(){
       </div></div>
     ${faqBlock(FAQ.home)}
     ${srcNote(lang==="ko"?"상품·수수료·규칙 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product, fee and rule values are HELIX records; check the evidence links in each product detail.")}`;
+}
+
+/* ---------- Prop Firms list ---------- */
+function renderFirms(){
+  const agg={};
+  rows.forEach(r=>{
+    const o=agg[r.f]||(agg[r.f]={n:0,mk:new Set(),split:{},grade:{A:0,B:0,C:0},promo:false,min:null,max:null,site:r.ur||null});
+    o.n++; if(r.mk) o.mk.add(r.mk);
+    if(r.sp!=null) o.split[r.sp]=(o.split[r.sp]||0)+1;
+    if(r.vf) o.grade[r.vf]=(o.grade[r.vf]||0)+1;
+    if(r.co||r.pt) o.promo=true;
+    const s=Number(r.s); if(!isNaN(s)){ o.min=o.min==null?s:Math.min(o.min,s); o.max=o.max==null?s:Math.max(o.max,s); }
+  });
+  const modeOf2=o=>{const e=Object.entries(o).sort((a,b)=>b[1]-a[1])[0];return e?e[0]:null;};
+  const list=Object.entries(agg).map(([f,o])=>({f,n:o.n,mk:[...o.mk],sp:modeOf2(o.split),g:o.grade,promo:o.promo,min:o.min,max:o.max,site:o.site}))
+    .sort((a,b)=>b.n-a.n);
+  el("firmsMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"프랍펌 · 브로커 목록":"Prop Firms"}</h1>
+      <p>${lang==="ko"?`${list.length}개 브랜드. 회사를 누르면 상품·규칙·프로모가 담긴 상세 페이지로 이동합니다.`:`${list.length} brands. Click a firm for its products, rules and offers.`}</p></div>
+    <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
+      <table class="fx" style="min-width:820px"><thead><tr>
+        <th>${esc(t("fFirm"))}</th><th class="num">${esc(t("rows"))}</th><th>${esc(t("fAsset"))}</th>
+        <th class="num">${esc(t("fSplit"))}</th><th class="num">${esc(t("fSize"))}</th><th>${esc(t("grade"))}</th><th></th>
+      </tr></thead><tbody>${list.map(o=>`<tr>
+        <td class="firm"><a href="#firm/${encodeURIComponent(o.f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.f)}</a>
+          ${o.promo?`<span class="tagpromo">PROMO</span>`:""}</td>
+        <td class="num">${o.n}</td>
+        <td>${o.mk.map(m=>`<span class="tag t-${esc(m)}">${esc(assetLabel(m))}</span>`).join(" ")}</td>
+        <td class="num">${o.sp?esc(o.sp)+"%":'<span class="dim">—</span>'}</td>
+        <td class="num">${o.min!=null?"$"+Math.min(o.min).toLocaleString('en-US')+"–"+Math.max(o.max).toLocaleString('en-US'):'<span class="dim">—</span>'}</td>
+        <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
+        <td>${o.site?`<a href="${esc(o.site)}" target="_blank" rel="noopener" style="font-size:12px">site ↗</a>`:""}</td>
+      </tr>`).join("")}</tbody></table></div></div>
+    ${faqBlock([[lang==="ko"?"브랜드 수가 자주 바뀌나요?":"Do brands change often?",
+      lang==="ko"?"새 브랜드가 추가되면 자동으로 이 목록에 나타납니다.":"New brands appear here automatically once records exist."]])}
+    ${srcNote(lang==="ko"?"브랜드·상품 수는 HELIX 기록 기준입니다.":"Brand and product counts come from HELIX records.")}`;
 }
 
 /* ---------- Offers ---------- */
@@ -1626,7 +1695,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={home:"pageHome",offers:"pageOffers",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   const h=(location.hash||"").replace(/^#/,"")||"home";
@@ -1635,13 +1704,14 @@ function route(){
   Object.entries(PAGES).forEach(([k,id])=>{ el(id).style.display=(k===page)?"grid":"none"; });
   el("pageFirm").style.display=isFirm?"grid":"none";
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
   if(isFirm) renderFirm(decodeURIComponent(h.slice(5)));
-  else if(page==="home") renderHome();
+  else if(page==="home"){ renderHome(); bindHomeLinks(); }
   else if(page==="offers") renderOffers();
+  else if(page==="firms") renderFirms();
   else if(page==="compare") renderCompare();
   else if(page==="payouts") renderPayouts();
   else if(page==="spreads") renderSpreads();
