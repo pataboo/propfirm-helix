@@ -90,6 +90,16 @@
   .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
   .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
+  .navitem{position:relative;display:inline-flex}
+  .dropdown{position:absolute;top:calc(100% + 10px);left:0;min-width:240px;background:var(--panel);
+    border:1px solid var(--line2);border-radius:12px;padding:6px;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transform:translateY(-4px);transition:.14s;z-index:60}
+  .navitem:hover .dropdown{opacity:1;pointer-events:auto;transform:none}
+  .dropdown a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
+    font-size:12.5px;color:var(--ink2);text-decoration:none;white-space:nowrap}
+  .dropdown a:hover{background:var(--panel2);color:var(--ink)}
+  .dropdown a b{font-weight:600}
+  .dropdown a span{margin-left:auto;color:var(--muted);font-size:11px}
   .navpill{display:flex;align-items:center;gap:1px;margin:0 auto;padding:4px;
     border-radius:9999px;border:1px solid rgba(167,139,250,.38);
     background:linear-gradient(90deg,rgba(167,139,250,.16),rgba(167,139,250,.05) 45%,rgba(167,139,250,.16));
@@ -130,7 +140,7 @@
   .hero2{padding:16px 0 6px}
   .hero2 h1{margin:0 0 6px;font-size:26px;letter-spacing:-.025em;font-weight:700}
   .hero2 p{margin:0;color:var(--muted);font-size:13.5px;max-width:760px;line-height:1.65}
-  .top .in{max-width:1500px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:16px;height:54px}
+  .top .in{max-width:none;margin:0;padding:0 16px;display:flex;align-items:center;gap:14px;height:54px}
   .brand{display:flex;align-items:center;gap:11px}
   .brand .mark{width:22px;height:22px;color:var(--accent);flex:none}
   .brand .wm{font-size:17px;letter-spacing:-.01em;font-weight:700;text-transform:lowercase}
@@ -260,8 +270,11 @@
   .notewrap{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px}
   .notelist{list-style:none;margin:0;padding:0;max-height:270px;overflow:hidden}
   .notelist.exp{max-height:none}
-  .notelist li{display:grid;grid-template-columns:14px 1fr;gap:9px;padding:9px 11px;font-size:12.5px;
-    line-height:1.6;color:var(--ink2);border-bottom:1px solid var(--line)}
+  .notelist li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:9px;padding:9px 11px;font-size:12.5px;
+    line-height:1.65;color:var(--ink2);border-bottom:1px solid var(--line);
+    word-break:normal;overflow-wrap:anywhere;white-space:normal}
+  .notelist li b{display:inline;margin-right:4px}
+  .notelist li span{display:inline;margin:0}
   .notelist li:last-child{border-bottom:0}
   .notelist li::before{content:"•";color:var(--muted)}
   .notelist li.ok::before{content:"✓";color:var(--green);font-weight:800}
@@ -379,14 +392,25 @@
       <path d="M10.1 8.1v9.4M10.1 12.6h4.6M14.7 8.1v9.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     </svg><div><b class="wm">helix</b><span id="brandSub"></span></div></a>
   <div class="navpill" id="subnav">
-    <a href="#home" data-page="home">Home</a>
-    <a href="#offers" data-page="offers">Offers</a>
-    <a href="#challenges" data-page="challenges">Challenges</a>
+    <span class="navitem">
+      <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
+      <div class="dropdown" id="chMenu">
+        <a href="#challenges" data-all="1"><b>All challenges</b><span>693</span></a>
+        <a href="#challenges" data-mk="cfd"><b>Forex</b><span>619</span></a>
+        <a href="#challenges" data-mk="fut"><b>Futures</b><span>17</span></a>
+        <a href="#challenges" data-mk="crypto"><b>Crypto</b><span>35</span></a>
+        <a href="#challenges" data-off="1"><b>Perps</b><span>—</span></a>
+        <a href="#challenges" data-off="1"><b>Brokers</b><span>—</span></a>
+        <a href="#compare"><b>Discover / Compare</b><span>→</span></a>
+      </div>
+    </span>
     <a href="#compare" data-page="compare">Compare</a>
-    <a href="#tools" data-page="tools">Tools</a>
+    <a href="#offers" data-page="offers">Offers</a>
+    <a href="#firms" data-page="firms">Firms</a>
     <a href="#rules" data-page="rules">Rules</a>
-    <a href="#spreads" data-page="spreads">Spreads</a>
     <a href="#payouts" data-page="payouts">Payouts</a>
+    <a href="#spreads" data-page="spreads">Spreads</a>
+    <a href="#tools" data-page="tools">Tools</a>
   </div>
   <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
   <div class="grow"></div>
@@ -395,13 +419,6 @@
   <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
   <button class="iconbtn" id="theme" title="theme">☾</button>
 </div>
-<div class="subnav"><div class="in" id="cats">
-  <a href="#challenges" data-mk="cfd">Forex</a>
-  <a href="#challenges" data-mk="fut">Futures</a>
-  <a href="#challenges" data-mk="crypto">Crypto</a>
-  <a class="off" title="데이터 미수집" href="#challenges">Perps</a>
-  <a class="off" title="데이터 미수집" href="#challenges">Brokers</a>
-</div></div>
 </div>
 
 <div class="shell" id="pageChallenges">
@@ -601,7 +618,7 @@ const I18N = {
 
 let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
-let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="";
+let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="", offersFilter="all";
 const picked = new Set();
 const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),
            sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
@@ -644,11 +661,10 @@ function notesBlock(txt){
 /* ---------- evidence ---------- */
 function asUrl(s){
   if(!s) return null;
-  s = String(s).trim();
-  const m = s.match(/((?:[a-z0-9-]+\.)+[a-z]{2,})((?:\/[^\s]*)?)/i);
-  if(m) return "https://" + m[1] + (m[2]||"");
+  s=String(s).trim();
   if(/^https?:\/\//i.test(s)) return s;
-  return null;
+  const m=s.match(/((?:[a-z0-9-]+\.)+[a-z]{2,})(\/[^\s]*)/i);   // need a real path
+  return m ? "https://"+m[1]+m[2] : null;
 }
 function evidenceBlock(r){
   const items = [];
@@ -664,7 +680,9 @@ function evidenceBlock(r){
   const meta = `<div class="ev"><div class="w">${esc(t("cVer"))}</div><div>` +
       `<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span> · ${esc(r.sy||"—")} · ${esc(t("evRecorded"))} ${esc(r.ao||"—")}</div></div>`;
   const list = items.map(it=>`<div class="ev"><div class="w">${esc(it.lbl)}</div><div>` +
-      (it.u?`<a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.txt)}</a>`:`<span>${esc(it.txt)}</span>`) +
+      (it.u?`<a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.txt)}</a>`
+           :`<span>${esc(it.txt)}</span>
+             <div class="meta">${esc(lang==="ko"?"도메인만 기록됨 — 헬프센터에서 직접 검색 필요":"domain only — search the help centre")}</div>`) +
       `</div></div>`).join("");
   const miss = items.length<=1 ? `<div class="evall">${esc(t("evMissing"))}</div>` : "";
   return `<div class="evlist">${meta}${list}</div>${miss}<div class="evall">${esc(t("evHow"))}</div>`;
@@ -1147,28 +1165,47 @@ const PFM_CODES={
  "Orion Funded":{d:"60%",c:"MATCH60"},"FundedNext":{d:"bulk",c:"MATCH"}
 };
 const FAQ={
- home:[["이 데이터는 어디서 왔나요?","HELIX는 공식 사이트와 공개 자료를 상품 단위로 기록한 로컬 데이터베이스를 바탕으로 만들어졌습니다. 각 상품 상세의 ‘근거 · 출처 링크’에서 원문을 확인할 수 있습니다."],
+ home:{ko:[["이 데이터는 어디서 왔나요?","HELIX는 공식 사이트와 공개 자료를 상품 단위로 기록한 로컬 데이터베이스를 바탕으로 만들어졌습니다. 각 상품 상세의 ‘근거 · 출처 링크’에서 원문을 확인할 수 있습니다."],
        ["미확인(unknown)은 무슨 뜻인가요?","아직 조사하지 않았다는 뜻입니다. 0도 아니고 허용도 아닙니다. 반드시 업체 공식 사이트에서 확인해야 합니다."],
        ["검증 등급 A/B/C는 무엇인가요?","A는 1차 확인(공식 사이트 직접 확인), B는 2차·간접 자료, C는 추정입니다."]],
- offers:[["MATCH 코드는 무엇인가요?","Prop Firm Match가 각 업체와 제휴해 제공하는 파트너 코드입니다. HELIX는 이를 참고용으로 함께 표기합니다."],
+       en:[["Where does this data come from?","HELIX is built from a local database that records official sites and public sources per product. Every product detail carries evidence and source links."],
+       ["What does unknown mean?","It means not researched yet. It is not zero and not permission. Always verify on the firm's official site."],
+       ["What are grades A/B/C?","A = verified against the official source, B = secondary/indirect, C = inferred."]]},
+ offers:{ko:[["MATCH 코드는 무엇인가요?","Prop Firm Match가 각 업체와 제휴해 제공하는 파트너 코드입니다. HELIX는 이를 참고용으로 함께 표기합니다."],
          ["공식 프로모와 PFM 코드가 다르면?","둘 다 표기합니다. 업체 공식 코드는 ‘공식 코드’ 열에, PFM 파트너 코드는 ‘PFM 코드’ 열에 나옵니다. 결제 전 업체 결제창에서 최종 확인하세요."],
          ["할인율은 언제 기준인가요?","PFM 파트너 할인율은 PFM offers 페이지(2026-11) 기준이며, 업체 프로모는 HELIX 기록 시점 기준입니다."]],
- challenges:[["상품이 693개인데 왜 업체는 29개인가요?","한 업체가 여러 상품(계좌 규모 × 프로그램)을 운영하기 때문입니다. 한 행이 하나의 상품입니다."],
+         en:[["What is the MATCH code?","It is Prop Firm Match's partner code with each firm. HELIX shows it alongside the official code, for reference."],
+         ["Official promo vs PFM code?","Both are shown: the official code in its own column and the PFM partner code in another. Confirm at the firm's checkout before paying."],
+         ["How fresh are the discounts?","PFM partner discounts are from propfirmmatch.com/offers (Nov 2026); official promos are as recorded in HELIX."]]},
+ challenges:{ko:[["상품이 693개인데 왜 업체는 29개인가요?","한 업체가 여러 상품(계좌 규모 × 프로그램)을 운영하기 때문입니다. 한 행이 하나의 상품입니다."],
              ["왜 어떤 상품은 금액이 비어 있나요?","해당 값을 아직 기록하지 못한 경우입니다. 0으로 채우지 않습니다."],
-             ["비교는 어떻게 하나요?","행에 마우스를 올리면 뜨는 카드에서 ‘비교에 추가’를 누르고 2개 이상 담으면 하단 바에서 나란히 비교할 수 있습니다."]],
- rules:[["규칙 집계는 어떤 기준인가요?","상품 단위 기록을 회사별로 묶어 허용/조건부/혼합/불가/미확인으로 판정합니다."],
+             ["비교는 어떻게 하나요?","행을 클릭해 상세를 열고, 카드의 ‘비교에 추가’로 담은 뒤 하단 Compare에서 2~4개를 나란히 볼 수 있습니다."]],
+             en:[["693 products but only 29 brands?","One brand runs many products (size × programme). Each row is a single product."],
+             ["Why are some values blank?","Because that value has not been recorded yet. We never fill blanks with zero."],
+             ["How do I compare?","Open a row for details, add it to compare, then open Compare to see 2-4 side by side."]]},
+ rules:{ko:[["규칙 집계는 어떤 기준인가요?","상품 단위 기록을 회사별로 묶어 허용/조건부/혼합/불가/미확인으로 판정합니다."],
         ["조건부와 혼합의 차이는?","조건부는 특정 조건에서만 허용된다는 기록이고, 혼합은 상품마다 기록이 서로 다른 경우입니다."],
         ["규칙은 자주 바뀌나요?","네. 프랍펌 규칙은 자주 바뀌므로 거래 전 반드시 공식 규정을 확인하세요."]],
- spreads:[["스프레드 데이터가 비어 있는 이유는?","아직 수집하지 않았습니다. PFM의 스프레드 표도 현재 MT5 기준 일부만 채워져 있습니다."],
+        en:[["How are the rule aggregates calculated?","Per-product records are grouped by firm and reduced to allowed / conditional / mixed / not allowed / unknown."],
+        ["Conditional vs mixed?","Conditional means allowed only under conditions; mixed means records disagree across products."],
+        ["Do rules change often?","Yes. Prop firm rules change frequently — always check the official terms before trading."]]},
+ spreads:{ko:[["스프레드 데이터가 비어 있는 이유는?","아직 수집하지 않았습니다. PFM의 스프레드 표도 현재 MT5 기준 일부만 채워져 있습니다."],
           ["언제 채워지나요?","업체별 MT5 스프레드 공개 자료를 수집한 뒤 자산군별로 표시할 예정입니다."]],
- payouts:[["지급 주기는 어떻게 비교하나요?","프로그램별 지급 주기·첫 지급·최소 지급액을 회사 단위로 묶어 표시합니다."],
+          en:[["Why is spread data empty?","It has not been collected yet. PFM's own spread table is also only partly filled (MT5)."],
+          ["When will it be filled?","Once per-firm MT5 spread references are collected, we will show them by asset class."]]},
+ payouts:{ko:[["지급 주기는 어떻게 비교하나요?","프로그램별 지급 주기·첫 지급·최소 지급액을 회사 단위로 묶어 표시합니다."],
           ["분배율이 여러 개인 경우는?","상품별 기록에서 가장 많이 나타난 값을 대표로 표시합니다. 정확한 조건은 상품 상세를 확인하세요."]],
- tools:[["Trading Tools에는 무엇이 올라오나요?","SilentFam이 실제로 사용하는 도구를 순차적으로 공개할 예정입니다."],
+          en:[["How is payout frequency compared?","Cycle, first payout and minimum amount are grouped per firm from product records."],
+          ["What if a firm has several splits?","The most frequent recorded value is shown as representative. Check product details for exact terms."]]},
+ tools:{ko:[["Trading Tools에는 무엇이 올라오나요?","SilentFam이 실제로 사용하는 도구를 순차적으로 공개할 예정입니다."],
         ["지금 사용할 수 있는 것은?","HELIX 데이터베이스가 첫 번째 도구입니다."]],
+        en:[["What will Trading Tools contain?","The tools SilentFam actually uses, released as they are ready."],
+        ["What can I use today?","HELIX itself is the first tool."]]}
 };
 function faqBlock(list){
+  const arr = Array.isArray(list) ? list : (list[lang] || list.ko || []);
   return `<div class="faq"><h3>${lang==="ko"?"자주 묻는 질문":"FAQ"}</h3>` +
-    list.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("") + `</div>`;
+    arr.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("") + `</div>`;
 }
 function srcNote(extra){
   return `<div class="src"><b>${lang==="ko"?"출처":"Source"}</b> ${extra}</div>`;
@@ -1262,16 +1299,24 @@ function renderOffers(){
     if(!o.text&&(r.pt||r.po)) o.text=r.pt||r.po;
     if(!o.exp&&r.px) o.exp=r.px;
   });
-  const list=Object.entries(byFirm).sort((a,b)=>a[0].localeCompare(b[0]));
+  const listAll=Object.entries(byFirm).sort((a,b)=>a[0].localeCompare(b[0]));
+  const list=listAll.filter(([,o])=>
+    offersFilter==="official"? !!o.code :
+    offersFilter==="pfm"? !!o.pfm :
+    offersFilter==="expiry"? !!o.exp : true);
   const withPfm=list.filter(([,o])=>o.pfm).length;
   el("offersMain").innerHTML=`
     <div class="hero2"><h1>${lang==="ko"?"프로모 코드 한눈에 보기":"All current offers"}</h1>
       <p>${lang==="ko"?`${list.length}개 브랜드의 프로모션을 모았습니다. 공식 코드와 PFM 파트너 코드를 나란히 표기합니다.`:`${list.length} brands. Official codes and PFM partner codes side by side.`}</p></div>
     <div class="stats">
-      <div class="stat"><div class="n">${list.length}</div><div class="l">${lang==="ko"?"프로모 브랜드":"promo brands"}</div></div>
-      <div class="stat"><div class="n">${list.filter(([,o])=>o.code).length}</div><div class="l">${lang==="ko"?"공식 코드 기록":"official codes"}</div></div>
-      <div class="stat"><div class="n">${withPfm}</div><div class="l">PFM ${lang==="ko"?"파트너 코드":"partner codes"}</div></div>
-      <div class="stat"><div class="n">${list.filter(([,o])=>o.exp).length}</div><div class="l">${lang==="ko"?"만료일 기록":"with expiry"}</div></div>
+      <a class="stat statlink ${offersFilter==="all"?"on":""}" data-of="all"><div class="n">${listAll.length}</div>
+        <div class="l">${lang==="ko"?"프로모 브랜드":"promo brands"} <span class="go">→</span></div></a>
+      <a class="stat statlink ${offersFilter==="official"?"on":""}" data-of="official"><div class="n">${listAll.filter(([,o])=>o.code).length}</div>
+        <div class="l">${lang==="ko"?"공식 코드 기록":"official codes"} <span class="go">→</span></div></a>
+      <a class="stat statlink ${offersFilter==="pfm"?"on":""}" data-of="pfm"><div class="n">${listAll.filter(([,o])=>o.pfm).length}</div>
+        <div class="l">PFM ${lang==="ko"?"파트너 코드":"partner codes"} <span class="go">→</span></div></a>
+      <a class="stat statlink ${offersFilter==="expiry"?"on":""}" data-of="expiry"><div class="n">${listAll.filter(([,o])=>o.exp).length}</div>
+        <div class="l">${lang==="ko"?"만료일 기록":"with expiry"} <span class="go">→</span></div></a>
     </div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 340px)">
       <table class="fx" style="min-width:920px"><thead><tr>
@@ -1291,6 +1336,9 @@ function renderOffers(){
     ${srcNote(PFM_SRC)}`;
   el("offersMain").querySelectorAll('a[onclick]').forEach(a=>a.onclick=()=>{
     F.firm.clear(); F.firm.add(a.getAttribute("onclick").split("'")[1]);
+  });
+  el("offersMain").querySelectorAll(".statlink[data-of]").forEach(a=>a.onclick=e=>{
+    e.preventDefault(); offersFilter=a.dataset.of; renderOffers();
   });
 }
 
@@ -1721,11 +1769,13 @@ function route(){
 }
 window.addEventListener("hashchange",route);
 
-document.querySelectorAll("#cats a").forEach(a=>a.onclick=e=>{
-  if(a.classList.contains("off")){e.preventDefault();return;}
-  e.preventDefault();
-  F.mk.clear(); F.mk.add(a.dataset.mk);
-  location.hash="#challenges"; route(); render();
+document.querySelectorAll("#chMenu a").forEach(a=>a.onclick=e=>{
+  if(a.dataset.off){ e.preventDefault(); return; }
+  if(a.dataset.mk){
+    e.preventDefault(); F.mk.clear(); F.mk.add(a.dataset.mk);
+    location.hash="#challenges"; route(); render(); return;
+  }
+  if(a.dataset.all){ e.preventDefault(); F.mk.clear(); location.hash="#challenges"; route(); render(); }
 });
 applyTheme();applyStatics();render();route();
 </script>
