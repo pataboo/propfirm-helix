@@ -22,6 +22,12 @@
     --green:#0a9d68;--amber:#a67400;--red:#c8392c;--shadow:0 18px 40px rgba(11,15,16,.12);
   }
   *{box-sizing:border-box}
+  *{scrollbar-width:thin;scrollbar-color:#2b3539 transparent}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#232c30;border-radius:99px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+  ::-webkit-scrollbar-corner{background:transparent}
   html,body{margin:0;background:var(--bg);color:var(--ink);
     font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;word-break:keep-all}
@@ -454,10 +460,10 @@
   <main>
     <h1 id="h1"></h1><p id="sub"></p>
     <div class="stats">
-      <div class="stat"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></div>
-      <div class="stat"><div class="n" id="s2">—</div><div class="l" id="s2l"></div></div>
-      <div class="stat"><div class="n" id="s3">—</div><div class="l" id="s3l"></div></div>
-      <div class="stat"><div class="n" id="s4">—</div><div class="l" id="s4l"></div></div>
+      <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
+      <a class="stat statlink" id="st2" href="#firms"><div class="n" id="s2">—</div><div class="l" id="s2l"></div></a>
+      <a class="stat statlink" id="st3" href="#challenges"><div class="n" id="s3">—</div><div class="l" id="s3l"></div></a>
+      <a class="stat statlink" id="st4" href="#challenges"><div class="n" id="s4">—</div><div class="l" id="s4l"></div></a>
     </div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
       <div class="resbar" id="resbar" style="flex:1;margin:0"></div>
@@ -751,6 +757,7 @@ function matches(r){
   const dy=num(r.mf??r.md); if(F.daysMax!=null&&(dy==null||dy>F.daysMax))return false;
   const lv=num(r.lv); if(F.levMin!=null&&(lv==null||lv<F.levMin))return false;
   if(F.fee.size && !F.fee.has(feeClass(r))) return false;
+  if(activePreset && !presetOk(r,activePreset)) return false;
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
   if(F.daysBand){ const d2=num(r.mf??r.md);
@@ -819,6 +826,10 @@ function buildFilterSettings(){
 }
 function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
+  const presetHtml=`<div class="fgroup" data-g="preset"><summary style="list-style:none;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;padding:2px 0">${lang==="ko"?"프리셋":"Presets"}</summary>
+    <div class="body" style="max-height:none"><div class="chips2">
+    ${Object.keys(PRESETS[lang]||PRESETS.en).map(k=>`<button data-preset="${k}" class="${activePreset===k?"on":""}">${esc(pname(k))}</button>`).join("")}
+    </div></div></div>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
   const parts=[]; const H={};
@@ -863,6 +874,7 @@ function buildFilters(){
   add("rating", `<details class="fgroup" data-g="rating" ${OPEN.rating?"open":""}><summary>${esc(t("fRating"))}</summary><div class="body"><div class="chips2">
     <button data-rating="4" class="${F.ratingMin===4?"on":""}">≥ 4.0</button>
     <button data-rating="4.5" class="${F.ratingMin===4.5?"on":""}">≥ 4.5</button></div></div></details>`);
+  parts.push(presetHtml);
   visGroups.forEach(id=>{ if(H[id]) parts.push(H[id]); });
   host.innerHTML=parts.join("");
 
@@ -883,6 +895,8 @@ function buildFilters(){
     F.sizeMin=on?null:Number(lo); F.sizeMax=on?null:(hi===""?null:Number(hi));
     render();
   });
+  host.querySelectorAll("button[data-preset]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.preset; activePreset = activePreset===k?null:k; render();});
   host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
     const v=Number(b.dataset.fee); F.priceMax = F.priceMax===v?null:v; render();
   });
@@ -901,10 +915,17 @@ function buildFilters(){
     const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; render();});
 }
 function render(){
+  let key=sortKey, dir=sortDir;
+  if(activePreset==="cheap"){ key="to"; dir=1; }
+  if(activePreset==="best"){ key="pr"; dir=1; }
   const out=rows.filter(matches).sort((a,b)=>{
-    const A=a[sortKey],B=b[sortKey];
-    if(["s","pr","sp","dl","ml"].includes(sortKey))return ((num(A)??-1)-(num(B)??-1))*sortDir;
-    return String(A??"").localeCompare(String(B??""))*sortDir;});
+    if(activePreset==="best"){
+      const ra=num(a.pr)/Math.max(num(a.s)||1,1), rb=num(b.pr)/Math.max(num(b.s)||1,1);
+      return ra-rb;
+    }
+    const A=a[key],B=b[key];
+    if(["s","pr","sp","dl","ml","to"].includes(key))return ((num(A)??1e12)-(num(B)??1e12))*dir;
+    return String(A??"").localeCompare(String(B??""))*dir;});
   el("listView").innerHTML=out.map(r=>{
     const g=r.vf||"—";
     return `<div class="mcard" data-id="${esc(r.i)}">
@@ -1260,6 +1281,13 @@ el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags","cycle"].forEach(k=
   q="";el("gq").value="";firmSearch="";render();};
 el("cGo").onclick=()=>{location.hash="#compare";route();};
 document.getElementById("cmpGo").onclick=()=>{location.hash="#compare";route();};
+["st1","st3"].forEach(id=>{const a=document.getElementById(id); if(a) a.onclick=e=>{e.preventDefault();
+  ["firm","mk","st","dd","vf","flags","cycle","fee"].forEach(k=>F[k].clear());
+  F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null;
+  activePreset=null; q=""; const g=el("gq"); if(g) g.value="";
+  location.hash="#challenges"; route(); render();};});
+{const a=document.getElementById("st4"); if(a) a.onclick=e=>{e.preventDefault();
+  F.vf.clear(); F.vf.add("A"); location.hash="#challenges"; route(); render();};}
 el("cClear").onclick=()=>{picked.clear();renderBar();render();};
 el("cmpClose").onclick=()=>el("cmpmod").classList.remove("on");
 el("cmpmod").onclick=e=>{if(e.target.id==="cmpmod")el("cmpmod").classList.remove("on");};
@@ -1379,7 +1407,26 @@ function feeClass(r){
 const FCLASS={ko:{free:"무료",normal:"일반",later:"후불"},en:{free:"Free",normal:"Normal",later:"Pay Later"}};
 const fclassLabel=k=>(FCLASS[lang]||FCLASS.en)[k]||k;
 const fclassBadge=r=>{const k=feeClass(r);return `<span class="fclass ${k}">${esc(fclassLabel(k))}</span>`;};
-let feeFilter=null;
+let feeFilter=null, activePreset=null;
+const PRESETS={ko:{ea:"EA+카피 허용",cheap:"총액 낮은 순",kr:"한국 가능",tot:"총액 확인됨",
+  buy:"★ 실구매 후보",sale:"할인 40%↑",best:"가성비 순",paf:"Pay Later $5",gap:"미확인 있음",src:"1차 출처만"},
+  en:{ea:"EA+copy allowed",cheap:"Lowest total",kr:"Korea OK",tot:"Total known",buy:"★ Shortlist",
+  sale:"40%+ off",best:"Best value",paf:"Pay Later $5",gap:"Has gaps",src:"Primary only"}};
+const pname=k=>(PRESETS[lang]||PRESETS.en)[k]||k;
+function presetOk(r,k){
+  const ok=v=>v===true||v==="cond";
+  switch(k){
+    case "ea":   return ok(r.ec)&&ok(r.cc);
+    case "kr":   return r.kr==="yes";
+    case "tot":  return r.to!=null;
+    case "buy":  return r.vf==="A" && r.to!=null;
+    case "src":  return r.vf==="A";
+    case "paf":  return feeClass(r)==="later" && Number(r.pr||0)<=5;
+    case "gap":  return r.ml==null || r.dl==null || r.tg==null || r.sp==null;
+    case "sale": { const m=String(r.pt||r.po||"").match(/(\d{2})\s*%/); return m && Number(m[1])>=40; }
+    default:     return true;
+  }
+}
 
 const SORTS=[["f","회사","Firm"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
   ["ml","최대 손실","Max loss"],["s","계좌 규모","Size"],["rt","평점","Rating"],["mf","최소일수","Min days"]];
