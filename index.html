@@ -31,6 +31,12 @@
     border-radius:9999px;padding:7px 14px;min-width:240px;max-width:420px;flex:1}
   .hsearch input{border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;width:100%}
   .hsearch input::placeholder{color:var(--muted)}
+  table.dense td{padding:5px 8px;font-size:12px}
+  table.dense thead th{padding:7px 8px}
+  .tsrow{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:7px;font-size:12.5px;color:var(--ink2);cursor:pointer}
+  .tsrow:hover{background:var(--panel2);color:var(--ink)}
+  .tsrow input{accent-color:var(--accent);width:14px;height:14px}
+  .tshead{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;padding:8px 8px 4px}
   .viewtoggle{display:flex;gap:4px;background:var(--panel2);border:1px solid var(--line2);border-radius:9px;padding:3px}
   .viewtoggle button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:11.5px;font-weight:700;
     padding:5px 11px;border-radius:7px;cursor:pointer}
@@ -154,7 +160,7 @@
   .lang{display:flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
   .lang button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer}
   .lang button.on{background:var(--accent);color:#0b0f10}
-  .shell{max-width:1500px;margin:0 auto;padding:22px;display:grid;grid-template-columns:262px 1fr;gap:22px;align-items:start}
+  .shell{max-width:none;margin:0;padding:16px 16px 28px;display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
   .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;position:sticky;top:86px}
   .filters h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
   .fg{margin-bottom:16px}
@@ -368,7 +374,7 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare{grid-template-columns:1fr}
+  #pageRules,#pageFirm,#pageHome,#pageFirms,#pageOffers,#pagePayouts,#pageSpreads,#pageTools,#pageCompare,#pageDocs{grid-template-columns:1fr}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -395,13 +401,10 @@
     <span class="navitem">
       <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
       <div class="dropdown" id="chMenu">
-        <a href="#challenges" data-all="1"><b>All challenges</b><span>693</span></a>
-        <a href="#challenges" data-mk="cfd"><b>Forex</b><span>619</span></a>
-        <a href="#challenges" data-mk="fut"><b>Futures</b><span>17</span></a>
-        <a href="#challenges" data-mk="crypto"><b>Crypto</b><span>35</span></a>
-        <a href="#challenges" data-off="1"><b>Perps</b><span>—</span></a>
-        <a href="#challenges" data-off="1"><b>Brokers</b><span>—</span></a>
-        <a href="#compare"><b>Discover / Compare</b><span>→</span></a>
+        <a href="#challenges" data-all="1"><b>All Challenges</b><span>693</span></a>
+        <a href="#firms"><b>Prop Firms</b><span>29</span></a>
+        <a href="#compare"><b>Discover</b><span>→</span></a>
+        <a href="#compare"><b>Compare</b><span>→</span></a>
       </div>
     </span>
     <a href="#compare" data-page="compare">Compare</a>
@@ -411,6 +414,7 @@
     <a href="#payouts" data-page="payouts">Payouts</a>
     <a href="#spreads" data-page="spreads">Spreads</a>
     <a href="#tools" data-page="tools">Tools</a>
+    <a href="#docs" data-page="docs">Docs</a>
   </div>
   <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
   <div class="grow"></div>
@@ -438,6 +442,10 @@
     </div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
       <div class="resbar" id="resbar" style="flex:1;margin:0"></div>
+      <div class="navitem" id="tsWrap">
+        <button class="iconbtn" id="tsBtn" title="Table settings">⚙</button>
+        <div class="dropdown" id="tsMenu" style="right:0;left:auto;min-width:250px"></div>
+      </div>
       <div class="viewtoggle" id="viewToggle">
         <button data-view="list" class="on">List</button><button data-view="table">Table</button>
       </div>
@@ -460,6 +468,7 @@
 <div class="shell" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
 <div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
 <div class="shell" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
+<div class="shell" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
 <div class="shell" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
@@ -539,7 +548,7 @@ const I18N = {
   fPromo:"프로모 있음",
   fDailyL:"일일 손실 최대", fMaxllL:"최대 손실 최대", fSplitL:"분배 최소", fDaysL:"최소일수 최대",
   fLevL:"레버리지 최소", fCycleL:"지급 주기",
-  navCh:"챌린지", navRules:"규칙", navHome:"홈", navOffers:"프로모", navCmp:"비교", navTools:"툴", navSpreads:"스프레드", navPayouts:"지급",
+  navCh:"챌린지", navRules:"규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모", navCmp:"비교", navTools:"툴", navSpreads:"스프레드", navPayouts:"지급",
   rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
   rFirm:"회사", rN:"상품", rGrade:"검증 등급",
   stYes:"허용", stNo:"불가", stMix:"혼합", stUnk:"미확인", stCond:"조건부",
@@ -589,7 +598,7 @@ const I18N = {
   fPromo:"Has promo",
   fDailyL:"Max daily loss", fMaxllL:"Max total loss", fSplitL:"Min split", fDaysL:"Max min-days",
   fLevL:"Min leverage", fCycleL:"Payout cycle",
-  navCh:"Challenges", navRules:"Rules", navHome:"Home", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
+  navCh:"Challenges", navRules:"Rules", navHome:"Home", navFirms:"Firms", navDocs:"Docs", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
   rulesH1:"Rules across firms", rulesSub:"Click a firm to filter its challenges. Allowed / conditional / not allowed / unknown aggregated from per-product records.",
   rFirm:"Firm", rN:"Products", rGrade:"Grade",
   stYes:"Allowed", stNo:"Not allowed", stMix:"Mixed", stUnk:"Unknown", stCond:"Conditional",
@@ -618,7 +627,9 @@ const I18N = {
 
 let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
-let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="", offersFilter="all";
+let q="", sortKey="f", sortDir=1, activeId=null, view="list", compareBest=false, compareSearch="", offersFilter="all",
+     colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,1,1,1,1,1,1],
+     dense=localStorage.getItem("helix-dense")==="1";
 const picked = new Set();
 const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),
            sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
@@ -1108,7 +1119,8 @@ function applyStatics(){
   el("gq").placeholder=t("search"); el("empty").textContent=t("empty");
   el("h1").textContent=t("h1"); el("sub").textContent=t("sub");
   {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
-             tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts"};
+             tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
+             firms:"navFirms",docs:"navDocs"};
    document.querySelectorAll("#subnav a").forEach(a=>{const k=NM[a.dataset.page]; if(k) a.textContent=t(k);});}
   el("thFirm").textContent=t("thFirm"); el("thPlan").textContent=t("thPlan");
   el("thMkt").textContent=t("thMkt"); el("thSize").textContent=t("thSize");
@@ -1251,6 +1263,75 @@ function renderHome(){
       </div></div>
     ${faqBlock(FAQ.home)}
     ${srcNote(lang==="ko"?"상품·수수료·규칙 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product, fee and rule values are HELIX records; check the evidence links in each product detail.")}`;
+}
+
+/* ---------- table preferences ---------- */
+const COLKEYS=["thFirm","thPlan","thMkt","thSize","thPrice","thSplit","thDaily","thMax","thTarget","thDd","thEa","thVer"];
+function applyTablePrefs(){
+  let st=document.getElementById("colStyle");
+  if(!st){ st=document.createElement("style"); st.id="colStyle"; document.head.appendChild(st); }
+  st.textContent=colVis.map((on,i)=>on?"":`#tableView th:nth-child(${i+1}),#tableView td:nth-child(${i+1}){display:none}`).join("");
+  const tb=document.querySelector("#tableView table");
+  if(tb) tb.classList.toggle("dense",dense);
+  localStorage.setItem("helix-cols",JSON.stringify(colVis));
+  localStorage.setItem("helix-dense",dense?"1":"0");
+}
+function buildTableSettings(){
+  const m=el("tsMenu"); if(!m) return;
+  m.innerHTML=`<div class="tshead">${lang==="ko"?"컬럼":"Columns"}</div>`+
+    COLKEYS.map((k,i)=>`<label class="tsrow"><input type="checkbox" data-c="${i}" ${colVis[i]?"checked":""}> ${esc(t(k))}</label>`).join("")+
+    `<div class="tshead" style="margin-top:6px">${lang==="ko"?"밀도":"Density"}</div>
+     <label class="tsrow"><input type="checkbox" id="denseChk" ${dense?"checked":""}> ${lang==="ko"?"컴팩트":"Compact"}</label>
+     <div class="tsrow" id="tsReset" style="color:var(--accent);font-weight:700">${lang==="ko"?"초기화":"Reset"}</div>`;
+  m.querySelectorAll("[data-c]").forEach(cb=>cb.onchange=()=>{
+    colVis[Number(cb.dataset.c)]=cb.checked?1:0; applyTablePrefs();
+  });
+  const d=el("denseChk"); if(d) d.onchange=()=>{dense=d.checked;applyTablePrefs();};
+  const r=el("tsReset"); if(r) r.onclick=e=>{e.preventDefault();
+    colVis=[1,1,1,1,1,1,1,1,1,1,1,1]; dense=false; applyTablePrefs(); buildTableSettings();};
+}
+
+/* ---------- Docs ---------- */
+function renderDocs(){
+  const F=[["offer_id","상품 고유 ID (예: CH-AC6DD)"],["provider / product","브랜드와 상품명"],
+    ["asset_class","cfd · fut · crypto · stocks · syn"],["size","계좌 명목 규모"],
+    ["entry_fee / activation_fee / total_fee_known","참가비·활성화비·확인된 총비용"],
+    ["maxloss_raw / daily_loss_raw","최대 손실·일일 손실 (기록된 원문)"],
+    ["drawdown_type_raw","Static · Trailing 등 낙폭 계산 방식"],
+    ["split_pct","수익 분배율"],["payout_cycle / payout_first","지급 주기와 첫 지급 조건"],
+    ["ea_eval / news_eval / on_eval / cp_eval","단계별 규칙 허용 여부"],
+    ["review_status","미검토·검토됨·3자 출처"],["verified","등급 A/B/C"]];
+  el("docsMain").innerHTML=`
+    <div class="hero2"><h1>${lang==="ko"?"HELIX 문서":"HELIX Docs"}</h1>
+      <p>${lang==="ko"?"데이터가 어떻게 구성되어 있고, 각 값이 무엇을 뜻하며, 어떻게 인용하는지 정리했습니다.":"How the data is structured, what each value means, and how to cite it."}</p></div>
+
+    <div class="panel"><h3>${lang==="ko"?"1. 빠른 시작":"1. Quickstart"}</h3>
+      <div class="empty-inline">${lang==="ko"
+        ?"Challenges에서 조건을 좁히고 → 행을 클릭해 상세와 근거 링크를 확인하고 → 비교에 담아 2~4개를 나란히 보세요. 모든 숫자는 상품 단위 기록이며, 상단 검색은 어느 페이지에서든 동작합니다."
+        :"Narrow with filters, open a row for detail and evidence links, then add 2-4 to Compare. Every number is a per-product record and the header search works on every page."}</div></div>
+
+    <div class="panel"><h3>${lang==="ko"?"2. 데이터 구조":"2. Data model"}</h3>
+      <table class="fx"><tbody>${F.map(([k,d])=>`<tr><td style="color:var(--ink);font-family:ui-monospace,monospace;font-size:12px">${esc(k)}</td><td class="dim">${esc(d)}</td></tr>`).join("")}</tbody></table></div>
+
+    <div class="panel"><h3>${lang==="ko"?"3. 검증 등급":"3. Grades"}</h3>
+      <div class="chips"><span class="pill p-A">A</span><span class="dim">${lang==="ko"?"공식 사이트에서 직접 확인":"verified on the official site"}</span>
+      <span class="pill p-B">B</span><span class="dim">${lang==="ko"?"2차·간접 자료":"secondary / indirect"}</span>
+      <span class="pill p-C">C</span><span class="dim">${lang==="ko"?"추정":"inferred"}</span></div>
+      <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+        ?"unknown은 조사하지 않았다는 뜻이며 0도 허용도 아닙니다.":"unknown means not researched — never zero, never permission."}</div></div>
+
+    <div class="panel"><h3>${lang==="ko"?"4. 출처와 인용":"4. Sources & citation"}</h3>
+      <div class="empty-inline">${lang==="ko"
+        ?"상품 상세의 ‘근거 · 출처 링크’에 기록 당시 확인한 출처가 있습니다. PFM에서 가져온 값(파트너 코드·할인·규칙 요약)은 각 페이지 하단에 출처를 표기합니다."
+        :"Each product detail lists the sources checked when it was recorded. PFM-derived values (partner codes, discounts, rule summaries) carry attribution at the bottom of the relevant page."}</div></div>
+
+    <div class="panel"><h3>${lang==="ko"?"5. 로드맵":"5. Roadmap"}</h3>
+      <div class="empty-inline">${lang==="ko"
+        ?"① 스프레드·랏당 커미션 수집 ② PFM 브랜드 데이터 병합 ③ 무료/신규 모델을 샌드박스에서 검증하는 에이전트 팀 운영 ④ 규칙 요약 한국어 번역."
+        :"1) spreads and per-lot commissions 2) merge PFM brand data 3) an agent team that sandbox-tests free/new models 4) Korean translation of rule summaries."}</div></div>
+
+    ${faqBlock(FAQ.home)}
+    ${srcNote(lang==="ko"?"문서는 HELIX 데이터 구조를 설명합니다.":"These docs describe the HELIX data model.")}`;
 }
 
 /* ---------- Prop Firms list ---------- */
@@ -1743,7 +1824,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   const h=(location.hash||"").replace(/^#/,"")||"home";
@@ -1752,7 +1833,7 @@ function route(){
   Object.entries(PAGES).forEach(([k,id])=>{ el(id).style.display=(k===page)?"grid":"none"; });
   el("pageFirm").style.display=isFirm?"grid":"none";
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
@@ -1760,6 +1841,7 @@ function route(){
   else if(page==="home"){ renderHome(); bindHomeLinks(); }
   else if(page==="offers") renderOffers();
   else if(page==="firms") renderFirms();
+  else if(page==="docs") renderDocs();
   else if(page==="compare") renderCompare();
   else if(page==="payouts") renderPayouts();
   else if(page==="spreads") renderSpreads();
@@ -1777,6 +1859,6 @@ document.querySelectorAll("#chMenu a").forEach(a=>a.onclick=e=>{
   }
   if(a.dataset.all){ e.preventDefault(); F.mk.clear(); location.hash="#challenges"; route(); render(); }
 });
-applyTheme();applyStatics();render();route();
+applyTheme();applyTablePrefs();buildTableSettings();applyStatics();render();route();
 </script>
 </body></html>
