@@ -28,7 +28,7 @@
   a{color:var(--blue)}
   .top{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
   .hsearch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line2);
-    border-radius:9999px;padding:7px 14px;min-width:240px;max-width:420px;flex:1}
+    border-radius:9999px;padding:6px 13px;min-width:190px;width:315px;flex:0 0 315px;margin-right:8px}
   .hsearch input{border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:13px;width:100%}
   .hsearch input::placeholder{color:var(--muted)}
   table.dense td{padding:5px 8px;font-size:12px}
@@ -97,16 +97,17 @@
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
   .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
   .navitem{position:relative;display:inline-flex}
-  .dropdown{position:absolute;top:calc(100% + 10px);left:0;min-width:240px;background:var(--panel);
+  .dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:240px;background:var(--panel);
     border:1px solid var(--line2);border-radius:12px;padding:6px;box-shadow:var(--shadow);
     opacity:0;pointer-events:none;transform:translateY(-4px);transition:.14s;z-index:60}
   .navitem:hover .dropdown{opacity:1;pointer-events:auto;transform:none}
+  .dropdown::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
   .dropdown a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
     font-size:12.5px;color:var(--ink2);text-decoration:none;white-space:nowrap}
   .dropdown a:hover{background:var(--panel2);color:var(--ink)}
   .dropdown a b{font-weight:600}
   .dropdown a span{margin-left:auto;color:var(--muted);font-size:11px}
-  .navpill{display:flex;align-items:center;gap:1px;margin:0 auto;padding:4px;
+  .navpill{display:flex;align-items:center;gap:1px;margin:0 0 0 6px;padding:4px;
     border-radius:9999px;border:1px solid rgba(167,139,250,.38);
     background:linear-gradient(90deg,rgba(167,139,250,.16),rgba(167,139,250,.05) 45%,rgba(167,139,250,.16));
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.35), 0 0 22px rgba(167,139,250,.10)}
@@ -397,6 +398,12 @@
       <path d="M16.6 21.4c3-.5 5.3-2.4 6.2-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".5"/>
       <path d="M10.1 8.1v9.4M10.1 12.6h4.6M14.7 8.1v9.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     </svg><div><b class="wm">helix</b><span id="brandSub"></span></div></a>
+  <div class="grow"></div>
+  <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
+  <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
+    <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
+  <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
+  <button class="iconbtn" id="theme" title="theme">☾</button>
   <div class="navpill" id="subnav">
     <span class="navitem">
       <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
@@ -407,21 +414,13 @@
         <a href="#compare"><b>Compare</b><span>→</span></a>
       </div>
     </span>
-    <a href="#compare" data-page="compare">Compare</a>
-    <a href="#offers" data-page="offers">Offers</a>
     <a href="#firms" data-page="firms">Firms</a>
+    <a href="#offers" data-page="offers">Offers</a>
     <a href="#rules" data-page="rules">Rules</a>
-    <a href="#payouts" data-page="payouts">Payouts</a>
-    <a href="#spreads" data-page="spreads">Spreads</a>
     <a href="#tools" data-page="tools">Tools</a>
-    <a href="#docs" data-page="docs">Docs</a>
+    <a href="#spreads" data-page="spreads">Spreads</a>
+    <a href="#payouts" data-page="payouts">Payouts</a>
   </div>
-  <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
-  <div class="grow"></div>
-  <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
-    <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
-  <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
-  <button class="iconbtn" id="theme" title="theme">☾</button>
 </div>
 </div>
 
@@ -489,6 +488,7 @@
     <div id="rPfm"></div>
     <footer id="foot2"></footer>
     <div id="rFaq"></div>
+    <div style="margin-top:16px"><a href="#docs" style="font-size:12px">문서 / Docs</a></div>
   </main>
 </div>
 
@@ -525,7 +525,7 @@ const ASSET_TIP = {ko:"Synthetic — 업체가 자체 산출하는 합성 지수
 const I18N = {
  ko:{
   brandSub:"프랍펌 및 브로커 데이터베이스",
-  h1:"Discover Challenges",
+  h1:"챌린지 둘러보기",
   sub:"왼쪽 필터로 좁히고, 행을 클릭하면 근거 링크까지 담긴 상세가 열립니다. 마우스를 올리면 빠른 비교가 뜹니다.",
   rows:"개 상품", firms:"개 브랜드",
   s1:"상품", s2:"브랜드", s3:"자산군", s4:"검증 A등급",
@@ -539,16 +539,16 @@ const I18N = {
   kTarget:"이익 목표", kDaily:"일일 손실", kMax:"최대 손실", kDays:"최소 거래일",
   sectCost:"비용", sectCond:"거래 조건", sectPay:"지급 조건", sectFloor:"낙폭 구조", sectSrc:"데이터 출처",
   sectNotes:"원본 기록", sectEv:"근거 · 출처 링크", sectPromo:"프로모션", sectMore:"상세 수치",
-  pCode:"프로모 코드", pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
+  pCode:"프로모션 코드", pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   pNoExpiry:"만료일 미표기", pExpired:"만료", pToday:"오늘 마감", pDays:"일 남음",
   pNone:"이 상품에 등록된 프로모션이 없습니다.",
   cTargets:"목표 (단계별)", cConsist:"일관성 규칙", cCap:"지급 상한", cMinPay:"최소 지급액",
   cPfmRef:"PFM 참고 (미검증)", cStepDetail:"단계 상세", cLeverageDetail:"레버리지 상세",
   gA:"1차 확인", gB:"2차·간접", gC:"추정",
-  fPromo:"프로모 있음",
+  fPromo:"프로모션 있음",
   fDailyL:"일일 손실 최대", fMaxllL:"최대 손실 최대", fSplitL:"분배 최소", fDaysL:"최소일수 최대",
   fLevL:"레버리지 최소", fCycleL:"지급 주기",
-  navCh:"챌린지", navRules:"규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모", navCmp:"비교", navTools:"툴", navSpreads:"스프레드", navPayouts:"지급",
+  navCh:"챌린지", navRules:"규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모션", navCmp:"비교", navTools:"도구", navSpreads:"스프레드", navPayouts:"지급",
   rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
   rFirm:"회사", rN:"상품", rGrade:"검증 등급",
   stYes:"허용", stNo:"불가", stMix:"혼합", stUnk:"미확인", stCond:"조건부",
@@ -567,7 +567,7 @@ const I18N = {
   popAdd:"비교에 추가", popOpen:"상세 보기", popFull:"이미 추가됨",
   cbarL:"비교", cbarClear:"초기화", cbarGo:"비교하기", cbarPick:"2개 이상 선택",
   cmpTitle:"Compare Challenges", cmpDiff:"다른 항목만 강조됩니다.",
-  fFirm:"회사", fPlan:"상품", fAsset:"자산군", fPromo:"프로모", fRating:"평점", fSite:"공식 사이트", fSize:"계좌 규모", fPrice:"참가비", fAct:"활성화", fTotal:"총비용",
+  fFirm:"회사", fPlan:"상품", fAsset:"자산군", fPromo:"프로모션", fRating:"평점", fSite:"공식 사이트", fSize:"계좌 규모", fPrice:"참가비", fAct:"활성화", fTotal:"총비용",
   fSplit:"수익 분배", fDaily:"일일 손실", fMax:"최대 손실", fTarget:"목표", fDd:"낙폭 방식",
   fLev:"레버리지", fSteps:"방식", fDays:"최소 거래일", fCycle:"지급 주기", fEa:"EA", fNews:"뉴스",
   fKorea:"한국 계좌", fVer:"검증 등급", fSrc:"출처 유형", fSite:"공식 사이트",
@@ -1117,6 +1117,11 @@ function applyStatics(){
   el("fTitle").textContent=t("filters");
   el("reset").textContent=t("reset");
   el("gq").placeholder=t("search"); el("empty").textContent=t("empty");
+  {const vt=document.querySelectorAll("#viewToggle button");
+   if(vt[0]) vt[0].textContent=lang==="ko"?"목록":"List";
+   if(vt[1]) vt[1].textContent=lang==="ko"?"표":"Table";
+   const cg=el("cmpGo"); if(cg) cg.textContent=lang==="ko"?"비교":"Compare";
+   const tb=el("tsBtn"); if(tb) tb.title=lang==="ko"?"표 설정":"Table settings";}
   el("h1").textContent=t("h1"); el("sub").textContent=t("sub");
   {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
              tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
@@ -1184,8 +1189,8 @@ const FAQ={
        ["What does unknown mean?","It means not researched yet. It is not zero and not permission. Always verify on the firm's official site."],
        ["What are grades A/B/C?","A = verified against the official source, B = secondary/indirect, C = inferred."]]},
  offers:{ko:[["MATCH 코드는 무엇인가요?","Prop Firm Match가 각 업체와 제휴해 제공하는 파트너 코드입니다. HELIX는 이를 참고용으로 함께 표기합니다."],
-         ["공식 프로모와 PFM 코드가 다르면?","둘 다 표기합니다. 업체 공식 코드는 ‘공식 코드’ 열에, PFM 파트너 코드는 ‘PFM 코드’ 열에 나옵니다. 결제 전 업체 결제창에서 최종 확인하세요."],
-         ["할인율은 언제 기준인가요?","PFM 파트너 할인율은 PFM offers 페이지(2026-11) 기준이며, 업체 프로모는 HELIX 기록 시점 기준입니다."]],
+         ["공식 프로모션와 PFM 코드가 다르면?","둘 다 표기합니다. 업체 공식 코드는 ‘공식 코드’ 열에, PFM 파트너 코드는 ‘PFM 코드’ 열에 나옵니다. 결제 전 업체 결제창에서 최종 확인하세요."],
+         ["할인율은 언제 기준인가요?","PFM 파트너 할인율은 PFM offers 페이지(2026-11) 기준이며, 업체 프로모션는 HELIX 기록 시점 기준입니다."]],
          en:[["What is the MATCH code?","It is Prop Firm Match's partner code with each firm. HELIX shows it alongside the official code, for reference."],
          ["Official promo vs PFM code?","Both are shown: the official code in its own column and the PFM partner code in another. Confirm at the firm's checkout before paying."],
          ["How fresh are the discounts?","PFM partner discounts are from propfirmmatch.com/offers (Nov 2026); official promos are as recorded in HELIX."]]},
@@ -1250,13 +1255,13 @@ function renderHome(){
       <a class="stat statlink" href="#firms"><div class="n">${DB.firms.length}</div>
         <div class="l">${esc(t("firms"))} <span class="go">→</span></div></a>
       <a class="stat statlink" href="#offers"><div class="n">${promoFirms.length}</div>
-        <div class="l">${lang==="ko"?"프로모 진행 브랜드":"brands with promo"} <span class="go">→</span></div></a>
+        <div class="l">${lang==="ko"?"프로모션 진행 브랜드":"brands with promo"} <span class="go">→</span></div></a>
       <a class="stat statlink" href="#challenges" data-grade="A"><div class="n">${graded}</div>
         <div class="l">${lang==="ko"?"A등급 상품":"grade-A products"} <span class="go">→</span></div></a>
     </div>
     <div class="panel"><h3>${lang==="ko"?"바로가기":"Jump to"} <span>pages</span></h3>
       <div class="chips">
-        <a class="chip2" href="#offers" style="text-decoration:none;color:inherit">${lang==="ko"?"프로모 코드 모아보기":"All offers"}</a>
+        <a class="chip2" href="#offers" style="text-decoration:none;color:inherit">${lang==="ko"?"프로모션 코드 모아보기":"All offers"}</a>
         <a class="chip2" href="#challenges" style="text-decoration:none;color:inherit">${lang==="ko"?"챌린지 비교":"Challenges"}</a>
         <a class="chip2" href="#rules" style="text-decoration:none;color:inherit">${lang==="ko"?"회사별 규칙":"Rules by firm"}</a>
         <a class="chip2" href="#payouts" style="text-decoration:none;color:inherit">${lang==="ko"?"지급 조건":"Payouts"}</a>
@@ -1350,7 +1355,7 @@ function renderFirms(){
     .sort((a,b)=>b.n-a.n);
   el("firmsMain").innerHTML=`
     <div class="hero2"><h1>${lang==="ko"?"프랍펌 · 브로커 목록":"Prop Firms"}</h1>
-      <p>${lang==="ko"?`${list.length}개 브랜드. 회사를 누르면 상품·규칙·프로모가 담긴 상세 페이지로 이동합니다.`:`${list.length} brands. Click a firm for its products, rules and offers.`}</p></div>
+      <p>${lang==="ko"?`${list.length}개 브랜드. 회사를 누르면 상품·규칙·프로모션가 담긴 상세 페이지로 이동합니다.`:`${list.length} brands. Click a firm for its products, rules and offers.`}</p></div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
       <table class="fx" style="min-width:820px"><thead><tr>
         <th>${esc(t("fFirm"))}</th><th class="num">${esc(t("rows"))}</th><th>${esc(t("fAsset"))}</th>
@@ -1387,11 +1392,11 @@ function renderOffers(){
     offersFilter==="expiry"? !!o.exp : true);
   const withPfm=list.filter(([,o])=>o.pfm).length;
   el("offersMain").innerHTML=`
-    <div class="hero2"><h1>${lang==="ko"?"프로모 코드 한눈에 보기":"All current offers"}</h1>
+    <div class="hero2"><h1>${lang==="ko"?"프로모션 코드 한눈에 보기":"All current offers"}</h1>
       <p>${lang==="ko"?`${list.length}개 브랜드의 프로모션을 모았습니다. 공식 코드와 PFM 파트너 코드를 나란히 표기합니다.`:`${list.length} brands. Official codes and PFM partner codes side by side.`}</p></div>
     <div class="stats">
       <a class="stat statlink ${offersFilter==="all"?"on":""}" data-of="all"><div class="n">${listAll.length}</div>
-        <div class="l">${lang==="ko"?"프로모 브랜드":"promo brands"} <span class="go">→</span></div></a>
+        <div class="l">${lang==="ko"?"프로모션 브랜드":"promo brands"} <span class="go">→</span></div></a>
       <a class="stat statlink ${offersFilter==="official"?"on":""}" data-of="official"><div class="n">${listAll.filter(([,o])=>o.code).length}</div>
         <div class="l">${lang==="ko"?"공식 코드 기록":"official codes"} <span class="go">→</span></div></a>
       <a class="stat statlink ${offersFilter==="pfm"?"on":""}" data-of="pfm"><div class="n">${listAll.filter(([,o])=>o.pfm).length}</div>
