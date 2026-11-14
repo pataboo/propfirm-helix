@@ -116,6 +116,11 @@
   .fsearch{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
     color:var(--ink);font:inherit;font-size:12px;padding:6px 9px;margin-bottom:6px}
   .chips2{display:flex;flex-wrap:wrap;gap:6px;padding-top:2px}
+  .rangeRow{display:flex;align-items:center;gap:6px;margin-top:8px}
+  .rangeRow input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
+    padding:5px 8px;color:var(--ink);font-size:12px;font-family:inherit}
+  .rangeRow input:focus{outline:none;border-color:var(--accent)}
+  .rangeRow span{color:var(--muted);font-size:12px}
   .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
   .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
@@ -670,10 +675,10 @@ let theme = localStorage.getItem("helix-theme") || "dark";
 let q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareSearch="", offersFilter="all",
      colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,1,1,1,1,1],
      dense=localStorage.getItem("helix-dense")==="1";
-const ALL_GROUPS=["st","dd","cycle","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
+const ALL_GROUPS=["st","dd","cycle","paym","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
 const picked = new Set();
-const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
+const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),paym:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
            sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
 const el=id=>document.getElementById(id);
 const t=k=>(I18N[lang][k] ?? k);
@@ -698,6 +703,16 @@ function dateLabel(r){
   if(r.ds==="unknown_future_legacy_date"||(r.la&&!ok(r.la)))
     return lang==="ko"?"미검증":"unverified";
   return "—";
+}
+const PAYM=[[/카드|card|visa|master/i,"카드","Card"],
+            [/은행|bank|wire|swift|ach/i,"은행 이체","Bank"],
+            [/crypto|usdt|btc|크립토|코인/i,"크립토","Crypto"],
+            [/risework/i,"RiseWorks","RiseWorks"],
+            [/wise|paypal|stripe|deel/i,"Wise/PayPal","Wise/PayPal"],
+            [/카카오|kakao/i,"카카오페이","KakaoPay"]];
+function payMethods(r){
+  const txt=[r.payCapNote,r.pcn,r.payout,r.po,r.paySrc,r.ps,r.payMinNote,r.payFirst].join(" ");
+  return PAYM.filter(([re])=>re.test(txt||"")).map(([,ko,en])=>lang==="ko"?ko:en);
 }
 function daysCell(r){
   const v = (r.md!=null?r.md:(r.minDaysFinal!=null?r.minDaysFinal:r.minDays));
@@ -790,9 +805,11 @@ function matches(r){
   const dy=num(r.mf??r.md); if(F.daysMax!=null&&(dy==null||dy>F.daysMax))return false;
   const lv=num(r.lv); if(F.levMin!=null&&(lv==null||lv<F.levMin))return false;
   if(F.fee.size && !F.fee.has(feeClass(r))) return false;
+  if(F.paym && F.paym.size){ const pm=payMethods(r); if(![...F.paym].some(k=>pm.includes(k))) return false; }
   if(activePreset && !presetOk(r,activePreset)) return false;
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
+  if(F.target && /^\d+$/.test(F.target) && !(num(r.tg)>=Number(F.target)))return false;
   if(F.daysBand){ const d2=num(r.mf??r.md);
     if(d2==null) return false;
     if(F.daysBand==="zero" && d2!==0) return false;
@@ -883,10 +900,12 @@ function buildFilters(){
     ${[...new Set(rows.map(r=>r.st).filter(Boolean))].map(v=>chk(enumv(v)||v,F.st.has(v),"st",v,rowCount(r=>r.st===v))).join("")}</div></details>`);
   const SIZES=[[0,25000,"≤ 25K"],[25000,50000,"25–50K"],[50000,100000,"50–100K"],[100000,null,"100K+"]];
   add("size", `<details class="fgroup" data-g="size" ${OPEN.size?"open":""}><summary title="${esc((TIPS.size)[lang])}">${esc(t("size"))}</summary><div class="body"><div class="chips2">
-    ${SIZES.map(([lo,hi,lb])=>`<button data-size="${lo}-${hi==null?"":hi}" class="${F.sizeMin===lo&&F.sizeMax===(hi??null)?"on":""}">${lb}</button>`).join("")}</div></div></details>`);
+    ${SIZES.map(([lo,hi,lb])=>`<button data-size="${lo}-${hi==null?"":hi}" class="${F.sizeMin===lo&&F.sizeMax===(hi??null)?"on":""}">${lb}</button>`).join("")}</div>
+    <div class="rangeRow"><input type="number" id="sizeMinIn" placeholder="${lang==="ko"?"최소":"min"}" value="${F.sizeMin??""}"><span>–</span><input type="number" id="sizeMaxIn" placeholder="${lang==="ko"?"최대":"max"}" value="${F.sizeMax??""}"></div></div></details>`);
   const FEES=[[null,100,"≤ $100"],[null,300,"≤ $300"],[null,600,"≤ $600"]];
   add("price", `<details class="fgroup" data-g="price" ${OPEN.price?"open":""}><summary title="${esc((TIPS.price)[lang])}">${esc(t("price"))}</summary><div class="body"><div class="chips2">
-    ${FEES.map(([,mx,lb])=>`<button data-fee="${mx}" class="${F.priceMax===mx?"on":""}">${lb}</button>`).join("")}</div></div></details>`);
+    ${FEES.map(([,mx,lb])=>`<button data-fee="${mx}" class="${F.priceMax===mx?"on":""}">${lb}</button>`).join("")}</div>
+    <div class="rangeRow" style="margin-top:6px"><input type="number" id="priceMaxIn" placeholder="${lang==="ko"?"최대 $ 직접입력":"max $"}" value="${F.priceMax??""}"></div></div></details>`);
   add("split", `<details class="fgroup" data-g="split" ${OPEN.split?"open":""}><summary title="${esc((TIPS.split)[lang])}">${esc(t("fSplit"))}</summary><div class="body"><div class="chips2">
     ${[80,85,90,95].map(v=>`<button data-split="${v}" class="${F.splitMin===v?"on":""}">≥ ${v}%</button>`).join("")}</div></div></details>`);
   add("dd", `<details class="fgroup" data-g="dd" ${OPEN.dd?"open":""}><summary title="${esc((TIPS.dd)[lang])}">${esc(t("ddF"))}</summary><div class="body">
@@ -898,11 +917,15 @@ function buildFilters(){
     ${DB.tiers.map(v=>chk(t("grade")+" "+v,F.vf.has(v),"vf",v,rowCount(r=>r.vf===v))).join("")}</div></details>`);
   add("cycle", `<details class="fgroup" data-g="cycle" ${OPEN.cycle?"open":""}><summary title="${esc((TIPS.cycle)[lang])}">${esc(t("fCycleL"))}</summary><div class="body">
     ${cyc.map(v=>chk(v,F.cycle.has(v),"cycle",v,rowCount(r=>r.pc===v))).join("")}</div></details>`);
+  {const pmOpts=[...new Set(rows.flatMap(r=>payMethods(r)))].sort();
+   if(pmOpts.length) add("paym", `<details class="fgroup" data-g="paym" ${OPEN.paym?"open":""}><summary>${lang==="ko"?"지급 방식":"Payout method"}</summary><div class="body">
+    ${pmOpts.map(v=>chk(v,F.paym.has(v),"paym",v,rowCount(r=>payMethods(r).includes(v)))).join("")}</div></details>`);}
   add("fee", `<details class="fgroup" data-g="fee" ${OPEN.fee?"open":""}><summary>${lang==="ko"?"결제 유형":"Payment"}</summary><div class="body"><div class="chips2">
     ${["free","normal","later"].map(k=>`<button data-fee="${k}" class="${F.fee.has(k)?"on":""}">${esc(fclassLabel(k))}</button>`).join("")}</div></div></details>`);
   add("target", `<details class="fgroup" data-g="target" ${OPEN.target?"open":""}><summary title="${esc((TIPS.split)[lang])}">${esc(t("fTarget"))}</summary><div class="body"><div class="chips2">
-    <button data-target="yes" class="${F.target==="yes"?"on":""}">${lang==="ko"?"목표 있음":"has target"}</button>
-    <button data-target="no" class="${F.target==="no"?"on":""}">${lang==="ko"?"목표 없음":"no target"}</button></div></div></details>`);
+    <button data-target="no" class="${F.target==="no"?"on":""}">${lang==="ko"?"목표 없음":"no target"}</button>
+    ${[3,5,8,10,12].map(v=>`<button data-target="${v}" class="${F.target===String(v)?"on":""}">${v}%+</button>`).join("")}
+    <button data-target="yes" class="${F.target==="yes"?"on":""}">${lang==="ko"?"목표 있음":"has target"}</button></div></div></details>`);
   add("days", `<details class="fgroup" data-g="days" ${OPEN.days?"open":""}><summary>${esc(t("fDays"))}</summary><div class="body"><div class="chips2">
     <button data-days="zero" class="${F.daysBand==="zero"?"on":""}">0${lang==="ko"?"일":"d"}</button>
     <button data-days="low" class="${F.daysBand==="low"?"on":""}">1–5${lang==="ko"?"일":"d"}</button>
@@ -929,6 +952,11 @@ function buildFilters(){
     if(cb.checked) F[k].add(v); else F[k].delete(v);
     render();
   });
+  {const a=el("sizeMinIn"),b=el("sizeMaxIn");
+   const apply=()=>{ F.sizeMin = a&&a.value!==""?Number(a.value):null; F.sizeMax = b&&b.value!==""?Number(b.value):null;
+     render(); };
+   if(a) a.onchange=apply; if(b) b.onchange=apply;}
+  {const c=el("priceMaxIn"); if(c) c.onchange=()=>{ F.priceMax = c.value!==""?Number(c.value):null; render(); };}
   host.querySelectorAll("button[data-size]").forEach(b=>b.onclick=()=>{
     const [lo,hi]=b.dataset.size.split("-");
     const on=F.sizeMin===Number(lo)&&F.sizeMax===(hi===""?null:Number(hi));
