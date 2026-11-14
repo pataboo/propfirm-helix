@@ -440,7 +440,7 @@
         <a href="#challenges" data-all="1"><b>전체 챌린지</b><span>693</span></a>
         <a href="#firms"><b>프랍펌</b><span>29</span></a>
         <a href="#discover"><b>둘러보기</b><span>→</span></a>
-        <a href="#challenges" data-cmp="1"><b>비교</b><span>⇄</span></a>
+        <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
       </div>
     </span>
     <a href="#firms" data-page="firms">Firms</a>
@@ -2235,8 +2235,8 @@ document.querySelectorAll("#chMenu a").forEach(a=>a.onclick=e=>{
   if(b.style.display==="block") buildFilterSettings();
 };}
 document.querySelectorAll("#chMenu a").forEach(a=>{
-  if(a.dataset.cmp) a.addEventListener("click",()=>{ picked.clear(); location.hash="#compare"; route(); });
-  if(a.dataset.discover) a.addEventListener("click",()=>{ location.hash="#discover"; route(); });
+  if(a.dataset.cmp) a.addEventListener("click",e=>{ e.preventDefault(); picked.clear(); location.hash="#compare"; route(); });
+  if(a.dataset.discover) a.addEventListener("click",e=>{ e.preventDefault(); location.hash="#discover"; route(); });
 });
 applyTheme();applyTablePrefs();buildTableSettings();buildSort();applyStatics();render();route();
 </script>
