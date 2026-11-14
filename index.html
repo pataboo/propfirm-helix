@@ -72,7 +72,7 @@
   .best{background:rgba(167,139,250,.20)!important;color:var(--ink)!important;font-weight:800;
     box-shadow:inset 0 0 0 1px rgba(167,139,250,.5);border-radius:6px}
   .cmpwrap{display:grid;gap:0}
-  .cmpslots{display:grid;grid-auto-flow:column;gap:10px;margin:16px 0}
+  .cmpslots{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin:16px 0}
   .slotcard{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:11px 13px;min-width:0}
   .slotcard .nm{font-weight:800;font-size:13px;display:flex;align-items:center;gap:7px}
   .slotcard .rm{margin-left:auto;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13px}
@@ -86,6 +86,14 @@
   .cmptable td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
   .cmptable td.k{color:var(--muted);font-weight:700;width:180px;background:var(--panel2)}
   .cmptable td.diff{background:rgba(231,70,148,.08)}
+  .cmptable.tight td.k{width:132px}
+  .cmptable.tight th,.cmptable.tight td{padding:8px 8px}
+  .cmpslots.tight{gap:8px}
+  .cmpslots.tight .slotcard{padding:9px 10px}
+  .cmpnotice{position:fixed;left:50%;bottom:86px;transform:translate(-50%,10px);z-index:130;background:var(--panel2);
+    border:1px solid var(--line2);border-radius:10px;padding:9px 14px;font-size:12.5px;color:var(--ink);
+    opacity:0;pointer-events:none;transition:.16s;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .cmpnotice.on{opacity:1;transform:translate(-50%,0)}
   .hlbar{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink2)}
   .switch{width:38px;height:21px;border-radius:9999px;background:var(--line2);position:relative;cursor:pointer;flex:none;transition:.15s}
   .switch.on{background:var(--accent)}
@@ -459,6 +467,7 @@
     thead th{padding:6px 5px}
     td{padding:7px 5px}
     .panel{padding:12px}
+    .cmpslots{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
   }
 </style></head><body>
 
@@ -648,6 +657,8 @@ const I18N = {
   popAdd:"비교에 추가", popOpen:"상세 보기", popFull:"이미 추가됨",
   cbarL:"비교", cbarClear:"초기화", cbarGo:"비교하기", cbarPick:"2개 이상 선택",
   cmpTitle:"Compare Challenges", cmpDiff:"다른 항목만 강조됩니다.",
+  cmpDiffOnly:"차이만 보기", cmpDiffHint:"같은 값인 항목을 접습니다", cmpFull:"비교는 최대 5개까지 담을 수 있습니다.",
+  cmpNoneSame:"선택한 상품의 값이 모든 항목에서 같습니다.",
   fFirm:"회사", fPlan:"상품", fAsset:"자산군", fPromo:"프로모션", fRating:"평점", fSite:"공식 사이트", fSize:"계좌 규모", fPrice:"참가비", fAct:"활성화", fTotal:"총비용",
   fSplit:"수익 분배", fDaily:"일일 손실", fMax:"최대 손실", fTarget:"목표", fDd:"낙폭 방식",
   fLev:"레버리지", fSteps:"방식", fDays:"최소 거래일", fCycle:"지급 주기", fEa:"EA", fNews:"뉴스",
@@ -698,6 +709,8 @@ const I18N = {
   popAdd:"Add to compare", popOpen:"Details", popFull:"Already added",
   cbarL:"Compare", cbarClear:"Clear", cbarGo:"Compare", cbarPick:"Pick 2+",
   cmpTitle:"Side by side", cmpDiff:"Only differing fields are highlighted.",
+  cmpDiffOnly:"Differences only", cmpDiffHint:"Collapse fields where every product matches", cmpFull:"Compare holds up to 5 products.",
+  cmpNoneSame:"The selected products match on every field.",
   fFirm:"Firm", fPlan:"Product", fAsset:"Asset", fPromo:"Promo", fRating:"Rating", fSite:"Site", fSize:"Account size", fPrice:"Entry fee", fAct:"Activation", fTotal:"Total",
   fSplit:"Profit split", fDaily:"Daily loss", fMax:"Max loss", fTarget:"Target", fDd:"Drawdown",
   fLev:"Leverage", fSteps:"Step type", fDays:"Min days", fCycle:"Payout cycle", fEa:"EA", fNews:"News",
@@ -710,7 +723,7 @@ let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
 let shownRows=120,
     unitMode=localStorage.getItem("helix-unit")||"auto",
-    q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareSearch="", offersFilter="all",
+    q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
      colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols")||"null"); const n=13; if(!v) return Array(n).fill(1); const o=v.slice(0,n); while(o.length<n) o.push(1); return o;})(),
      dense=localStorage.getItem("helix-dense")==="1";
 const ALL_GROUPS=["st","dd","cycle","paym","plat","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
@@ -1229,7 +1242,7 @@ function showPop(id, tr, ev){
   if(y+h>window.innerHeight-12) y=Math.max(70, cy-h-16);
   pop.style.left=Math.max(12,x)+"px"; pop.style.top=Math.max(70,y)+"px";
   pop.querySelectorAll("[data-add]").forEach(btn=>btn.onclick=e=>{
-    e.stopPropagation(); addPick(btn.dataset.add); hidePop(); render();
+    e.stopPropagation(); if(!addPick(btn.dataset.add)) flashCmpFull(); hidePop(); render();
   });
   pop.querySelectorAll("[data-open]").forEach(btn=>btn.onclick=e=>{
     e.stopPropagation(); hidePop(); openDrawer(btn.dataset.open);
@@ -1238,10 +1251,18 @@ function showPop(id, tr, ev){
 function hidePop(){ clearTimeout(popTimer); popTimer=setTimeout(()=>el("pop").classList.remove("on"), 300); }
 
 /* ---------- compare ---------- */
+const CMP_MAX=5;
+let cmpNoticeTimer=null;
+function flashCmpFull(){
+  let nn=el("cmpNotice");
+  if(!nn){ nn=document.createElement("div"); nn.id="cmpNotice"; nn.className="cmpnotice"; nn.setAttribute("role","status"); document.body.appendChild(nn); }
+  nn.textContent=t("cmpFull"); nn.classList.add("on");
+  clearTimeout(cmpNoticeTimer); cmpNoticeTimer=setTimeout(()=>nn.classList.remove("on"),2600);
+}
 function addPick(id){
-  if(picked.has(id)) return;
-  if(picked.size>=4) return;
-  picked.add(id); renderBar();
+  if(picked.has(id)) return true;
+  if(picked.size>=CMP_MAX) return false;
+  picked.add(id); renderBar(); return true;
 }
 function renderBar(){
   const arr=[...picked];
@@ -1403,7 +1424,7 @@ function openDrawer(id){
     `<button class="btn" id="dCmp" style="margin-right:6px">${lang==="ko"?"비교하기":"Compare"}</button>`+
     (r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:"");
   {const _d=el("dDetail"); if(_d) _d.onclick=()=>{const id=r.i; closeDrawer(); location.hash="#challenge/"+encodeURIComponent(id); route();};}
-  {const _k=el("dCmp"); if(_k) _k.onclick=()=>{picked.add(r.i); closeDrawer(); renderBar(); location.hash="#compare"; route();};}
+  {const _k=el("dCmp"); if(_k) _k.onclick=()=>{if(!addPick(r.i)) flashCmpFull(); closeDrawer(); renderBar(); location.hash="#compare"; route();};}
   el("drawer").classList.add("on"); el("drawer").setAttribute("aria-hidden","false");
   el("scrim").classList.add("on");
   document.querySelectorAll("#tb tr").forEach(tr=>tr.classList.toggle("open",tr.dataset.id===id));
@@ -1515,10 +1536,10 @@ const FAQ={
          ["How fresh are the discounts?","PFM partner discounts are from propfirmmatch.com/offers (Nov 2026); official promos are as recorded in HELIX."]]},
  challenges:{ko:[["상품이 693개인데 왜 업체는 29개인가요?","한 업체가 여러 상품(계좌 규모 × 프로그램)을 운영하기 때문입니다. 한 행이 하나의 상품입니다."],
              ["왜 어떤 상품은 금액이 비어 있나요?","해당 값을 아직 기록하지 못한 경우입니다. 0으로 채우지 않습니다."],
-             ["비교는 어떻게 하나요?","행을 클릭해 상세를 열고, 카드의 ‘비교에 추가’로 담은 뒤 하단 Compare에서 2~4개를 나란히 볼 수 있습니다."]],
+             ["비교는 어떻게 하나요?","행을 클릭해 상세를 열고, 카드의 ‘비교에 추가’로 담은 뒤 하단 Compare에서 2~5개를 나란히 볼 수 있습니다."]],
              en:[["693 products but only 29 brands?","One brand runs many products (size × programme). Each row is a single product."],
              ["Why are some values blank?","Because that value has not been recorded yet. We never fill blanks with zero."],
-             ["How do I compare?","Open a row for details, add it to compare, then open Compare to see 2-4 side by side."]]},
+             ["How do I compare?","Open a row for details, add it to compare, then open Compare to see 2-5 side by side."]]},
  rules:{ko:[["규칙 집계는 어떤 기준인가요?","상품 단위 기록을 회사별로 묶어 허용/조건부/혼합/불가/미확인으로 판정합니다."],
         ["조건부와 혼합의 차이는?","조건부는 특정 조건에서만 허용된다는 기록이고, 혼합은 상품마다 기록이 서로 다른 경우입니다."],
         ["규칙은 자주 바뀌나요?","네. 프랍펌 규칙은 자주 바뀌므로 거래 전 반드시 공식 규정을 확인하세요."]],
@@ -1711,7 +1732,7 @@ function renderChallenge(id){
       lang==="ko"?"값은 기록된 원문이며 unknown은 미조사입니다. 자금 투입 전 공식 사이트에서 확인하세요.":"Values are records; unknown means not researched. Verify on the official site before funding."],
       [lang==="ko"?"비교하려면?":"How do I compare?",
       lang==="ko"?"‘비교에 추가’를 누른 뒤 챌린지의 비교 버튼으로 이동하세요.":"Add to compare, then open the compare button on the challenges page."]])}`;
-  const add=el("chAdd"); if(add) add.onclick=()=>{picked.add(r.i); renderBar(); add.textContent=lang==="ko"?"비교에 추가됨":"Added";};
+  const add=el("chAdd"); if(add) add.onclick=()=>{if(addPick(r.i)) add.textContent=lang==="ko"?"비교에 추가됨":"Added"; else flashCmpFull(); renderBar();};
 }
 
 function renderDiscover(){
@@ -1800,8 +1821,8 @@ function renderDocs(){
 
     <div class="panel"><h3>${lang==="ko"?"1. 빠른 시작":"1. Quickstart"}</h3>
       <div class="empty-inline">${lang==="ko"
-        ?"Challenges에서 조건을 좁히고 → 행을 클릭해 상세와 근거 링크를 확인하고 → 비교에 담아 2~4개를 나란히 보세요. 모든 숫자는 상품 단위 기록이며, 상단 검색은 어느 페이지에서든 동작합니다."
-        :"Narrow with filters, open a row for detail and evidence links, then add 2-4 to Compare. Every number is a per-product record and the header search works on every page."}</div></div>
+        ?"Challenges에서 조건을 좁히고 → 행을 클릭해 상세와 근거 링크를 확인하고 → 비교에 담아 2~5개를 나란히 보세요. 모든 숫자는 상품 단위 기록이며, 상단 검색은 어느 페이지에서든 동작합니다."
+        :"Narrow with filters, open a row for detail and evidence links, then add 2-5 to Compare. Every number is a per-product record and the header search works on every page."}</div></div>
 
     <div class="panel"><h3>${lang==="ko"?"2. 데이터 구조":"2. Data model"}</h3>
       <table class="fx"><tbody>${F.map(([k,d])=>`<tr><td style="color:var(--ink);font-family:ui-monospace,monospace;font-size:12px">${esc(k)}</td><td class="dim">${esc(d)}</td></tr>`).join("")}</tbody></table></div>
@@ -2052,19 +2073,43 @@ function renderCompare(){
   const arr=[...picked].map(id=>rows.find(r=>r.i===id)).filter(Boolean);
   const presets=cmpPresets();
   const slots=arr.map(r=>`<div class="slotcard">
-      <div class="nm">${esc(r.f)}<button class="rm" data-rm="${esc(r.i)}">✕</button></div>
+      <div class="nm">${esc(r.f)}<button class="rm" data-rm="${esc(r.i)}" aria-label="${lang==="ko"?"비교에서 빼기":"Remove from compare"}">✕</button></div>
       <div class="sub">${esc(r.p)}${r.s?" · "+Number(r.s).toLocaleString('en-US'):""}</div>
     </div>`).join("");
-  const addSlot = arr.length<4 ? `<div class="slotadd" id="addSlot">＋ ${lang==="ko"?"상품 추가":"Add product"}</div>` : "";
-  const picker = compareSearch!==null && el("pickerOpen") ? "" : "";
+  const addSlot = arr.length<CMP_MAX ? `<div class="slotadd" id="addSlot">＋ ${lang==="ko"?"상품 추가":`Add product (${arr.length}/${CMP_MAX})`}</div>` : "";
+  const rowsData=CMP_ROWS.map(([k,f,dir])=>{
+    const vals=arr.map(f);
+    const filled=vals.filter(v=>v!==null&&v!=="");
+    const diff=new Set(vals.map(String)).size>1;
+    const bestSet=new Set();
+    if(compareBest&&dir&&filled.length>1){
+      const nums=arr.map((r,i)=>({i,v:f(r)})).filter(o=>typeof o.v==="number"&&!isNaN(o.v));
+      if(nums.length>1){
+        const nv=nums.map(o=>o.v);
+        const target=dir==="max"?Math.max(...nv):Math.min(...nv);
+        nums.forEach(o=>{ if(o.v===target) bestSet.add(o.i); });
+      }
+    }
+    return {k,vals,diff,bestSet};
+  });
+  const diffCount=rowsData.filter(x=>x.diff).length;
+  const shown=compareDiffOnly?rowsData.filter(x=>x.diff):rowsData;
+  const bodyRows = shown.length
+    ? shown.map(({k,vals,diff,bestSet})=>
+        `<tr><td class="k">${esc(t(k))}</td>`+vals.map((v,i)=>
+          `<td class="${diff?"diff":""}${bestSet.has(i)?" best":""}">${fmtCell(k,v)}</td>`).join("")+`</tr>`).join("")
+    : `<tr><td class="k">—</td><td colspan="${arr.length}" style="color:var(--muted)">${t("cmpNoneSame")}</td></tr>`;
   el("compareMain").innerHTML=`
-    <div class="hero2"><h1>${lang==="ko"?"Compare Challenges":"Compare Challenges"}</h1>
-      <p>${lang==="ko"?"최대 4개 상품을 나란히 비교합니다. 값이 다른 항목은 강조되고, Highlight best를 켜면 유리한 값을 표시합니다.":"Compare up to 4 products side by side. Differing rows are highlighted; turn on Highlight best to mark the better value."}</p></div>
-    <div style="display:flex;align-items:center;gap:14px;margin:6px 0 0">
-      <label class="hlbar"><span class="switch ${compareBest?"on":""}" id="hlSwitch"></span>${lang==="ko"?"Highlight best":"Highlight best"}</label>
+    <div class="hero2"><h1>${lang==="ko"?"Challenge 비교":"Compare Challenges"}</h1>
+      <p>${lang==="ko"?`최대 ${CMP_MAX}개 상품을 나란히 비교합니다. 값이 다른 항목은 강조되고, ‘차이만 보기’를 켜면 같은 값인 행이 사라집니다. Highlight best는 유리한 값을 표시합니다.`:`Compare up to ${CMP_MAX} products side by side. Differing rows are highlighted; turn on "Differences only" to hide rows where every product matches. Highlight best marks the better value.`}</p></div>
+    <div style="display:flex;align-items:center;gap:14px;margin:6px 0 0;flex-wrap:wrap">
+      <label class="hlbar"><span class="switch ${compareDiffOnly?"on":""}" id="diffSwitch" role="switch" aria-checked="${compareDiffOnly?"true":"false"}" tabindex="0"></span>${t("cmpDiffOnly")}
+        <span class="dim" style="font-size:11.5px">${diffCount}${lang==="ko"?"개 항목 다름 / 전체 ":" of "}${rowsData.length}</span></label>
+      <span class="dim" style="font-size:11.5px">${t("cmpDiffHint")}</span>
+      <label class="hlbar" style="margin-left:auto"><span class="switch ${compareBest?"on":""}" id="hlSwitch" role="switch" aria-checked="${compareBest?"true":"false"}" tabindex="0"></span>${lang==="ko"?"Highlight best":"Highlight best"}</label>
       <span class="dim" style="font-size:11.5px">${lang==="ko"?"보라색 = 비교 항목 중 유리한 값":"Purple = better value among the compared"}</span>
     </div>
-    <div class="cmpslots" style="--n:${Math.max(arr.length+ (arr.length<4?1:0),2)}">${slots}${addSlot}</div>
+    <div class="cmpslots${arr.length>=4?" tight":""}">${slots}${addSlot}</div>
     <div class="panel" style="margin-top:14px"><h3>${lang==="ko"?"인기 비교":"Popular comparisons"} <span>presets</span></h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
         ${presets.map(([nm,l],i)=>`<div class="slotcard" data-preset="${i}" style="cursor:pointer">
@@ -2073,47 +2118,42 @@ function renderCompare(){
       </div></div>
     <div id="pickerHost"></div>
     ${arr.length>=2?`<div class="card"><div class="scroll" style="max-height:calc(100vh - 360px)">
-      <table class="cmptable"><thead><tr><th>${lang==="ko"?"항목":"Field"}</th>
-        ${arr.map(r=>`<th>${esc(r.f)}<div style="font-weight:500;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0">${esc(r.p)}</div></th>`).join("")}
+      <table class="cmptable${arr.length>3?" tight":""}" data-cols="${arr.length}"><thead><tr><th scope="col">${lang==="ko"?"항목":"Field"}</th>
+        ${arr.map(r=>`<th scope="col">${esc(r.f)}<div style="font-weight:500;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0">${esc(r.p)}</div></th>`).join("")}
       </tr></thead><tbody>
-      ${CMP_ROWS.map(([k,f,dir])=>{
-        const vals=arr.map(f);
-        const filled=vals.filter(v=>v!==null&&v!=="");
-        const diff=new Set(vals.map(String)).size>1;
-        const bestSet=new Set();
-        if(compareBest&&dir&&filled.length>1){
-          const nums=arr.map((r,i)=>({i,v:f(r)})).filter(o=>typeof o.v==="number"&&!isNaN(o.v));
-          if(nums.length>1){
-            const vals=nums.map(o=>o.v);
-            const target=dir==="max"?Math.max(...vals):Math.min(...vals);
-            nums.forEach(o=>{ if(o.v===target) bestSet.add(o.i); });
-          }
-        }
-        return `<tr><td class="k">${esc(t(k))}</td>`+vals.map((v,i)=>
-          `<td class="${diff?"diff":""} ${bestSet.has(i)?"best":""}">${fmtCell(k,v)}</td>`).join("")+`</tr>`;
-      }).join("")}
+      ${bodyRows}
       </tbody></table></div></div>`
       :`<div class="panel"><div class="empty-inline">${lang==="ko"?"상품을 2개 이상 선택하세요. Challenges에서 비교에 추가하거나 아래에서 검색해 추가할 수 있습니다.":"Pick at least 2 products — add from Challenges or search below."}</div></div>`}
     ${faqBlock([[lang==="ko"?"Highlight best는 무엇을 기준으로 하나요?":"How is 'best' decided?",
       lang==="ko"?"참가비·목표·최소일수는 낮을수록, 분배·일일손실·최대손실 한도는 높을수록 유리한 것으로 계산합니다.":"Lower is better for fee, target and min-days; higher is better for split, daily loss allowance and max loss."],
       [lang==="ko"?"차이 강조는 무엇인가요?":"What is the diff highlight?",
-      lang==="ko"?"비교 중인 상품 간에 값이 다른 행을 옅게 표시합니다.":"Rows whose values differ across the compared products are tinted."]])}
+      lang==="ko"?"비교 중인 상품 간에 값이 다른 행을 옅게 표시합니다.":"Rows whose values differ across the compared products are tinted."],
+      [lang==="ko"?"몇 개까지 비교할 수 있나요?":"How many can I compare?",
+      lang==="ko"?`최대 ${CMP_MAX}개입니다. ‘차이만 보기’를 켜면 모든 상품이 같은 값인 항목은 표에서 빠집니다.`:`Up to ${CMP_MAX}. "Differences only" drops rows where every compared product has the same value.`]])}
     ${srcNote(lang==="ko"?"값은 HELIX 기록입니다. 최종 조건은 업체 공식 사이트에서 확인하세요.":"Values are HELIX records. Confirm final terms on the firm's official site.")}`;
   el("compareMain").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{picked.delete(b.dataset.rm);renderBar();renderCompare();});
   const sw=el("hlSwitch"); if(sw) sw.onclick=()=>{compareBest=!compareBest;renderCompare();};
+  const ds=el("diffSwitch");
+  if(ds){ ds.onclick=()=>{compareDiffOnly=!compareDiffOnly;renderCompare();};
+    ds.onkeydown=e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); compareDiffOnly=!compareDiffOnly; renderCompare(); } }; }
+  if(sw){ sw.onkeydown=e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); compareBest=!compareBest; renderCompare(); } }; }
   const add=el("addSlot"); if(add) add.onclick=openPicker;
   el("compareMain").querySelectorAll("[data-preset]").forEach(c=>c.onclick=()=>{
     const list=presets[Number(c.dataset.preset)][1];
-    picked.clear(); list.forEach(r=>picked.add(r.i)); renderBar(); renderCompare();
+    picked.clear(); list.slice(0,CMP_MAX).forEach(r=>picked.add(r.i)); renderBar(); renderCompare();
   });
   if(!arr.length && el("pickerHost")) openPicker();
  }catch(err){ el("compareMain").innerHTML=`<div class="panel"><h3>${lang==="ko"?"비교를 불러오지 못했습니다":"Comparison failed"}</h3><p class="meta">${esc(String(err))}</p></div>`; }
   el("compareMain").querySelectorAll(".pickrow").forEach(x=>x.onclick=()=>{
-    picked.add(x.dataset.id); renderBar(); renderCompare();
+    if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull();
   });
 }
 function openPicker(){
   const host=el("pickerHost");
+  if(picked.size>=CMP_MAX){
+    host.innerHTML=`<div class="picker"><div class="empty-inline">${lang==="ko"?`비교는 최대 ${CMP_MAX}개까지입니다. 위 카드의 ✕로 하나를 빼면 추가할 수 있습니다.`:`Compare holds up to ${CMP_MAX} products. Remove one with ✕ above to add another.`}</div></div>`;
+    return;
+  }
   const renderList=(term)=>{
     const list=rows.filter(r=>!picked.has(r.i) &&
       (!term||(r.f+" "+r.p).toLowerCase().includes(term.toLowerCase()))).slice(0,40);
