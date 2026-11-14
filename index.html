@@ -33,6 +33,12 @@
     -webkit-font-smoothing:antialiased;word-break:keep-all}
   a{color:var(--blue)}
   a:hover{color:var(--accent)}
+  .panel h3:hover,.panel h3:hover span,.fgroup summary:hover,.faq summary:hover,
+  .kv > div:hover,.ev:hover,.ev:hover a,.noteline:hover,.kpi:hover .k,.kpi:hover .v,
+  tbody tr:hover td,.mcard:hover .nm,.mcard:hover .plan,.chip2:hover,
+  .tsrow:hover,.tsrow:hover input,.frow:hover,.slotcard:hover .nm,.rstate:hover,
+  .metrics span:hover,.metrics span:hover b{color:var(--accent)}
+  tbody tr:hover td .dim{color:var(--accent);opacity:.75}
   .brand:hover .wm,.brand:hover svg.mark{color:var(--accent)}
   .brand:hover .mark{filter:drop-shadow(0 0 8px rgba(167,139,250,.55))}
   .navpill a:hover{color:var(--accent)}
@@ -293,11 +299,14 @@
   .notewrap{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px}
   .notelist{list-style:none;margin:0;padding:0;max-height:270px;overflow:hidden}
   .notelist.exp{max-height:none}
-  .notelist li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:9px;padding:9px 11px;font-size:12.5px;
-    line-height:1.65;color:var(--ink2);border-bottom:1px solid var(--line);
-    word-break:normal;overflow-wrap:anywhere;white-space:normal}
-  .notelist li b{display:inline;margin-right:4px}
-  .notelist li span{display:inline;margin:0}
+  .noteline{position:relative;padding:9px 11px 9px 26px;font-size:12.5px;line-height:1.7;color:var(--ink2);
+    border-bottom:1px solid var(--line);display:block;white-space:normal;word-break:keep-all;overflow-wrap:anywhere}
+  .noteline:last-child{border-bottom:0}
+  .noteline::before{content:"•";position:absolute;left:11px;color:var(--muted)}
+  .noteline.ok::before{content:"✓";color:var(--green);font-weight:800}
+  .noteline.warn::before{content:"!";color:var(--amber);font-weight:800}
+  .noteline.warn{background:rgba(255,194,71,.05)}
+  .noteline b{color:var(--ink);font-weight:700}
   .notelist li:last-child{border-bottom:0}
   .notelist li::before{content:"•";color:var(--muted)}
   .notelist li.ok::before{content:"✓";color:var(--green);font-weight:800}
@@ -692,11 +701,11 @@ function notesBlock(txt){
     const cls = /⚠/.test(p) ? "warn" : /✅/.test(p) ? "ok" : "";
     let body = p.replace(/^[✅⚠️❗❌🔴🟡✔✖\s]+/u,"");
     const m = body.match(/^([^:：]{1,26})[:：]\s*(.+)$/s);
-    const html = m ? `<b>${esc(m[1])}</b><span>${esc(m[2])}</span>` : `<span>${esc(body)}</span>`;
-    return `<li class="${cls}">${html}</li>`;
+    const html = m ? `<b>${esc(m[1])}</b> ${esc(m[2])}` : esc(body);
+    return `<div class="noteline ${cls}">${html}</div>`;
   }).join("");
   const long = parts.length > 4;
-  return `<div class="notewrap"><ul class="notelist${long?"":""}" id="noteList">${li}</ul>` +
+  return `<div class="notewrap"><div class="notelist" id="noteList">${li}</div>` +
          (long?`<button class="morebtn" id="noteMore">${esc(t("more"))}</button>`:"") + `</div>`;
 }
 
@@ -721,11 +730,18 @@ function evidenceBlock(r){
   push(t("evRating"), r.rs);
   const meta = `<div class="ev"><div class="w">${esc(t("cVer"))}</div><div>` +
       `<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span> · ${esc(r.sy||"—")} · ${esc(t("evRecorded"))} ${esc(r.ao||"—")}</div></div>`;
-  const list = items.map(it=>`<div class="ev"><div class="w">${esc(it.lbl)}</div><div>` +
-      (it.u?`<a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.txt)}</a>`
-           :`<span>${esc(it.txt)}</span>
-             <div class="meta">${esc(lang==="ko"?"도메인만 기록됨 — 헬프센터에서 직접 검색 필요":"domain only — search the help centre")}</div>`) +
-      `</div></div>`).join("");
+  const list = items.map(it=>{
+    if(it.u) return `<div class="ev"><div class="w">${esc(it.lbl)}</div><div>
+      <a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.txt)}</a></div></div>`;
+    const dom=(String(it.txt).match(/((?:[a-z0-9-]+\.)+[a-z]{2,})/i)||[])[1]||"";
+    const idf=(String(it.txt).match(/\b(\d{5,})\b/)||[])[1]||"";
+    const q=encodeURIComponent((dom?("site:"+dom+" "):"")+idf);
+    const link=dom?`<a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">${lang==="ko"?"검색으로 열기 ↗":"Search this article ↗"}</a>`:"";
+    return `<div class="ev"><div class="w">${esc(it.lbl)}</div><div>
+      <span>${esc(it.txt)}</span>
+      <div class="meta">${link}${link?" · ":""}${esc(lang==="ko"?"원문 경로는 기록되지 않아 문서 검색으로 연결합니다":"exact path not recorded, linking a document search")}</div>
+    </div></div>`;
+  }).join("");
   const miss = items.length<=1 ? `<div class="evall">${esc(t("evMissing"))}</div>` : "";
   return `<div class="evlist">${meta}${list}</div>${miss}<div class="evall">${esc(t("evHow"))}</div>`;
 }
@@ -804,32 +820,39 @@ function buildFilterSettings(){
     lev:t("fLev"),rating:t("fRating")};
   box.innerHTML=`<div class="tshead">${lang==="ko"?"표시할 필터":"Visible filters"}</div>`+
     visGroups.concat(ALL_GROUPS.filter(g=>!visGroups.includes(g)))
-      .map(g=>`<label class="tsrow"><input type="checkbox" data-g="${g}" ${visGroups.includes(g)?"checked":""}> ${esc(NAMES[g]||g)}
-        <span style="margin-left:auto;display:flex;gap:4px">
-          <button type="button" class="tsmv" data-up="${g}" style="border:0;background:transparent;color:var(--muted);cursor:pointer">↑</button>
-          <button type="button" class="tsmv" data-down="${g}" style="border:0;background:transparent;color:var(--muted);cursor:pointer">↓</button>
-        </span></label>`).join("")+
+      .map(g=>`<label class="tsrow draggable" draggable="true" data-drag="${g}">
+        <span style="color:var(--muted);cursor:grab;padding-right:2px">⣿</span>
+        <input type="checkbox" data-g="${g}" ${visGroups.includes(g)?"checked":""}> ${esc(NAMES[g]||g)}</label>`).join("")+
     `<div class="tsrow" id="fgReset" style="color:var(--accent);font-weight:700">${lang==="ko"?"초기화":"Reset"}</div>`;
   box.querySelectorAll("[data-g]").forEach(cb=>cb.onchange=()=>{
     const g=cb.dataset.g;
     visGroups = cb.checked ? [...new Set([...visGroups,g])] : visGroups.filter(x=>x!==g);
     localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilters();
   });
-  box.querySelectorAll("[data-up]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();
-    const g=b.dataset.up, i=visGroups.indexOf(g); if(i>0){ visGroups.splice(i,1); visGroups.splice(i-1,0,g);
-      localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters(); }});
-  box.querySelectorAll("[data-down]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();
-    const g=b.dataset.down, i=visGroups.indexOf(g); if(i>=0&&i<visGroups.length-1){ visGroups.splice(i,1); visGroups.splice(i+1,0,g);
-      localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters(); }});
+  let dragKey=null;
+  box.querySelectorAll("[data-drag]").forEach(row=>{
+    row.ondragstart=e=>{ dragKey=row.dataset.drag; row.style.opacity=".4"; e.dataTransfer.effectAllowed="move"; };
+    row.ondragend=()=>{ row.style.opacity="1"; dragKey=null;
+      box.querySelectorAll("[data-drag]").forEach(r=>r.style.borderTop=""); };
+    row.ondragover=e=>{ e.preventDefault(); if(!dragKey||dragKey===row.dataset.drag) return;
+      box.querySelectorAll("[data-drag]").forEach(r=>r.style.borderTop=""); row.style.borderTop="2px solid var(--accent)"; };
+    row.ondrop=e=>{ e.preventDefault(); if(!dragKey||dragKey===row.dataset.drag) return;
+      const from=visGroups.indexOf(dragKey); if(from<0) return;
+      visGroups.splice(from,1);
+      const to=visGroups.indexOf(row.dataset.drag);
+      visGroups.splice(to<0?visGroups.length:to,0,dragKey);
+      localStorage.setItem("helix-groups",JSON.stringify(visGroups));
+      buildFilterSettings(); buildFilters(); };
+  });
   const r=el("fgReset"); if(r) r.onclick=()=>{visGroups=ALL_GROUPS.slice();
     localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters();};
 }
 function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
-  const presetHtml=`<div class="fgroup" data-g="preset"><summary style="list-style:none;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;padding:2px 0">${lang==="ko"?"프리셋":"Presets"}</summary>
+  const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
     <div class="body" style="max-height:none"><div class="chips2">
     ${Object.keys(PRESETS[lang]||PRESETS.en).map(k=>`<button data-preset="${k}" class="${activePreset===k?"on":""}">${esc(pname(k))}</button>`).join("")}
-    </div></div></div>`;
+    </div></div></details>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
   const parts=[]; const H={};
