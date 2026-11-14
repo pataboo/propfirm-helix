@@ -216,6 +216,10 @@
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
   .stat .n{font-size:19px;font-weight:800}
   .stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-top:3px}
+  .freshbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px;font-size:11.5px;color:var(--muted)}
+  .freshbar b{color:var(--ink2);font-weight:700}
+  .freshbar .sc{color:var(--amber)}
+  .stale{display:inline-block;margin-left:5px;color:var(--amber);font-size:11px;cursor:help;line-height:1}
   h1{margin:0 0 4px;font-size:22px;letter-spacing:-.02em;font-weight:700}
   .hero p{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.6;max-width:720px}
   .searchrow{display:flex;gap:10px;align-items:center;margin-bottom:12px}
@@ -503,6 +507,7 @@
 
   <main>
     <button id="fMobile" aria-label="filters">☰ ${lang==="ko"?"필터":"Filters"}</button>
+    <div class="freshbar" id="freshBar"></div>
     <div class="stats">
       <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
       <a class="stat statlink" id="st2" href="#firms"><div class="n" id="s2">—</div><div class="l" id="s2l"></div></a>
@@ -746,7 +751,9 @@ function evCell(r){
   return `<span class="pill p-${esc(g)}" style="margin-right:5px">${esc(g)}</span><span class="dim" style="font-size:11px">${esc(short)}</span>${link}`;
 }
 function dateLabel(r){
-  const today=new Date().toISOString().slice(0,10);
+  // local (KST) calendar date — toISOString() is UTC and would call today's records "future"
+  const _n=new Date(), _p2=n=>String(n).padStart(2,"0");
+  const today=`${_n.getFullYear()}-${_p2(_n.getMonth()+1)}-${_p2(_n.getDate())}`;
   const ok=d=>/^\d{4}-\d{2}-\d{2}/.test(d||"") && d.slice(0,10)<=today;
   const a=(r.ao||"").slice(0,10);
   if(ok(a)) return a;
@@ -755,6 +762,40 @@ function dateLabel(r){
   if(/^\d{4}-\d{2}-\d{2}/.test(a))
     return lang==="ko"?"미검증":"unverified";
   return "—";
+}
+/* ---------- data freshness ---------- */
+/* A record is "past limit" when its asOf date is older than the age limit for
+   its verification grade: 30 days for A/B, 14 days for unverified C records.
+   Age is computed in whole days from the viewer's local date. */
+const FRESH_DAYS=30, FRESH_C_DAYS=14;
+function ageDays(r){
+  const a=(r.ao||"").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(a)) return null;
+  const t=Date.parse(a+"T00:00:00Z"); if(isNaN(t)) return null;
+  const n=new Date();
+  const today=Date.UTC(n.getFullYear(),n.getMonth(),n.getDate());
+  const d=Math.round((today-t)/86400000);
+  return d>=0?d:null;
+}
+function freshLimit(r){ return (r.vf==="C")?FRESH_C_DAYS:FRESH_DAYS; }
+function staleDays(r){ const d=ageDays(r); if(d==null) return null; return d>freshLimit(r)?d:null; }
+function freshBadge(r){
+  const d=staleDays(r); if(d==null) return "";
+  const lim=freshLimit(r);
+  const tip=lang==="ko"
+    ? `${d}일 경과 · ${r.vf||"—"}등급 기준 ${lim}일 초과`
+    : `${d} days old · past the ${lim}-day limit for grade ${r.vf||"—"}`;
+  return `<span class="stale" title="${esc(tip)}" aria-label="${esc(tip)}">⚠</span>`;
+}
+function renderFreshBar(){
+  const box=el("freshBar"); if(!box) return;
+  const ds=rows.map(r=>(r.ao||"").slice(0,10)).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+  const latest=ds.length?ds[ds.length-1]:"—";
+  const n=rows.filter(r=>staleDays(r)!=null).length;
+  box.innerHTML=(lang==="ko"
+      ? `데이터 기준일: 최신 <b>${esc(latest)}</b>`
+      : `Data as of: latest <b>${esc(latest)}</b>`)
+    + (n?`<span class="sc">· ${lang==="ko"?`갱신 지연 ${n.toLocaleString('en-US')}개`:`${n.toLocaleString('en-US')} past limit`}</span>`:"");
 }
 const PAYM=[[/카드|card|visa|master/i,"카드","Card"],
             [/은행|bank|wire|swift|ach/i,"은행 이체","Bank"],
@@ -1110,7 +1151,7 @@ function render(){
       <td class="num">${daysCell(r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
       <td class="evc">${evCell(r)}</td>
-      <td class="num">${esc(dateLabel(r))}</td></tr>`;
+      <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td></tr>`;
   }).join("") + (out.length>PAGE
     ? `<tr class="moreRow"><td colspan="13"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
     : "");
@@ -1155,6 +1196,7 @@ function render(){
     render();});
   const ca=el("clrAll"); if(ca) ca.onclick=()=>el("reset").click();
   el("s4").textContent=rows.filter(r=>r.vf==="A").length.toLocaleString('en-US');
+  renderFreshBar();
   buildFilters();
   buildSort();
 }
@@ -1383,6 +1425,7 @@ function applyStatics(){
   Tset("s1",rows.length.toLocaleString('en-US'));Tset("s2",DB.firms.length);
   Tset("s3",DB.mkts.length);
   Tset("s1l",t("s1"));Tset("s2l",t("s2"));Tset("s3l",t("s3"));Tset("s4l",t("s4"));
+  renderFreshBar();
   Tset("fTitle",t("filters"));
   Tset("reset",t("reset"));
   el("gq").placeholder=t("search"); Tset("empty",t("empty"));
