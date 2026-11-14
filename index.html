@@ -470,7 +470,6 @@
   </aside>
 
   <main>
-    <h1 id="h1"></h1><p id="sub"></p>
     <div class="stats">
       <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
       <a class="stat statlink" id="st2" href="#firms"><div class="n" id="s2">—</div><div class="l" id="s2l"></div></a>
@@ -493,9 +492,9 @@
     <div class="card" id="tableView"><div class="scroll"><table><thead><tr>
       <th data-sort="f" id="thFirm"></th><th data-sort="p" id="thPlan"></th><th data-sort="mk" id="thMkt"></th>
       <th data-sort="s" class="num" id="thSize"></th><th data-sort="pr" class="num" id="thPrice"></th>
-      <th data-sort="sp" class="num" id="thSplit"></th><th data-sort="dl" class="num" id="thDaily"></th>
+      <th data-sort="ac" class="num" id="thAct"></th><th data-sort="sp" class="num" id="thSplit"></th>
       <th data-sort="ml" class="num" id="thMax"></th><th data-sort="tg" id="thTarget"></th>
-      <th data-sort="dd" id="thDd"></th><th data-sort="ec" id="thEa"></th><th data-sort="vf" id="thVer"></th>
+      <th data-sort="md" class="num" id="thDays"></th><th data-sort="vf" id="thVer"></th>
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
     <footer id="foot"></footer>
@@ -573,7 +572,7 @@ const I18N = {
   search:"회사 · 상품 검색…", filters:"필터", firm:"회사", mkt:"자산군", step:"단계", ddF:"낙폭 방식",
   ver:"검증 등급", flags:"규칙", size:"계좌 규모", price:"최대 참가비", reset:"필터 초기화",
   empty:"조건에 맞는 상품이 없습니다.",
-  thFirm:"회사", thPlan:"상품", thMkt:"자산", thSize:"규모", thPrice:"참가비", thSplit:"분배",
+  thFirm:"회사", thPlan:"상품", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
   fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
@@ -623,7 +622,7 @@ const I18N = {
   search:"Search firm, product…", filters:"Filters", firm:"Firm", mkt:"Asset", step:"Step", ddF:"Drawdown",
   ver:"Grade", flags:"Rules", size:"Account size", price:"Max entry fee", reset:"Reset filters",
   empty:"No products match these filters.",
-  thFirm:"Firm", thPlan:"Product", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thSplit:"Split",
+  thFirm:"Firm", thPlan:"Product", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
   fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
@@ -669,7 +668,7 @@ const I18N = {
 let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
 let q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareSearch="", offersFilter="all",
-     colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,0,1,1,0,0,1],
+     colVis=JSON.parse(localStorage.getItem("helix-cols")||"null")||[1,1,1,1,1,1,1,1,1,1,1],
      dense=localStorage.getItem("helix-dense")==="1";
 const ALL_GROUPS=["st","dd","cycle","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
@@ -691,6 +690,21 @@ const tx=v=>{ if(v==null||v==="")return v; if(lang!=="en")return v;
   const k=String(v).trim(); return KO2EN[k]||k; };
 const enumv=v=>{if(v==null||v==="")return v;const m={ko:{instant:"즉시","1-step":"1단계","2-step":"2단계","3-step":"3단계","1":"1단계","2":"2단계","3":"3단계",yes:"예",no:"아니오"},en:{"1":"1-step","2":"2-step","3":"3-step",yes:"yes",no:"no"}}[lang]||{};return m[v]||v;};
 const pc=v=>(v==null||v===""||num(v)===0)?'<span class="dim">—</span>':`<span class="mono">${esc(v)}%</span>`;
+function dateLabel(r){
+  const today=new Date().toISOString().slice(0,10);
+  const ok=d=>/^\d{4}-\d{2}-\d{2}/.test(d||"") && d.slice(0,10)<=today;
+  const a=(r.ao||"").slice(0,10);
+  if(ok(a)) return a;
+  if(r.ds==="unknown_future_legacy_date"||(r.la&&!ok(r.la)))
+    return lang==="ko"?"미검증":"unverified";
+  return "—";
+}
+function daysCell(r){
+  const v = (r.md!=null?r.md:(r.minDaysFinal!=null?r.minDaysFinal:r.minDays));
+  if(v==null||v==="") return '<span class="dim">—</span>';
+  const n=Number(v);
+  return isNaN(n) ? esc(String(v)) : String(n);
+}
 function money(v,cur){if(v==null||v==="")return '<span class="dim">—</span>';const n=num(v);if(n==null)return esc(v);
   const sym=((cur||"").toUpperCase()==="USD"||!cur)?"$":"";return `<span class="mono">${sym}${n.toLocaleString('en-US')}</span>`;}
 
@@ -732,7 +746,7 @@ function evidenceBlock(r){
   push(t("evPayout"), r.ys);
   push(t("evRating"), r.rs);
   const meta = `<div class="ev"><div class="w">${esc(t("cVer"))}</div><div>` +
-      `<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span> · ${esc(r.sy||"—")} · ${esc(t("evRecorded"))} ${esc(r.ao||"—")}</div></div>`;
+      `<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span> · ${esc(r.sy||"—")} · ${esc(t("evRecorded"))} ${esc(dateLabel(r))}</div></div>`;
   const list = items.map(it=>{
     if(it.u) return `<div class="ev"><div class="w">${esc(it.lbl)}</div><div>
       <a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.txt)}</a></div></div>`;
@@ -950,7 +964,7 @@ function render(){
       return ra-rb;
     }
     const A=a[key],B=b[key];
-    if(["s","pr","sp","dl","ml","to"].includes(key))return ((num(A)??1e12)-(num(B)??1e12))*dir;
+    if(["s","pr","sp","dl","ml","to","ac","md"].includes(key))return ((num(A)??1e12)-(num(B)??1e12))*dir;
     return String(A??"").localeCompare(String(B??""))*dir;});
   el("listView").innerHTML=out.map(r=>{
     const g=r.vf||"—";
@@ -988,11 +1002,11 @@ function render(){
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}" title="${esc(ASSET_TIP[lang])}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${money(r.s,r.cu)}</td>
       <td class="num">${money(r.pr,r.cu)}</td>
+      <td class="num">${(r.ac==null||r.ac===""||r.ac===0)?'<span class="dim">—</span>':money(r.ac,r.cu)}</td>
       <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
-      <td class="num">${pc(r.dl)}</td><td class="num">${pc(r.ml)}</td>
+      <td class="num">${pc(r.ml)}</td>
       <td class="mono">${r.tg==="0"||r.tg==null?'<span class="dim">—</span>':esc(r.tg)+"%"}</td>
-      <td>${esc(tx(r.dd)||"—")}</td>
-      <td>${ea==="yes"?'<span class="yes">✓</span>':ea==="no"?'<span class="no">✕</span>':`<span class="dim">${esc(r.ec==="cond"?"조건":"?")}</span>`}</td>
+      <td class="num">${daysCell(r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td></tr>`;
   }).join("");
   document.querySelectorAll("#tb tr").forEach(tr=>{
@@ -1225,7 +1239,7 @@ function openDrawer(id){
     <div class="sect">${esc(t("sectEv"))}</div>${evidenceBlock(r)}
     <div class="sect">${esc(t("sectSrc"))}</div>
     <div class="kv">${drawerRow(t("cVer"),`<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span>`)}
-      ${drawerRow(t("cSrc"),esc(r.sy||"—"))}${drawerRow(t("cAsOf"),esc(r.ao||"—"))}
+      ${drawerRow(t("cSrc"),esc(r.sy||"—"))}${drawerRow(t("cAsOf"),esc(dateLabel(r)))}
       ${drawerRow(t("cId"),`<span class="dim mono">${esc(r.i)}</span>`)}</div>`;
   const cp=el("promoCopy");
   if(cp) cp.onclick=()=>{
@@ -1237,8 +1251,11 @@ function openDrawer(id){
   const mb=el("noteMore");
   if(mb) mb.onclick=()=>{const L=el("noteList");const exp=L.classList.toggle("exp");
     mb.textContent=exp?t("less"):t("more");};
-  el("dCta").innerHTML=`<a class="btn g" href="#challenge/${encodeURIComponent(r.i)}" style="text-decoration:none;margin-right:6px">${lang==="ko"?"자세히 보기":"Full page"}</a>`+
+  el("dCta").innerHTML=`<button class="btn g" id="dDetail" style="margin-right:6px">${lang==="ko"?"자세히 보기":"Full page"}</button>`+
+    `<button class="btn" id="dCmp" style="margin-right:6px">${lang==="ko"?"비교하기":"Compare"}</button>`+
     (r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:"");
+  {const _d=el("dDetail"); if(_d) _d.onclick=()=>{const id=r.i; closeDrawer(); location.hash="#challenge/"+encodeURIComponent(id); route();};}
+  {const _k=el("dCmp"); if(_k) _k.onclick=()=>{picked.add(r.i); closeDrawer(); renderBar(); location.hash="#compare"; route();};}
   el("drawer").classList.add("on"); el("drawer").setAttribute("aria-hidden","false");
   el("scrim").classList.add("on");
   document.querySelectorAll("#tb tr").forEach(tr=>tr.classList.toggle("open",tr.dataset.id===id));
@@ -1251,39 +1268,40 @@ function applyTheme(){document.documentElement.setAttribute("data-theme",theme);
   el("theme").textContent=theme==="dark"?"☾":"☀";}
 let pageSuffix="";
 function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx):"helix"; }
+const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
 function applyStatics(){
   document.documentElement.lang=lang;
-  el("brandSub").textContent=t("brandSub");el("h1").textContent=t("h1");el("sub").textContent=t("sub");
-  el("lRows").textContent=t("rows");el("lFirms").textContent=t("firms");
-  el("mRows").textContent=rows.length.toLocaleString('en-US');el("mFirms").textContent=DB.firms.length;
-  el("s1").textContent=rows.length.toLocaleString('en-US');el("s2").textContent=DB.firms.length;
-  el("s3").textContent=DB.mkts.length;
-  el("s1l").textContent=t("s1");el("s2l").textContent=t("s2");el("s3l").textContent=t("s3");el("s4l").textContent=t("s4");
-  el("fTitle").textContent=t("filters");
-  el("reset").textContent=t("reset");
-  el("gq").placeholder=t("search"); el("empty").textContent=t("empty");
+  Tset("brandSub",t("brandSub"));{const _h=el("h1"),_s=el("sub"); if(_h)_h.textContent=t("h1"); if(_s)_s.textContent=t("sub");}
+  Tset("lRows",t("rows"));Tset("lFirms",t("firms"));
+  Tset("mRows",rows.length.toLocaleString('en-US'));Tset("mFirms",DB.firms.length);
+  Tset("s1",rows.length.toLocaleString('en-US'));Tset("s2",DB.firms.length);
+  Tset("s3",DB.mkts.length);
+  Tset("s1l",t("s1"));Tset("s2l",t("s2"));Tset("s3l",t("s3"));Tset("s4l",t("s4"));
+  Tset("fTitle",t("filters"));
+  Tset("reset",t("reset"));
+  el("gq").placeholder=t("search"); Tset("empty",t("empty"));
   {const vt=document.querySelectorAll("#viewToggle button");
    if(vt[0]) vt[0].textContent=lang==="ko"?"목록":"List";
    if(vt[1]) vt[1].textContent=lang==="ko"?"표":"Table";
    const cg=el("cmpGo"); if(cg) cg.textContent=lang==="ko"?"비교":"Compare";
    const tb=el("tsBtn"); if(tb) tb.title=lang==="ko"?"표 설정":"Table settings";}
-  el("h1").textContent=t("h1"); el("sub").textContent=t("sub");
+  {const _h=el("h1"),_s=el("sub"); if(_h)_h.textContent=t("h1"); if(_s)_s.textContent=t("sub");}
   {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
              tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
              firms:"navFirms",docs:"navDocs"};
    document.querySelectorAll("#subnav a").forEach(a=>{const k=NM[a.dataset.page]; if(k) a.textContent=t(k);});}
-  el("thFirm").textContent=t("thFirm"); el("thPlan").textContent=t("thPlan");
-  el("thMkt").textContent=t("thMkt"); el("thSize").textContent=t("thSize");
-  el("thPrice").textContent=t("thPrice"); el("thSplit").textContent=t("thSplit");
-  el("thDaily").textContent=t("thDaily"); el("thMax").textContent=t("thMax");
-  el("thTarget").textContent=t("thTarget"); el("thDd").textContent=t("thDd");
-  el("thEa").textContent=t("thEa"); el("thVer").textContent=t("thVer");
+  Tset("thFirm",t("thFirm")); Tset("thPlan",t("thPlan"));
+  Tset("thMkt",t("thMkt")); Tset("thSize",t("thSize"));
+  Tset("thPrice",t("thPrice")); Tset("thSplit",t("thSplit"));
+  Tset("thAct",t("thAct")); Tset("thMax",t("thMax"));
+  Tset("thTarget",t("thTarget")); Tset("thDays",t("thDays"));
+  Tset("thVer",t("thVer"));
   if(el("rFirm")){
-    el("rFirm").textContent=t("rFirm"); el("rN").textContent=t("rN");
-    el("rEa").textContent=t("fEa"); el("rNews").textContent=t("fNews");
-    el("rOn").textContent=t("fOn"); el("rCp").textContent=t("fCp");
-    el("rWk").textContent=t("fWk"); el("rKr").textContent=t("fKorea");
-    el("rM5").textContent="MT5"; el("rGrade").textContent=t("rGrade");
+    Tset("rFirm",t("rFirm")); Tset("rN",t("rN"));
+    Tset("rEa",t("fEa")); Tset("rNews",t("fNews"));
+    Tset("rOn",t("fOn")); Tset("rCp",t("fCp"));
+    Tset("rWk",t("fWk")); Tset("rKr",t("fKorea"));
+    Tset("rM5","MT5"); Tset("rGrade",t("rGrade"));
   }
   el("foot").innerHTML=t("foot");
   if(el("chFaq")) el("chFaq").innerHTML=faqBlock(FAQ.challenges)+
@@ -1479,7 +1497,10 @@ function renderChallenge(id){
   const kDays=(r.mf??r.md);
   const tg=Number(r.tg||0), dl=Number(r.dl||0), ml=Number(r.ml||0);
   el("challengeMain").innerHTML=`
-    <div style="margin:6px 0 14px"><a href="#challenges" style="font-size:12px">← ${lang==="ko"?"챌린지 목록":"All challenges"}</a></div>
+    <div class="crumb" style="margin:6px 0 12px;font-size:12px;color:var(--muted)">
+      <a href="#challenges">${lang==="ko"?"챌린지":"Challenges"}</a> <span style="opacity:.5">/</span>
+      <a href="#firm/${encodeURIComponent(r.f)}">${esc(r.f)}</a> <span style="opacity:.5">/</span>
+      <span style="color:var(--ink2)">${esc(r.p)}</span></div>
     <div class="fhero">
       <div>
         <h1>${esc(r.f)} <span class="dim" style="font-weight:400">· ${esc(r.p)}</span></h1>
@@ -1490,6 +1511,11 @@ function renderChallenge(id){
           ${r.co?`<span class="tagpromo">PROMO ${esc(r.co)}</span>`:""}
           <span>${r.s?Number(r.s).toLocaleString('en-US'):"—"} ${esc(r.cu||"")}</span>
         </div>
+        <p class="lead" style="margin:10px 0 0;max-width:760px;font-size:13px;line-height:1.7;color:var(--ink2)">
+          ${lang==="ko"
+            ? `${esc(r.f)}의 ${esc(r.p)} 챌린지입니다. ${esc(assetLabel(r.mk))} 계좌 ${r.s?Number(r.s).toLocaleString("en-US"):"—"} ${esc(r.cu||"USD")} 를 ${money(r.pr,r.cu)}에 판매하며, 수익 분배 ${r.sp?esc(r.sp)+"%":"미기록"}, 최대 손실 ${r.ml!=null?esc(r.ml)+"%":"미기록"}${r.tg&&r.tg!=="0"?`, 목표 ${esc(r.tg)+"%"}`:", 목표 없음(즉시 자금)"}${kDays!=null?`, 최소 거래일 ${esc(kDays)}일`:""}입니다.`
+            : `The ${esc(r.p)} challenge from ${esc(r.f)}: a ${esc(assetLabel(r.mk))} account of ${r.s?Number(r.s).toLocaleString("en-US"):"—"} ${esc(r.cu||"USD")} costing ${money(r.pr,r.cu)}, with ${r.sp?esc(r.sp)+"%":"unrecorded"} profit split and ${r.ml!=null?esc(r.ml)+"%":"unrecorded"} maximum loss${r.tg&&r.tg!=="0"?`, targeting ${esc(r.tg)+"%"}`:", no profit target (instant funding)"}.`}
+        </p>
       </div>
       <div class="fbtns">
         <button class="btn g" id="chAdd">${lang==="ko"?"비교에 추가":"Add to compare"}</button>
@@ -1578,7 +1604,7 @@ function renderDiscover(){
 }
 
 /* ---------- table preferences ---------- */
-const COLKEYS=["thFirm","thPlan","thMkt","thSize","thPrice","thSplit","thDaily","thMax","thTarget","thDd","thEa","thVer"];
+const COLKEYS=["thFirm","thPlan","thMkt","thSize","thPrice","thAct","thSplit","thMax","thTarget","thDays","thVer"];
 function applyTablePrefs(){
   let st=document.getElementById("colStyle");
   if(!st){ st=document.createElement("style"); st.id="colStyle"; document.head.appendChild(st); }
@@ -1600,7 +1626,7 @@ function buildTableSettings(){
   });
   const d=el("denseChk"); if(d) d.onchange=()=>{dense=d.checked;applyTablePrefs();};
   const r=el("tsReset"); if(r) r.onclick=e=>{e.preventDefault();
-    colVis=[1,1,1,1,1,1,0,1,1,0,0,1]; dense=false; applyTablePrefs(); buildTableSettings();};
+    colVis=[1,1,1,1,1,1,1,1,1,1,1]; dense=false; applyTablePrefs(); buildTableSettings();};
 }
 
 /* ---------- Docs ---------- */
