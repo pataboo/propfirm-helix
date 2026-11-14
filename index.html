@@ -211,12 +211,45 @@
   .cmprow .v.diff{background:rgba(231,70,148,.10);font-weight:700;color:var(--ink)}
   .cmphead .v{font-weight:800;font-size:13px;padding:14px}
   .cmphead .v small{display:block;font-weight:500;font-size:11px;color:var(--muted);margin-top:3px}
+  /* nav */
+  .nav{display:flex;gap:4px;margin-left:10px}
+  .nav button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
+    padding:8px 13px;border-radius:9px;cursor:pointer}
+  .nav button:hover{color:var(--ink);background:var(--panel2)}
+  .nav button.on{background:var(--panel2);color:var(--ink)}
+  /* result bar */
+  .resbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:11px 14px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .resbar .big{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .resbar .big span{color:var(--pink)}
+  .resbar .of{font-size:12px;color:var(--muted)}
+  .fchip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);
+    border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
+  .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
+  /* rules page */
+  #pageRules{grid-template-columns:1fr}
+  .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
+  table.rulesT{min-width:900px}
+  table.rulesT td,table.rulesT th{padding:9px 11px}
+  table.rulesT tbody tr{cursor:pointer}
+  .rstate{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+  .rstate i{width:7px;height:7px;border-radius:99px;display:inline-block}
+  .rstate.yes{color:var(--green)}.rstate.yes i{background:var(--green)}
+  .rstate.no{color:var(--red)}.rstate.no i{background:var(--red)}
+  .rstate.mix{color:var(--purple)}.rstate.mix i{background:var(--purple)}
+  .rstate.unk{color:var(--muted)}.rstate.unk i{background:var(--muted)}
+  .minibar{display:flex;height:5px;border-radius:99px;overflow:hidden;width:56px;background:var(--line)}
+  .minibar span{display:block;height:100%}
   footer{padding:26px 0 90px;color:var(--muted);font-size:12px;line-height:1.7;max-width:860px}
   @media(max-width:1080px){.shell{grid-template-columns:1fr}.filters{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 
 <div class="top"><div class="in">
   <div class="brand"><div class="mark">H</div><div><b>SilentFam Helix</b><span id="brandSub"></span></div></div>
+  <nav class="nav" id="nav">
+    <button data-page="challenges" class="on">Challenges</button>
+    <button data-page="rules">Rules</button>
+  </nav>
   <div class="grow"></div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
@@ -224,7 +257,7 @@
   <button class="iconbtn" id="theme" title="theme">☾</button>
 </div></div>
 
-<div class="shell">
+<div class="shell" id="pageChallenges">
   <aside class="filters">
     <h3 id="fTitle"></h3>
     <div class="fg"><label id="fFirmL"></label><div class="opts" id="fFirms"></div></div>
@@ -235,6 +268,12 @@
     <div class="fg"><label id="fFlagL"></label><div class="opts" id="fFlags"></div></div>
     <div class="fg"><label id="fSizeL"></label><div class="range"><input id="sizeMin" type="number"><span>–</span><input id="sizeMax" type="number"></div></div>
     <div class="fg"><label id="fPriceL"></label><div class="range"><input id="priceMax" type="number"><span id="priceUnit"></span></div></div>
+    <div class="fg"><label id="fDailyL"></label><div class="range"><input id="dailyMax" type="number"><span>%</span></div></div>
+    <div class="fg"><label id="fMaxllL"></label><div class="range"><input id="maxlossMax" type="number"><span>%</span></div></div>
+    <div class="fg"><label id="fSplitL"></label><div class="range"><input id="splitMin" type="number"><span>%</span></div></div>
+    <div class="fg"><label id="fDaysL"></label><div class="range"><input id="daysMax" type="number"><span>d</span></div></div>
+    <div class="fg"><label id="fLevL"></label><div class="range"><input id="levMin" type="number"><span>:1</span></div></div>
+    <div class="fg"><label id="fCycleL"></label><div class="opts" id="fCycle"></div></div>
     <button class="reset" id="reset"></button>
   </aside>
 
@@ -247,7 +286,8 @@
       <div class="stat"><div class="n" id="s4">—</div><div class="l" id="s4l"></div></div>
     </div>
     <div class="searchrow"><label class="search"><span class="dim">⌕</span><input id="q" autocomplete="off"></label>
-      <span class="count" id="count"></span></div>
+      </div>
+    <div class="resbar" id="resbar"></div>
     <div class="card"><div class="scroll"><table><thead><tr>
       <th data-sort="f" id="thFirm"></th><th data-sort="p" id="thPlan"></th><th data-sort="mk" id="thMkt"></th>
       <th data-sort="s" class="num" id="thSize"></th><th data-sort="pr" class="num" id="thPrice"></th>
@@ -257,6 +297,21 @@
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
     <footer id="foot"></footer>
+  </main>
+</div>
+
+<div class="shell" id="pageRules" style="display:none">
+  <main>
+    <h1 id="rulesH1"></h1>
+    <p id="rulesSub"></p>
+    <div class="rulesbar" id="rulesLegend"></div>
+    <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
+      <table class="rulesT"><thead><tr>
+        <th id="rFirm"></th><th class="num" id="rN"></th><th id="rEa"></th><th id="rNews"></th>
+        <th id="rOn"></th><th id="rCp"></th><th id="rWk"></th><th id="rKr"></th><th id="rM5"></th><th id="rGrade"></th>
+      </tr></thead><tbody id="rulesBody"></tbody></table>
+    </div></div>
+    <footer id="foot2"></footer>
   </main>
 </div>
 
@@ -314,6 +369,13 @@ const I18N = {
   cPfmRef:"PFM 참고 (미검증)", cStepDetail:"단계 상세", cLeverageDetail:"레버리지 상세",
   gA:"1차 확인", gB:"2차·간접", gC:"추정",
   fPromo:"프로모 있음",
+  fDailyL:"일일 손실 최대", fMaxllL:"최대 손실 최대", fSplitL:"분배 최소", fDaysL:"최소일수 최대",
+  fLevL:"레버리지 최소", fCycleL:"지급 주기",
+  navCh:"챌린지", navRules:"규칙",
+  rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
+  rFirm:"회사", rN:"상품", rGrade:"검증 등급",
+  stYes:"허용", stNo:"불가", stMix:"혼합", stUnk:"미확인", stCond:"조건부",
+  resFound:"개 상품", resOf:"/ 전체", clearAll:"필터 해제",
   cPrice:"참가비", cAct:"활성화 비용", cTotal:"확인된 총비용", cPromo:"프로모션", cCode:"코드",
   cLev:"레버리지", cType:"방식", cStages:"평가 페이즈", cDays:"최소 거래일", cKorea:"한국 계좌", cMt5:"MT5",
   cSplit:"수익 분배", cCycle:"지급 주기", cFirst:"첫 지급", cMin:"최소 지급 기준", cRating:"평점",
@@ -357,6 +419,13 @@ const I18N = {
   cPfmRef:"PFM reference (unverified)", cStepDetail:"Step detail", cLeverageDetail:"Leverage detail",
   gA:"primary", gB:"indirect", gC:"inferred",
   fPromo:"Has promo",
+  fDailyL:"Max daily loss", fMaxllL:"Max total loss", fSplitL:"Min split", fDaysL:"Max min-days",
+  fLevL:"Min leverage", fCycleL:"Payout cycle",
+  navCh:"Challenges", navRules:"Rules",
+  rulesH1:"Rules across firms", rulesSub:"Click a firm to filter its challenges. Allowed / conditional / not allowed / unknown aggregated from per-product records.",
+  rFirm:"Firm", rN:"Products", rGrade:"Grade",
+  stYes:"Allowed", stNo:"Not allowed", stMix:"Mixed", stUnk:"Unknown", stCond:"Conditional",
+  resFound:"products", resOf:"/ of", clearAll:"Clear filters",
   cPrice:"Entry fee", cAct:"Activation", cTotal:"Total known", cPromo:"Promotion", cCode:"Code",
   cLev:"Leverage", cType:"Step type", cStages:"Phases", cDays:"Min trading days", cKorea:"Korea accounts", cMt5:"MT5",
   cSplit:"Profit split", cCycle:"Payout cycle", cFirst:"First payout", cMin:"Minimum payout basis", cRating:"Rating",
@@ -383,8 +452,8 @@ let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
 let q="", sortKey="f", sortDir=1, activeId=null;
 const picked = new Set();
-const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),
-           sizeMin:null,sizeMax:null,priceMax:null};
+const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),
+           sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
 const el=id=>document.getElementById(id);
 const t=k=>(I18N[lang][k] ?? k);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -462,6 +531,12 @@ function matches(r){
   const s=num(r.s); if(F.sizeMin!=null&&(s==null||s<F.sizeMin))return false;
   if(F.sizeMax!=null&&(s==null||s>F.sizeMax))return false;
   const pr=num(r.pr); if(F.priceMax!=null&&(pr==null||pr>F.priceMax))return false;
+  if(F.cycle.size&&!F.cycle.has(r.pc||"—"))return false;
+  const dl=num(r.dl); if(F.dailyMax!=null&&(dl==null||dl>F.dailyMax))return false;
+  const ml=num(r.ml); if(F.maxlossMax!=null&&(ml==null||ml>F.maxlossMax))return false;
+  const sp=num(r.sp); if(F.splitMin!=null&&(sp==null||sp<F.splitMin))return false;
+  const dy=num(r.mf??r.md); if(F.daysMax!=null&&(dy==null||dy>F.daysMax))return false;
+  const lv=num(r.lv); if(F.levMin!=null&&(lv==null||lv<F.levMin))return false;
   return true;
 }
 function chipRow(host,values,set,labelFn){
@@ -476,6 +551,8 @@ function buildFilters(){
   chipRow(el("fSteps"),DB.steps.concat(["—"]).filter((v,i,a)=>a.indexOf(v)===i),F.st,v=>enumv(v)||"—");
   chipRow(el("fDd"),DB.dd,F.dd);
   chipRow(el("fVer"),DB.tiers,F.vf);
+  const cycles=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
+  chipRow(el("fCycle"),cycles,F.cycle);
   const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["korea","fKorea"],["on","fOn"],["cp","fCp"],["wk","fWk"]];
   const host=el("fFlags"); host.innerHTML="";
   flags.forEach(([k,lab])=>{const b=document.createElement("button");
@@ -505,7 +582,8 @@ function render(){
   }).join("");
   document.querySelectorAll("#tb tr").forEach(tr=>{
     tr.onclick=()=>openDrawer(tr.dataset.id);
-    tr.onmouseenter=ev=>showPop(tr.dataset.id, ev.currentTarget);
+    tr.onmouseenter=ev=>showPop(tr.dataset.id, ev.currentTarget, ev);
+    tr.onmousemove=ev=>{ if(el('pop').classList.contains('on')) showPop(tr.dataset.id, ev.currentTarget, ev); };
     tr.onmouseleave=hidePop;
   });
   document.querySelectorAll("thead th[data-sort]").forEach(th=>{
@@ -513,14 +591,39 @@ function render(){
     if(th.dataset.sort===sortKey){const s=document.createElement("span");s.className="ar";
       s.textContent=sortDir>0?"▲":"▼";th.appendChild(s);}});
   el("empty").style.display=out.length?"none":"block";
-  el("count").textContent=`${out.length.toLocaleString('en-US')} / ${rows.length.toLocaleString('en-US')}`;
+  const chips=[];
+  const pushChip=(label,clear)=>{chips.push(`<span class="fchip">${esc(label)}<button data-clr="${clear}">✕</button></span>`);};
+  F.firm.forEach(v=>pushChip(v,"firm:"+v));
+  F.mk.forEach(v=>pushChip(assetLabel(v),"mk:"+v));
+  F.st.forEach(v=>pushChip(enumv(v),"st:"+v));
+  F.dd.forEach(v=>pushChip(v,"dd:"+v));
+  F.vf.forEach(v=>pushChip(t("grade")+" "+v,"vf:"+v));
+  F.cycle.forEach(v=>pushChip(v,"cycle:"+v));
+  F.flags.forEach(v=>pushChip(v==="promo"?t("fPromo"):t("f"+v.charAt(0).toUpperCase()+v.slice(1)).replace("f",""),"flags:"+v));
+  [["sizeMin","≥"+F.sizeMin],["sizeMax","≤"+F.sizeMax],["priceMax","≤$"+F.priceMax],
+   ["dailyMax","DL≤"+F.dailyMax+"%"],["maxlossMax","ML≤"+F.maxlossMax+"%"],
+   ["splitMin","Split≥"+F.splitMin+"%"],["daysMax","Days≤"+F.daysMax],["levMin","Lev≥"+F.levMin]]
+   .forEach(([k,lb])=>{ if(F[k]!=null) pushChip(lb,k); });
+  if(q) pushChip("“"+q+"”","q");
+  el("resbar").innerHTML =
+    `<span class="big">${out.length.toLocaleString('en-US')}<span>${esc(t("resFound"))}</span></span>`+
+    `<span class="of">${esc(t("resOf"))} ${rows.length.toLocaleString('en-US')}</span>`+
+    (chips.length?`<div style="display:flex;gap:6px;flex-wrap:wrap">${chips.join("")}</div>`+
+      `<button class="fchip" id="clrAll" style="cursor:pointer">${esc(t("clearAll"))}</button>`:"");
+  el("resbar").querySelectorAll("[data-clr]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.clr;
+    if(k==="q"){q="";el("q").value="";}
+    else if(k.includes(":")){const [g,v]=k.split(":");F[g].delete(v);}
+    else F[k]=null;
+    render();});
+  const ca=el("clrAll"); if(ca) ca.onclick=()=>el("reset").click();
   el("s4").textContent=rows.filter(r=>r.vf==="A").length.toLocaleString('en-US');
   buildFilters();
 }
 
 /* ---------- hover popover ---------- */
 let popTimer=null;
-function showPop(id, tr){
+function showPop(id, tr, ev){
   clearTimeout(popTimer);
   const r=rows.find(x=>x.i===id); if(!r) return;
   const inSel=picked.has(id);
@@ -537,11 +640,14 @@ function showPop(id, tr){
     </div>`;
   const pop=el("pop");
   pop.classList.add("on");
-  const b=tr.getBoundingClientRect();
-  const w=296, h=pop.offsetHeight||170;
-  let x=Math.min(b.right+10, window.innerWidth-w-12);
-  let y=Math.min(Math.max(b.top-8, 74), window.innerHeight-h-16);
-  pop.style.left=x+"px"; pop.style.top=y+"px";
+  pop.onmouseenter=()=>clearTimeout(popTimer);
+  pop.onmouseleave=hidePop;
+  const w=296, h=pop.offsetHeight||178;
+  const cx=(ev&&ev.clientX)||0, cy=(ev&&ev.clientY)||0;
+  let x=cx+16, y=cy+16;
+  if(x+w>window.innerWidth-12) x=cx-w-16;
+  if(y+h>window.innerHeight-12) y=Math.max(70, cy-h-16);
+  pop.style.left=Math.max(12,x)+"px"; pop.style.top=Math.max(70,y)+"px";
   pop.querySelectorAll("[data-add]").forEach(btn=>btn.onclick=e=>{
     e.stopPropagation(); addPick(btn.dataset.add); hidePop(); render();
   });
@@ -549,7 +655,7 @@ function showPop(id, tr){
     e.stopPropagation(); hidePop(); openDrawer(btn.dataset.open);
   });
 }
-function hidePop(){ popTimer=setTimeout(()=>el("pop").classList.remove("on"), 120); }
+function hidePop(){ clearTimeout(popTimer); popTimer=setTimeout(()=>el("pop").classList.remove("on"), 300); }
 
 /* ---------- compare ---------- */
 function addPick(id){
@@ -735,7 +841,17 @@ function applyStatics(){
   el("s1l").textContent=t("s1");el("s2l").textContent=t("s2");el("s3l").textContent=t("s3");el("s4l").textContent=t("s4");
   el("fTitle").textContent=t("filters");el("fFirmL").textContent=t("firm");el("fMktL").textContent=t("mkt");
   el("fStepL").textContent=t("step");el("fDdL").textContent=t("ddF");el("fVerL").textContent=t("ver");
-  el("fFlagL").textContent=t("flags");el("fSizeL").textContent=t("size");el("fPriceL").textContent=t("price");
+  el("fFlagL").textContent=t("flags");
+  el("fDailyL").textContent=t("fDailyL");el("fMaxllL").textContent=t("fMaxllL");
+  el("fSplitL").textContent=t("fSplitL");el("fDaysL").textContent=t("fDaysL");
+  el("fLevL").textContent=t("fLevL");el("fCycleL").textContent=t("fCycleL");
+  el("nav").querySelector('[data-page="challenges"]').textContent=t("navCh");
+  el("nav").querySelector('[data-page="rules"]').textContent=t("navRules");
+  el("rulesH1").textContent=t("rulesH1");el("rulesSub").textContent=t("rulesSub");
+  el("rFirm").textContent=t("rFirm");el("rN").textContent=t("rN");el("rEa").textContent=t("fEa");
+  el("rNews").textContent=t("fNews");el("rOn").textContent=t("fOn");el("rCp").textContent=t("fCp");
+  el("rWk").textContent=t("fWk");el("rKr").textContent=t("fKorea");el("rM5").textContent="MT5";
+  el("rGrade").textContent=t("rGrade");el("foot2").innerHTML=t("foot");el("fSizeL").textContent=t("size");el("fPriceL").textContent=t("price");
   el("priceUnit").textContent="USD";el("reset").textContent=t("reset");
   el("q").placeholder=t("search");el("empty").textContent=t("empty");
   el("thFirm").textContent=t("thFirm");el("thPlan").textContent=t("thPlan");el("thMkt").textContent=t("thMkt");
@@ -753,11 +869,11 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
 el("q").addEventListener("input",e=>{q=e.target.value.toLowerCase().trim();render();});
 document.querySelectorAll("thead th[data-sort]").forEach(th=>th.onclick=()=>{
   const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();});
-["sizeMin","sizeMax","priceMax"].forEach(id=>el(id).addEventListener("input",e=>{
+["sizeMin","sizeMax","priceMax","dailyMax","maxlossMax","splitMin","daysMax","levMin"].forEach(id=>el(id).addEventListener("input",e=>{
   const v=e.target.value===""?null:Number(e.target.value);
-  if(id==="sizeMin")F.sizeMin=v;else if(id==="sizeMax")F.sizeMax=v;else F.priceMax=v;render();}));
-el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags"].forEach(k=>F[k].clear());
-  F.sizeMin=F.sizeMax=F.priceMax=null;el("sizeMin").value="";el("sizeMax").value="";el("priceMax").value="";
+  F[id]=v; render();}));
+el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags","cycle"].forEach(k=>F[k].clear());
+  ["sizeMin","sizeMax","priceMax","dailyMax","maxlossMax","splitMin","daysMax","levMin"].forEach(k=>{F[k]=null; if(el(k)) el(k).value="";});
   q="";el("q").value="";render();};
 el("cGo").onclick=openCompare;
 el("cClear").onclick=()=>{picked.clear();renderBar();render();};
@@ -767,6 +883,60 @@ el("dClose").onclick=closeDrawer;el("scrim").onclick=closeDrawer;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");}});
 document.addEventListener("scroll",()=>hidePop(),true);
 
-applyTheme();applyStatics();render();
+/* ---------- rules page ---------- */
+function ruleState(vals){
+  const y=vals.filter(v=>v==="y").length, n=vals.filter(v=>v==="n").length,
+        c=vals.filter(v=>v==="c").length, u=vals.filter(v=>v==="u").length;
+  if(!y&&!n&&!c) return {k:"unk",lbl:t("stUnk")};
+  if(!n&&!c&&y) return {k:"yes",lbl:t("stYes")};
+  if(!y&&!n&&c) return {k:"mix",lbl:t("stCond")};
+  if(!y&&!c&&n) return {k:"no",lbl:t("stNo")};
+  return {k:"mix",lbl:t("stMix")};
+}
+const flagOf=v=> v===true?"y":(v===false?"n":(v==="cond"?"c":"u"));
+function renderRules(){
+  const map={};
+  rows.forEach(r=>{
+    const o=map[r.f]||(map[r.f]={n:0,ea:[],news:[],on:[],cp:[],wk:[],kr:[],m5:[],g:{A:0,B:0,C:0}});
+    o.n++; o.ea.push(flagOf(r.ec)); o.news.push(flagOf(r.nc)); o.on.push(flagOf(r.oc));
+    o.cp.push(flagOf(r.cc)); o.wk.push(flagOf(r.wk));
+    o.kr.push(r.kr==="yes"?"y":(r.kr?"n":"u")); o.m5.push(r.m5===true?"y":(r.m5===false?"n":"u"));
+    if(r.vf) o.g[r.vf]=(o.g[r.vf]||0)+1;
+  });
+  const cell=(vals)=>{const st=ruleState(vals);return `<span class="rstate ${st.k}"><i></i>${esc(st.lbl)}</span>`;};
+  el("rulesLegend").innerHTML =
+    `<span class="rstate yes"><i></i>${esc(t("stYes"))}</span>`+
+    `<span class="rstate mix"><i></i>${esc(t("stCond"))}</span>`+
+    `<span class="rstate mix"><i></i>${esc(t("stMix"))}</span>`+
+    `<span class="rstate no"><i></i>${esc(t("stNo"))}</span>`+
+    `<span class="rstate unk"><i></i>${esc(t("stUnk"))}</span>`+
+    `<span style="font-size:11.5px;color:var(--muted)">${esc(lang==="ko"?"등급 A=1차 확인 · B=2차·간접 · C=추정":"Grade A=primary · B=indirect · C=inferred")}</span>`;
+  el("rulesBody").innerHTML=Object.entries(map)
+    .sort((a,b)=>b[1].n-a[1].n)
+    .map(([f,o])=>`<tr data-firm="${esc(f)}">
+      <td class="firm">${esc(f)}</td>
+      <td class="num">${o.n}</td>
+      <td>${cell(o.ea)}</td><td>${cell(o.news)}</td><td>${cell(o.on)}</td>
+      <td>${cell(o.cp)}</td><td>${cell(o.wk)}</td><td>${cell(o.kr)}</td><td>${cell(o.m5)}</td>
+      <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
+    </tr>`).join("");
+  el("rulesBody").querySelectorAll("tr[data-firm]").forEach(tr=>tr.onclick=()=>{
+    F.firm.clear(); F.firm.add(tr.dataset.firm);
+    location.hash="#challenges"; route(); render();
+  });
+}
+function route(){
+  const rules=(location.hash||"").includes("rules");
+  el("pageChallenges").style.display=rules?"none":"grid";
+  el("pageRules").style.display=rules?"grid":"none";
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",(b.dataset.page==="rules")===rules));
+  if(rules) renderRules();
+}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{
+  location.hash="#"+b.dataset.page; route();
+});
+window.addEventListener("hashchange",route);
+
+applyTheme();applyStatics();render();route();
 </script>
 </body></html>
