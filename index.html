@@ -838,7 +838,12 @@ function filterSignature(){
     F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,activePreset]);
 }
 function matches(r){
-  if(q){const h=(r.f+" "+r.p+" "+(r.pm||"")).toLowerCase();if(!h.includes(q))return false;}
+  if(q){
+    const pay=(DB.pay&&DB.pay[r.f]&&DB.pay[r.f].methods||[]).join(" ");
+    const plat=(DB.eap&&DB.eap[r.f]&&DB.eap[r.f].platforms||[]).join(" ");
+    const hay=[r.f,r.p,r.pm,r.co,r.pt,r.pc,r.dd,r.no,r.sy,r.mlT,r.tgT,pay,plat].filter(Boolean).join(" ").toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
   if(F.firm.size&&!F.firm.has(r.f))return false;
   if(F.mk.size&&!F.mk.has(r.mk))return false;
   if(F.st.size&&!F.st.has(r.st||"—"))return false;
