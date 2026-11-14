@@ -122,7 +122,7 @@
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.35), 0 0 22px rgba(167,139,250,.10)}
   .navpill a{font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
     padding:6px 13px;border-radius:9999px;white-space:nowrap;transition:.15s}
-  .navpill a:hover{color:var(--ink);background:rgba(167,139,250,.14)}
+  .navpill a:hover{color:var(--accent);background:rgba(167,139,250,.14)}
   .navpill a.on{color:#0b0f10;background:linear-gradient(90deg,#bda8ff,#a78bfa);font-weight:700;
     box-shadow:0 0 16px rgba(167,139,250,.4)}
   .statlink{text-decoration:none;color:inherit;display:block;border-radius:12px;transition:.15s;
@@ -171,7 +171,8 @@
   .lang button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer}
   .lang button.on{background:var(--accent);color:#0b0f10}
   .shell{max-width:none;margin:0;padding:16px 16px 28px;display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
-  .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;position:sticky;top:86px}
+  .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;
+    position:sticky;top:70px;max-height:calc(100vh - 92px);overflow-y:auto;overscroll-behavior:contain}
   .filters h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
   .fg{margin-bottom:16px}
   .fg > label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px}
@@ -795,13 +796,24 @@ function buildFilterSettings(){
     dd:t("ddF"),flags:t("flags"),ver:t("ver"),cycle:t("fCycleL"),target:t("fTarget"),days:t("fDays"),fee:lang==="ko"?"결제 유형":"Payment",
     lev:t("fLev"),rating:t("fRating")};
   box.innerHTML=`<div class="tshead">${lang==="ko"?"표시할 필터":"Visible filters"}</div>`+
-    ALL_GROUPS.map(g=>`<label class="tsrow"><input type="checkbox" data-g="${g}" ${visGroups.includes(g)?"checked":""}> ${esc(NAMES[g]||g)}</label>`).join("")+
+    visGroups.concat(ALL_GROUPS.filter(g=>!visGroups.includes(g)))
+      .map(g=>`<label class="tsrow"><input type="checkbox" data-g="${g}" ${visGroups.includes(g)?"checked":""}> ${esc(NAMES[g]||g)}
+        <span style="margin-left:auto;display:flex;gap:4px">
+          <button type="button" class="tsmv" data-up="${g}" style="border:0;background:transparent;color:var(--muted);cursor:pointer">↑</button>
+          <button type="button" class="tsmv" data-down="${g}" style="border:0;background:transparent;color:var(--muted);cursor:pointer">↓</button>
+        </span></label>`).join("")+
     `<div class="tsrow" id="fgReset" style="color:var(--accent);font-weight:700">${lang==="ko"?"초기화":"Reset"}</div>`;
   box.querySelectorAll("[data-g]").forEach(cb=>cb.onchange=()=>{
     const g=cb.dataset.g;
     visGroups = cb.checked ? [...new Set([...visGroups,g])] : visGroups.filter(x=>x!==g);
     localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilters();
   });
+  box.querySelectorAll("[data-up]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();
+    const g=b.dataset.up, i=visGroups.indexOf(g); if(i>0){ visGroups.splice(i,1); visGroups.splice(i-1,0,g);
+      localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters(); }});
+  box.querySelectorAll("[data-down]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();
+    const g=b.dataset.down, i=visGroups.indexOf(g); if(i>=0&&i<visGroups.length-1){ visGroups.splice(i,1); visGroups.splice(i+1,0,g);
+      localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters(); }});
   const r=el("fgReset"); if(r) r.onclick=()=>{visGroups=ALL_GROUPS.slice();
     localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters();};
 }
@@ -809,8 +821,8 @@ function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
-  const parts=[];
-  const add=(id,h)=>{ if(visGroups.includes(id)) parts.push(h); };
+  const parts=[]; const H={};
+  const add=(id,h)=>{ H[id]=h; };
   add("firm", `<details class="fgroup" data-g="firm" ${OPEN.firm?"open":""}><summary title="${esc((TIPS.firm)[lang])}">${esc(t("firm"))}</summary><div class="body">
     <input class="fsearch" id="firmSearch" placeholder="${esc(lang==="ko"?"회사 검색":"search firm")}" value="${esc(firmSearch)}">
     ${gf.map(f=>chk(f,F.firm.has(f),"firm",f,rowCount(r=>r.f===f))).join("")}</div></details>`);
@@ -851,6 +863,7 @@ function buildFilters(){
   add("rating", `<details class="fgroup" data-g="rating" ${OPEN.rating?"open":""}><summary>${esc(t("fRating"))}</summary><div class="body"><div class="chips2">
     <button data-rating="4" class="${F.ratingMin===4?"on":""}">≥ 4.0</button>
     <button data-rating="4.5" class="${F.ratingMin===4.5?"on":""}">≥ 4.5</button></div></div></details>`);
+  visGroups.forEach(id=>{ if(H[id]) parts.push(H[id]); });
   host.innerHTML=parts.join("");
 
   host.querySelectorAll(".fgroup").forEach(d=>d.ontoggle=()=>{OPEN[d.dataset.g]=d.open;});
@@ -1771,8 +1784,18 @@ function fmtCell(k, v){
   if(k==="fSize") return esc(v);
   return typeof v==="string"?v:esc(v);
 }
+function cmpPresets(){
+  const byRt=[...rows].filter(r=>Number(r.rt)>0).sort((a,b)=>Number(b.rt)-Number(a.rt)).slice(0,3);
+  const cheap=[...rows].filter(r=>Number(r.pr)>0).sort((a,b)=>Number(a.pr)-Number(b.pr)).slice(0,3);
+  const split=[...rows].sort((a,b)=>Number(b.sp||0)-Number(a.sp||0)).slice(0,3);
+  const later=rows.filter(r=>feeClass(r)==="later").slice(0,3);
+  return [[lang==="ko"?"최고 평점":"Top rated",byRt],[lang==="ko"?"최저 참가비":"Cheapest",cheap],
+          [lang==="ko"?"최고 분배":"Highest split",split],[lang==="ko"?"후불":"Pay later",later]]
+    .filter(([,l])=>l.length>=2);
+}
 function renderCompare(){
   const arr=[...picked].map(id=>rows.find(r=>r.i===id)).filter(Boolean);
+  const presets=cmpPresets();
   const slots=arr.map(r=>`<div class="slotcard">
       <div class="nm">${esc(r.f)}<button class="rm" data-rm="${esc(r.i)}">✕</button></div>
       <div class="sub">${esc(r.p)}${r.s?" · "+Number(r.s).toLocaleString('en-US'):""}</div>
@@ -1787,6 +1810,12 @@ function renderCompare(){
       <span class="dim" style="font-size:11.5px">${lang==="ko"?"보라색 = 비교 항목 중 유리한 값":"Purple = better value among the compared"}</span>
     </div>
     <div class="cmpslots" style="--n:${Math.max(arr.length+ (arr.length<4?1:0),2)}">${slots}${addSlot}</div>
+    <div class="panel" style="margin-top:14px"><h3>${lang==="ko"?"인기 비교":"Popular comparisons"} <span>presets</span></h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+        ${presets.map(([nm,l],i)=>`<div class="slotcard" data-preset="${i}" style="cursor:pointer">
+          <div class="nm">${esc(nm)}</div>
+          <div class="sub">${l.map(r=>esc(r.f)+" "+esc(r.p)).join(" · ").slice(0,80)}</div></div>`).join("")}
+      </div></div>
     <div id="pickerHost"></div>
     ${arr.length>=2?`<div class="card"><div class="scroll" style="max-height:calc(100vh - 360px)">
       <table class="cmptable"><thead><tr><th>${lang==="ko"?"항목":"Field"}</th>
@@ -1818,6 +1847,11 @@ function renderCompare(){
   el("compareMain").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{picked.delete(b.dataset.rm);renderBar();renderCompare();});
   const sw=el("hlSwitch"); if(sw) sw.onclick=()=>{compareBest=!compareBest;renderCompare();};
   const add=el("addSlot"); if(add) add.onclick=openPicker;
+  el("compareMain").querySelectorAll("[data-preset]").forEach(c=>c.onclick=()=>{
+    const list=presets[Number(c.dataset.preset)][1];
+    picked.clear(); list.forEach(r=>picked.add(r.i)); renderBar(); renderCompare();
+  });
+  if(!arr.length) openPicker();
   el("compareMain").querySelectorAll(".pickrow").forEach(x=>x.onclick=()=>{
     picked.add(x.dataset.id); renderBar(); renderCompare();
   });
