@@ -2096,7 +2096,7 @@ function route(){
   const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
-  else setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
+  else if(!isCh) setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
   if(isFirm) renderFirm(decodeURIComponent(h.slice(5)));
   else if(page==="home"){ renderHome(); bindHomeLinks(); }
   else if(page==="offers") renderOffers();
