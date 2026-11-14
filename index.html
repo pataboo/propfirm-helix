@@ -211,6 +211,31 @@
   .cmprow .v.diff{background:rgba(231,70,148,.10);font-weight:700;color:var(--ink)}
   .cmphead .v{font-weight:800;font-size:13px;padding:14px}
   .cmphead .v small{display:block;font-weight:500;font-size:11px;color:var(--muted);margin-top:3px}
+  /* firm page */
+  .fhero{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin:6px 0 18px}
+  .fhero h1{margin:0;font-size:30px;letter-spacing:-.03em}
+  .fmeta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--muted)}
+  .rating{display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:15px;color:var(--ink)}
+  .rating small{font-weight:500;font-size:12px;color:var(--muted)}
+  .fbtns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .panel h3{margin:0 0 12px;font-size:13px;letter-spacing:-.01em;font-weight:800;display:flex;align-items:center;gap:8px}
+  .panel h3 span{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+  table.fx{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:0}
+  table.fx th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+    font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.fx td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.fx tr:last-child td{border-bottom:0}
+  table.fx td.num,table.fx th.num{text-align:right}
+  .prog{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:10px}
+  .prog h4{margin:0 0 8px;font-size:13px;font-weight:800}
+  .prog dl{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;margin:0;font-size:12.5px}
+  .prog dt{color:var(--muted);font-weight:600}
+  .prog dd{margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip2{background:var(--panel2);border:1px solid var(--line2);border-radius:9999px;padding:5px 11px;font-size:12px}
+  .empty-inline{color:var(--muted);font-size:12.5px;line-height:1.6}
   /* nav */
   .nav{display:flex;gap:4px;margin-left:10px}
   .nav button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
@@ -227,7 +252,7 @@
     border-radius:9999px;padding:3px 9px;font-size:11px;color:var(--ink2)}
   .fchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
   /* rules page */
-  #pageRules{grid-template-columns:1fr}
+  #pageRules,#pageFirm{grid-template-columns:1fr}
   .rulesbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}
   table.rulesT{min-width:900px}
   table.rulesT td,table.rulesT th{padding:9px 11px}
@@ -299,6 +324,8 @@
     <footer id="foot"></footer>
   </main>
 </div>
+
+<div class="shell" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
 
 <div class="shell" id="pageRules" style="display:none">
   <main>
@@ -460,7 +487,7 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const num=v=>{const n=Number(String(v).replace(/[,$%\s]/g,""));return isNaN(n)?null:n;};
 const ok=v=>v===true;
 const assetLabel=v=>(ASSET[lang]||ASSET.en)[v]||(v||"—").toUpperCase();
-const enumv=v=>{if(v==null||v==="")return v;const m={ko:{instant:"즉시","1-step":"1단계","2-step":"2단계","3-step":"3단계",yes:"예",no:"아니오"},en:{yes:"yes",no:"no"}}[lang]||{};return m[v]||v;};
+const enumv=v=>{if(v==null||v==="")return v;const m={ko:{instant:"즉시","1-step":"1단계","2-step":"2단계","3-step":"3단계","1":"1단계","2":"2단계","3":"3단계",yes:"예",no:"아니오"},en:{"1":"1-step","2":"2-step","3":"3-step",yes:"yes",no:"no"}}[lang]||{};return m[v]||v;};
 const pc=v=>(v==null||v===""||num(v)===0)?'<span class="dim">—</span>':`<span class="mono">${esc(v)}%</span>`;
 function money(v,cur){if(v==null||v==="")return '<span class="dim">—</span>';const n=num(v);if(n==null)return esc(v);
   const sym=((cur||"").toUpperCase()==="USD"||!cur)?"$":"";return `<span class="mono">${sym}${n.toLocaleString('en-US')}</span>`;}
@@ -568,7 +595,7 @@ function render(){
     const g=r.vf||"—";
     const ea = ok(r.ec)?"yes":(r.ec===false?"no":"dim");
     return `<tr data-id="${esc(r.i)}" class="${activeId===r.i?"open":""}">
-      <td class="firm">${esc(r.f)}</td>
+      <td class="firm"><a href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(r.f)}</a></td>
       <td class="plan" title="${esc(r.p)}">${esc(r.p)}${(r.co||r.pt)?`<span class="tagpromo">PROMO</span>`:""}</td>
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}" title="${esc(ASSET_TIP[lang])}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${money(r.s,r.cu)}</td>
@@ -883,6 +910,161 @@ el("dClose").onclick=closeDrawer;el("scrim").onclick=closeDrawer;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");}});
 document.addEventListener("scroll",()=>hidePop(),true);
 
+/* ---------- firm detail page (PFM-style) ---------- */
+const modeOf=arr=>{const c={};arr.forEach(v=>{if(v!=null&&v!=="")c[v]=(c[v]||0)+1;});
+  const e=Object.entries(c).sort((a,b)=>b[1]-a[1])[0]; return e?e[0]:null;};
+const KO_MK={cfd:"FX · CFD",fut:"선물",futures:"선물",crypto:"크립토",stocks:"주식",syn:"합성지수"};
+const mkName=v=>lang==="ko"?(KO_MK[v]||(v||"—").toUpperCase()):assetLabel(v);
+
+function renderFirm(name){
+  const rs = rows.filter(r=>r.f===name);
+  if(!rs.length){ el("firmMain").innerHTML=`<p class="empty-inline">${esc(name)}</p>`; return; }
+  const meta=(DB.firmMeta||{})[name]||{};
+  const grades=["A","B","C"].filter(g=>rs.some(r=>r.vf===g));
+  const sizes=rs.map(r=>num(r.s)).filter(v=>v!=null);
+  const assets=[...new Set(rs.map(r=>r.mk).filter(Boolean))];
+  const progs=[...new Set(rs.map(r=>r.st).filter(Boolean))];
+  const fees=rs.map(r=>num(r.pr)).filter(v=>v!=null);
+  const lv=(...ids)=>{const tr=el(ids[0]);return tr?tr.textContent:"";};
+
+  /* leverage matrix */
+  const cols=progs.slice(0,4);
+  const levRows=assets.map(a=>({a, cells:cols.map(p=>{
+      const lvV=modeOf(rs.filter(r=>r.mk===a&&r.st===p).map(r=>r.lv));
+      if(lvV) return /^1:/.test(String(lvV))?String(lvV):":"+lvV;
+      const rawV=modeOf(rs.filter(r=>r.mk===a&&r.st===p).map(r=>r.lvp));
+      return rawV?{raw:String(rawV)}:"—";
+    })}));
+
+  /* payout by program */
+  const plans=[...new Set(rs.map(r=>r.p).filter(Boolean))];
+  const payBlocks=plans.slice(0,6).map(pl=>{
+    const g=rs.filter(r=>r.p===pl);
+    const sp=modeOf(g.map(r=>r.sp)), pc=modeOf(g.map(r=>r.pc)), pf=modeOf(g.map(r=>r.pf));
+    const pn=g.map(r=>r.pn).find(Boolean), yk=g.map(r=>r.yk).find(v=>v!=null);
+    return `<div class="prog"><h4>${esc(pl)}</h4><dl>
+      <dt>${esc(t("cSplit"))}</dt><dd>${sp?esc(sp)+"%":'<span class="dim">—</span>'}</dd>
+      <dt>${esc(t("cCycle"))}</dt><dd>${pc?esc(pc):'<span class="dim">—</span>'}</dd>
+      <dt>${esc(t("cFirst"))}</dt><dd>${pf?esc(pf):'<span class="dim">—</span>'}</dd>
+      ${yk!=null?`<dt>${esc(t("cCap"))}</dt><dd>${yk===0?"무제한":money(yk,"USD")}</dd>`:""}
+      ${pn?`<dt>${esc(t("cMin"))}</dt><dd style="white-space:normal">${esc(pn)}</dd>`:""}
+    </dl></div>`;
+  }).join("");
+
+  /* rules */
+  const ruleLine=(label,vals)=>{const st=ruleState(vals);
+    return `<span class="rstate ${st.k}"><i></i>${esc(label)} ${esc(st.lbl)}</span>`;};
+  const rulesHtml=[["EA",'ec'],["뉴스",'nc'],["오버나이트",'oc'],["카피",'cc'],["주말",'wk']]
+    .map(([lb,k])=>ruleLine(lb,rs.map(r=>flagOf(r[k])))).join("");
+
+  /* promos + addons */
+  const promos=[...new Set(rs.filter(r=>r.co||r.pt).map(r=>`${r.co||""}||${r.pt||r.po||""}||${r.px||""}`))]
+    .map(sv=>{const [co,pt,px]=sv.split("||");return {co,pt,px};});
+  const addons=[...new Set(rs.flatMap(r=>Array.isArray(r.ad)?r.ad:[]))].slice(0,12);
+
+  /* product table */
+  const tableRows=rs.slice().sort((a,b)=>(num(a.s)??0)-(num(b.s)??0)).map(r=>`
+    <tr data-id="${esc(r.i)}">
+      <td class="firm">${esc(r.p)}</td>
+      <td>${esc(enumv(r.st)||r.ty||"—")}</td>
+      <td class="num">${money(r.s,r.cu)}</td>
+      <td class="num">${money(r.pr,r.cu)}</td>
+      <td class="num">${r.sp?esc(r.sp)+"%":'<span class="dim">—</span>'}</td>
+      <td class="num">${r.ml!=null?esc(r.ml)+"%":'<span class="dim">—</span>'}</td>
+      <td class="num">${(r.mf??r.md)!=null?esc(r.mf??r.md):'<span class="dim">—</span>'}</td>
+      <td>${r.co?`<span class="tagpromo">PROMO</span>`:""}</td>
+      <td><span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span></td>
+    </tr>`).join("");
+
+  el("firmMain").innerHTML=`
+    <div class="fhero">
+      <div>
+        <h1>${esc(name)}</h1>
+        <div class="fmeta">
+          ${meta.rating?`<span class="rating">★ ${esc(meta.rating)} <small>${esc(meta.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span>`:""}
+          ${grades.map(g=>`<span class="pill p-${g}">${esc(t("grade"))} ${g}</span>`).join("")}
+          <span>${rs.length} ${esc(t("rows"))}</span>
+          <span>${esc(assets.map(mkName).join(" · "))}</span>
+        </div>
+      </div>
+      <div class="fbtns">
+        ${rs[0].ur?`<a class="btn" href="${esc(rs[0].ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:""}
+        <button class="btn g" id="firmCh">${lang==="ko"?"이 회사 챌린지":"Firm challenges"}</button>
+      </div>
+    </div>
+
+    <div class="panel"><h3>${lang==="ko"?"개요":"Overview"} <span>summary</span></h3>
+      <table class="fx"><tbody>
+        <tr><td style="color:var(--muted)">${lang==="ko"?"계좌 규모":"Account size"}</td>
+            <td>${sizes.length?money(Math.min(...sizes),"USD")+" – "+money(Math.max(...sizes),"USD"):"—"}</td></tr>
+        <tr><td style="color:var(--muted)">${lang==="ko"?"프로그램":"Programs"}</td>
+            <td>${progs.map(p=>esc(enumv(p)||p)).join(" · ")||"—"}</td></tr>
+        <tr><td style="color:var(--muted)">${lang==="ko"?"참가비 범위":"Entry fee range"}</td>
+            <td>${fees.length?money(Math.min(...fees),"USD")+" – "+money(Math.max(...fees),"USD"):"—"}</td></tr>
+        <tr><td style="color:var(--muted)">${lang==="ko"?"자산군":"Assets"}</td>
+            <td>${assets.map(mkName).join(" · ")||"—"}</td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="grid2">
+      <div class="panel"><h3>${lang==="ko"?"레버리지":"Leverage"} <span>${lang==="ko"?"자산 × 프로그램":"asset × program"}</span></h3>
+        <table class="fx"><thead><tr><th>${lang==="ko"?"자산":"Asset"}</th>
+          ${cols.map(c=>`<th class="num">${esc(enumv(c)||c)}</th>`).join("")}</tr></thead>
+          <tbody>${levRows.map(o=>`<tr><td>${esc(mkName(o.a))}</td>
+            ${o.cells.map(v=>typeof v==="object"&&v.raw
+              ?`<td class="num mono dim" title="${esc(lang==="ko"?"원본 표기 · 미검증":"raw recorded value · unverified")}">${esc(v.raw)}*</td>`
+              :`<td class="num mono">${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>
+        <div class="empty-inline" style="margin-top:8px">${lang==="ko"
+          ?"상품 기록에서 자산·프로그램별 최빈값입니다. * 는 검증되지 않은 원본 표기입니다.":"Most frequent recorded value per asset and program. * marks an unverified raw value."}</div>
+      </div>
+
+      <div class="panel"><h3>${lang==="ko"?"규칙":"Rules"} <span>${lang==="ko"?"상품 단위 집계":"per-product aggregate"}</span></h3>
+        <div class="chips">${rulesHtml}</div>
+        <div class="empty-inline" style="margin-top:10px">${lang==="ko"
+          ?"조건부는 일부 상품만 허용, 혼합은 상품 간 기록이 갈리는 경우입니다.":"Conditional = some programs allow; mixed = records disagree."}</div>
+      </div>
+    </div>
+
+    <div class="panel"><h3>${lang==="ko"?"지급 정책":"Payout policy"} <span>${lang==="ko"?"프로그램별":"by program"}</span></h3>
+      ${payBlocks||`<div class="empty-inline">${lang==="ko"?"기록 없음":"Not recorded"}</div>`}
+    </div>
+
+    <div class="grid2">
+      <div class="panel"><h3>${lang==="ko"?"프로모션":"Promotions"} <span>${promos.length}</span></h3>
+        ${promos.length?promos.slice(0,8).map(pm=>`<div class="prog">
+            <h4>${esc(pm.co||(lang==="ko"?"코드 미표기":"no code"))}</h4>
+            <div style="font-size:12.5px;color:var(--ink2)">${esc(pm.pt||"")}</div>
+            <div style="margin-top:6px">${expiryChip(pm.px)}</div></div>`).join("")
+          :`<div class="empty-inline">${esc(t("pNone"))}</div>`}
+      </div>
+      <div class="panel"><h3>${lang==="ko"?"애드온":"Add-ons"} <span>${addons.length}</span></h3>
+        ${addons.length?`<div class="chips">${addons.map(a=>`<span class="chip2">${esc(a)}</span>`).join("")}</div>`
+          :`<div class="empty-inline">${lang==="ko"?"기록된 애드온이 없습니다.":"No add-ons recorded."}</div>`}
+      </div>
+    </div>
+
+    <div class="panel"><h3>${lang==="ko"?"상품 전체":"All products"} <span>${rs.length}</span></h3>
+      <div style="overflow:auto;max-height:460px">
+        <table class="fx"><thead><tr>
+          <th>${esc(t("fPlan"))}</th><th>${esc(t("fSteps"))}</th><th class="num">${esc(t("fSize"))}</th>
+          <th class="num">${esc(t("fPrice"))}</th><th class="num">${esc(t("fSplit"))}</th>
+          <th class="num">${esc(t("fMax"))}</th><th class="num">${esc(t("fDays"))}</th><th></th><th>${esc(t("fVer"))}</th>
+        </tr></thead><tbody>${tableRows}</tbody></table>
+      </div>
+    </div>
+
+    <div class="panel"><h3>${lang==="ko"?"기록되지 않은 항목":"Not recorded"}</h3>
+      <div class="empty-inline">${lang==="ko"
+        ?"수수료(로트당 커미션)·공지사항·리뷰 점수 분포는 아직 수집되지 않았습니다. PFM 페이지에는 있으나 HELIX 데이터에는 없으므로 비워 둡니다."
+        :"Commissions per lot, announcements and review distribution are not collected yet. They exist on the PFM page but not in HELIX data, so they stay empty."}</div>
+    </div>
+
+    <footer>${t("foot")}</footer>`;
+
+  el("firmCh").onclick=()=>{F.firm.clear();F.firm.add(name);location.hash="#challenges";route();render();};
+  el("firmMain").querySelectorAll("tr[data-id]").forEach(tr=>tr.onclick=()=>openDrawer(tr.dataset.id));
+}
+
 /* ---------- rules page ---------- */
 function ruleState(vals){
   const y=vals.filter(v=>v==="y").length, n=vals.filter(v=>v==="n").length,
@@ -921,16 +1103,18 @@ function renderRules(){
       <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
     </tr>`).join("");
   el("rulesBody").querySelectorAll("tr[data-firm]").forEach(tr=>tr.onclick=()=>{
-    F.firm.clear(); F.firm.add(tr.dataset.firm);
-    location.hash="#challenges"; route(); render();
+    location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
 function route(){
-  const rules=(location.hash||"").includes("rules");
-  el("pageChallenges").style.display=rules?"none":"grid";
-  el("pageRules").style.display=rules?"grid":"none";
-  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",(b.dataset.page==="rules")===rules));
-  if(rules) renderRules();
+  const h=(location.hash||"").replace(/^#/,"");
+  const isRules=h.startsWith("rules"), isFirm=h.startsWith("firm/");
+  el("pageChallenges").style.display=(!isRules&&!isFirm)?"grid":"none";
+  el("pageRules").style.display=isRules?"grid":"none";
+  el("pageFirm").style.display=isFirm?"grid":"none";
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",(b.dataset.page==="rules")===isRules));
+  if(isRules) renderRules();
+  if(isFirm) renderFirm(decodeURIComponent(h.slice(5)));
 }
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{
   location.hash="#"+b.dataset.page; route();
