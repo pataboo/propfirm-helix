@@ -144,6 +144,9 @@
     font-size:10px;font-weight:800;line-height:15px}
   .fbadge{display:none;margin-left:6px;background:var(--accent);color:#150b23;border-radius:999px;
     padding:1px 7px;font-size:10.5px;font-weight:800;vertical-align:middle}
+  .payshort{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;cursor:help}
+  .ptk{background:rgba(167,139,250,.10);border-radius:4px;padding:0 5px;font-size:11px;color:var(--ink2);line-height:16px}
+  .psep{color:var(--muted);opacity:.5;font-size:10px}
   .phases{display:inline-flex;align-items:center;gap:2px;font-family:ui-monospace,monospace;font-size:11.5px}
   .phv{color:var(--ink)}
   .phsep{color:var(--muted);opacity:.6}
@@ -621,7 +624,7 @@
   </aside>
 
   <main id="main" tabindex="-1">
-    <button id="fMobile" aria-label="필터 열기 / Open filters" aria-expanded="false" aria-controls="filterAside">☰ ${lang==="ko"?"필터":"Filters"}</button>
+    <button id="fMobile" aria-label="필터 열기 / Open filters" aria-expanded="false" aria-controls="filterAside">☰ <span id="fMobileTxt">필터</span></button>
     <div class="freshbar" id="freshBar"></div>
     <div class="stats">
       <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
@@ -630,7 +633,7 @@
       <a class="stat statlink" id="st4" href="#challenges"><div class="n" id="s4">—</div><div class="l" id="s4l"></div></a>
     </div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-      <div class="resbar" id="resbar" style="flex:1;margin:0"></div>
+      <div class="resbar" id="resbar" role="status" aria-live="polite" style="flex:1;margin:0"></div>
       <select class="selsort" id="sortSel" aria-label="정렬 기준 / Sort by"></select>
       <div class="navitem" id="tsWrap">
         <button class="iconbtn" id="tsBtn" title="Table settings" aria-label="표 설정 / Table settings" aria-expanded="false" aria-controls="tsMenu">⚙</button>
@@ -874,6 +877,50 @@ function unitCell(numVal, txt){
     return pct || usd || '<span class="dim">—</span>';
   }
   return pct || usd || '<span class="dim">—</span>';
+}
+function payTokens(raw){
+  const t=String(raw||"").toLowerCase();
+  if(!t) return [];
+  const out=[]; const push=x=>{ if(!out.includes(x)) out.push(x); };
+  if(/on[- ]?demand|수시|instant|anytime|whenever|day one/.test(t)) push("수시");
+  if(/\bdaily\b|every day|each day|매일|per day|24\s*h/.test(t)) push("매일");
+  if(/weekly|every week|each week|매주|7일/.test(t)) push("주간");
+  if(/bi-?weekly|every 14 days|14[\s-]?days?|fortnight|2주|14일/.test(t)) push("격주");
+  if(/monthly|every 30 days|30[\s-]?days?|월간|30일/.test(t)) push("월간");
+  const ms=t.match(/(\d{1,2})\s*(business\s*)?(days?|영업일)/g)||[];
+  ms.forEach(x=>{
+    const n=parseInt(x,10);
+    if(n>=1&&n<=45&&![7,14,30].includes(n)) push(n+(/business|영업/.test(x)?"영업일":"일"));
+  });
+  const m3=t.match(/every\s*(\d{1,2})\s*(qualifying |winning |trading )?days?/g)||[];
+  m3.forEach(x=>{ const n=parseInt(x.replace(/\D/g,""),10); if(n>=1&&n<=45&&![7,14,30].includes(n)) push(n+"일"); });
+  const m4=t.match(/(\d{1,2})\s*(qualifying|winning|trading)\s*days?/g)||[];
+  m4.forEach(x=>{ const n=parseInt(x,10); if(n>=1&&n<=45&&![7,14,30].includes(n)) push(n+"일"); });
+  if(!out.length){
+    if(/one[- ]?time|single payout|1회/.test(t)) out.push("1회");
+    else if(/next day|다음날/.test(t)) out.push("다음날");
+    else if(/after (the )?(trading )?period|기간 후/.test(t)) out.push("기간 후");
+    else if(/after (passing|challenge)|통과 후/.test(t)) out.push("통과 후");
+  }
+  return out.slice(0,3);
+}
+function payCell(raw){
+  if(!raw) return '<span class="dim">—</span>';
+  const tk=payTokens(raw);
+  const full=String(raw).replace(/\s+/g," ").slice(0,180);
+  if(!tk.length) return `<span class="payshort" title="${esc(full)}">${esc(String(raw).slice(0,14))}</span>`;
+  return `<span class="payshort" title="${esc(full)}">${tk.map(x=>`<span class="ptk">${esc(x)}</span>`).join('<span class="psep">·</span>')}</span>`;
+}
+function ddLabel(raw){
+  const t=String(raw||"").toLowerCase();
+  if(!t) return "";
+  if(/static|fixed/.test(t)) return "고정";
+  if(/eod/.test(t)&&/trail/.test(t)) return "EOD 추적";
+  if(/trail.*(balance|잔고)/.test(t)) return "잔고 추적";
+  if(/trail.*equity|equity.*trail/.test(t)) return "자산 추적";
+  if(/intraday/.test(t)) return "일중 추적";
+  if(/trail/.test(t)) return "추적";
+  return raw;
 }
 function stageTag(r){
   const n=Number(r.sg||0);
@@ -1259,6 +1306,24 @@ function buildFilterSettings(){
   const r=el("fgReset"); if(r) r.onclick=()=>{visGroups=ALL_GROUPS.slice();
     localStorage.setItem("helix-groups",JSON.stringify(visGroups)); buildFilterSettings(); buildFilters();};
 }
+/* A11Y: keep keyboard focus on the same filter control across re-renders */
+function focusSig(a){
+  if(!a||a===document.body||a===document.documentElement) return null;
+  const d=a.dataset||{}, escv=s=>String(s).replace(/["\\]/g,"\\$&");
+  if(d.k!=null&&d.v!=null) return {sel:`#filterPanel input[type="checkbox"][data-k="${escv(d.k)}"][data-v="${escv(d.v)}"]`};
+  if(a.id) return {sel:`#${CSS.escape(a.id)}`};
+  for(const k of ["size","preset","fee","split","target","days","lev","rating","sort","view"]){
+    if(d[k]!=null) return {sel:`#filterPanel [data-${k}="${escv(d[k])}"]`};
+  }
+  return null;
+}
+function restoreFocus(sig){
+  if(!sig) return;
+  const t=document.querySelector(sig.sel);
+  if(t&&t!==document.activeElement) t.focus({preventScroll:true});
+}
+function fapply(){ const s=focusSig(document.activeElement); render(); restoreFocus(s); }
+
 function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
   const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
@@ -1334,39 +1399,39 @@ function buildFilters(){
   host.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.onchange=()=>{
     const k=cb.dataset.k, v=cb.dataset.v;
     if(cb.checked) F[k].add(v); else F[k].delete(v);
-    render();
+    fapply();
   });
   {const a=el("sizeMinIn"),b=el("sizeMaxIn");
    const apply=()=>{ F.sizeMin = a&&a.value!==""?Number(a.value):null; F.sizeMax = b&&b.value!==""?Number(b.value):null;
-     render(); };
+     fapply(); };
    if(a) a.onchange=apply; if(b) b.onchange=apply;}
-  {const c=el("priceMaxIn"); if(c) c.onchange=()=>{ F.priceMax = c.value!==""?Number(c.value):null; render(); };}
+  {const c=el("priceMaxIn"); if(c) c.onchange=()=>{ F.priceMax = c.value!==""?Number(c.value):null; fapply(); };}
   host.querySelectorAll("button[data-size]").forEach(b=>b.onclick=()=>{
     const [lo,hi]=b.dataset.size.split("-");
     const on=F.sizeMin===Number(lo)&&F.sizeMax===(hi===""?null:Number(hi));
     F.sizeMin=on?null:Number(lo); F.sizeMax=on?null:(hi===""?null:Number(hi));
-    render();
+    fapply();
   });
   const favChip=document.getElementById("favChip");
   if(favChip) favChip.onclick=()=>{ favOnly=!favOnly; favChip.classList.toggle("on",favOnly);
-    favChip.textContent=`★ ${lang==="ko"?"관심":"Saved"} ${favs.size}`; render(); };
+    favChip.textContent=`★ ${lang==="ko"?"관심":"Saved"} ${favs.size}`; fapply(); };
   host.querySelectorAll("button[data-preset]").forEach(b=>b.onclick=()=>applyPreset(b.dataset.preset));
   host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
-    const v=Number(b.dataset.fee); F.priceMax = F.priceMax===v?null:v; render();
+    const v=Number(b.dataset.fee); F.priceMax = F.priceMax===v?null:v; fapply();
   });
   host.querySelectorAll("button[data-split]").forEach(b=>b.onclick=()=>{
-    const v=Number(b.dataset.split); F.splitMin = F.splitMin===v?null:v; render();
+    const v=Number(b.dataset.split); F.splitMin = F.splitMin===v?null:v; fapply();
   });
   host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
-    const k=b.dataset.fee; F.fee.has(k)?F.fee.delete(k):F.fee.add(k); render();});
+    const k=b.dataset.fee; F.fee.has(k)?F.fee.delete(k):F.fee.add(k); fapply();});
   host.querySelectorAll("button[data-target]").forEach(b=>b.onclick=()=>{
-    F.target = F.target===b.dataset.target?null:b.dataset.target; render();});
+    F.target = F.target===b.dataset.target?null:b.dataset.target; fapply();});
   host.querySelectorAll("button[data-days]").forEach(b=>b.onclick=()=>{
-    F.daysBand = F.daysBand===b.dataset.days?null:b.dataset.days; render();});
+    F.daysBand = F.daysBand===b.dataset.days?null:b.dataset.days; fapply();});
   host.querySelectorAll("button[data-lev]").forEach(b=>b.onclick=()=>{
-    F.levBand = F.levBand===b.dataset.lev?null:b.dataset.lev; render();});
+    F.levBand = F.levBand===b.dataset.lev?null:b.dataset.lev; fapply();});
   host.querySelectorAll("button[data-rating]").forEach(b=>b.onclick=()=>{
-    const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; render();});
+    const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; fapply();});
   if(typeof syncFilterUI==="function"){ syncFilterUI(); updateGroupBadges(); }
 }
 function render(){
@@ -1426,8 +1491,8 @@ function render(){
       <td class="mono">${targetCell(r)}</td>
       <td class="num">${lossCell(r.dl, r.dlT, r)}</td>
       <td class="num">${daysCell(r)}</td>
-      <td>${r.pc?`<span class="mono" style="font-size:11.5px">${esc(r.pc)}</span>`:'<span class="dim">—</span>'}</td>
-      <td class="mono">${r.pf?esc(r.pf):'<span class="dim">—</span>'}</td>
+      <td>${payCell(r.pc)}</td>
+      <td>${payCell(r.pf)}</td>
       <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
       <td class="num">${r.rt?esc(r.rt):'<span class="dim">—</span>'}</td>
       <td>${r.m5===true?'<span class="yes">✓</span>':r.m5===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
@@ -1785,7 +1850,7 @@ function applyStatics(){
   document.querySelectorAll(".lang button").forEach(b=>{const on=b.dataset.lang===lang;
     b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false");});
   {const g=el("gq"); if(g) g.setAttribute("aria-label", lang==="ko"?"브랜드·상품 검색":"Search brands and products");}
-  {const fm=el("fMobile"); if(fm) fm.setAttribute("aria-label", lang==="ko"?"필터 열기":"Open filters");}
+  {const fm=el("fMobile"); if(fm){fm.setAttribute("aria-label", lang==="ko"?"필터 열기":"Open filters"); const tx=document.getElementById("fMobileTxt"); if(tx) tx.textContent=lang==="ko"?"필터":"Filters";}}
   {const ss=el("sortSel"); if(ss) ss.setAttribute("aria-label", lang==="ko"?"정렬 기준":"Sort by");}
   {const vt=el("viewToggle"); if(vt) vt.setAttribute("aria-label", lang==="ko"?"보기 방식":"View");}
   {const sl=document.getElementById("skipLink"); if(sl) sl.textContent=lang==="ko"?"본문으로 건너뛰기":"Skip to content";}
@@ -1991,7 +2056,7 @@ function applyPreset(k){
   if(p.sort){
     sortPreset = (sortPreset===k) ? null : k;
     if(sortPreset){ sortKey=p.sort; sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
-    render(); return;
+    fapply(); return;
   }
   const conds=presetConds(p);
   const on=presetActive(p);
@@ -2000,7 +2065,7 @@ function applyPreset(k){
   if(!on) conds.forEach(([set])=>{
     const g=document.querySelector(`#filterPanel details[data-g="${set}"]`); if(g) g.open=true;
   });
-  render();
+  fapply();
 }
 function flagOk(r,f){
   const ok=v=>v===true||v==="cond";
