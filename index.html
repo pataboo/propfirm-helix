@@ -147,6 +147,11 @@
     background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);color:var(--accent);
     font-size:12px;font-weight:700;text-decoration:none}
   .goalCTA:hover{background:rgba(167,139,250,.22)}
+  .gcheck{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
+  .gcheck .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px;background:var(--muted)}
+  .gcheck.no{border-color:rgba(239,125,125,.35);background:rgba(239,125,125,.06)} .gcheck.no .dot{background:#ef7d7d}
+  .gcheck.cond{border-color:rgba(255,194,71,.35);background:rgba(255,194,71,.06)} .gcheck.cond .dot{background:var(--amber)}
+  .gcheck.yes{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.05)} .gcheck.yes .dot{background:var(--green)}
   .brow{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}
   .brow:last-child{border-bottom:0}
   .brow a{font-size:12.5px;font-weight:700;color:var(--ink)}
@@ -2285,6 +2290,7 @@ function renderChallenge(id){
 
     ${eapBlock(r.f)}
     ${brokerPanel(r)}
+    ${groupPanel(r)}
     <div class="panel"><h3>${esc(t("sectCond"))}</h3>
       <div class="rules">${ruleChip(t("fEa"),r.ec)}${ruleChip(t("fNews"),r.nc)}${ruleChip(t("fOn"),r.oc)}
       ${ruleChip(t("fCp"),r.cc)}${ruleChip(t("fWk"),r.wk)}</div>
@@ -2365,6 +2371,10 @@ function renderBrokers(){
         <th scope="col">${T("레버리지","Leverage")}</th><th scope="col">${T("NBP","NBP")}</th>
         <th scope="col">${T("자금분리","Segregated")}</th><th scope="col" class="num">${T("설립","Founded")}</th><th scope="col" class="num">${T("호환 챌린지","Runnable challenges")}</th><th scope="col">${T("근거","Source")}</th>
       </tr></thead><tbody>${ok.map(row).join("")}</tbody></table></div></div>
+    <div class="panel" style="margin-top:14px"><h3>${T("가족·그룹이 브로커를 고를 때 확인할 3가지","Three checks for a family or group")}</h3>
+      <div class="meta">1. ${T("계좌 소유자 — 모든 계좌가 본인 명의여야 카피가 허용되는 경우가 많습니다.","Ownership — many permissions only cover accounts in the same person's name.")}</div>
+      <div class="meta">2. ${T("NBP(네거티브 밸런스 보호) — 위 표에서 ✓가 있는 브로커를 우선하세요.","Negative balance protection — prefer a broker marked ✓ above.")}</div>
+      <div class="meta">3. ${T("규제 기관 — 1개국 규제보다 다국가 규제가 일반적으로 안전합니다.","Regulators — multi-jurisdiction regulation is generally stronger than a single offshore licence.")}</div></div>
     <div class="panel" style="margin-top:14px"><h3>${T("아직 확인하지 못한 브로커","Not yet verifiable")} <span>${list.length-ok.length}</span></h3>
       ${list.filter(b=>b.status!=="verified").map(b=>`<div class="meta">${esc(b.name)} — ${esc(b.note)} <a href="${esc(b.src)}" target="_blank" rel="noopener">↗</a></div>`).join("")||`<div class="dim">${T("없음","none")}</div>`}
       <div class="srcline">${T("데이터 기준일","Data as of")}: ${esc((DB.brokers||{}).as_of||"—")}</div></div>`;
@@ -3450,6 +3460,27 @@ function brokersForPlatforms(plats){
 function brokerRow(b){
   return `<div class="brow"><a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.name)}</a>
     <span class="bmeta">${b.min!=null?money(b.min,b.cur||"USD"):"—"} · ${b.spread!=null?b.spread+"핍":"—"} · ${esc((b.reg||[])[0]||"—")}</span></div>`;
+}
+function groupPanel(r){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const e=(DB.eap||{})[r.f]||{};
+  const copyTxt=String(e.copy||"");
+  const prohibited=/not allowed|prohibited|strictly prohibit|금지|불가/i.test(copyTxt);
+  const onlyOwn=/personal accounts only|본인|same individual|own accounts|your own/i.test(copyTxt);
+  const cpFlag=r.cc;
+  const level = cpFlag===false ? "no" : (cpFlag===true||cpFlag==="cond") ? "yes" : (prohibited?"no":onlyOwn?"own":"unknown");
+  const map={
+    no:{cls:"no", ko:"이 상품은 카피트레이딩이 금지됩니다. 가족·그룹이 각자 계좌를 사서 같은 전략을 돌리면 규칙 위반입니다.", en:"Copy trading is prohibited on this product — family or group members running the same strategy on separate accounts risk a rule breach."},
+    own:{cls:"cond", ko:"본인 명의 계좌 간 카피만 허용됩니다. 배우자·자녀 계좌라도 소유자가 다르면 위반입니다.", en:"Only your own accounts may copy each other — a spouse's or child's account is a different owner and falls outside the permission."},
+    yes:{cls:"yes", ko:"카피트레이딩이 허용됩니다. 단 계좌 소유자가 모두 본인이어야 합니다.", en:"Copy trading is allowed, provided every linked account is owned by the same person."},
+    unknown:{cls:"unk", ko:"카피트레이딩 규칙이 기록되지 않았습니다. 브랜드의 규칙 페이지에서 확인하세요.", en:"Copy-trading rules are not recorded for this brand — check the firm's rules page."}
+  };
+  const m=map[level];
+  return `<div class="panel"><h3>${T("가족·그룹으로 할 때","If a family or group trades together")} <span>${T("카피 규칙","copy rules")}</span></h3>
+    <div class="gcheck ${m.cls}"><span class="dot"></span>${esc(T(m.ko,m.en))}</div>
+    <div class="meta">${T("여러 명이 같은 챌린지를 각자 구매하는 것은 대체로 허용되지만, 계좌 간 카피·신호 공유는 대부분 금지됩니다. 프랍펌은 계좌 소유권과 거래 유사성을 함께 봅니다.","Several people each buying the same challenge is normally fine; copying or sharing signals between those accounts usually is not. Firms check both ownership and trade similarity.")}</div>
+    ${e.copy?`<div class="meta" style="margin-top:6px;opacity:.8">${T("기록된 규칙","Recorded rule")}: ${esc(String(e.copy).slice(0,220))}</div>`:""}
+  </div>`;
 }
 function brokerPanel(r){
   const plats=challengePlatforms(r);
