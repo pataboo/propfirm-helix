@@ -713,7 +713,8 @@
 </div></div>
 
 
-<script src="data.js"></script>
+<script>window.HELIX_VER="9cf0fbd3";</script>
+<script src="data.js?v=9cf0fbd3"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -1097,7 +1098,7 @@ function ensureNotes(cb){
   if(window.HELIX_NOTES){ cb&&cb(); return; }
   if(!_notesReq){
     _notesReq=new Promise(res=>{
-      const sc=document.createElement("script"); sc.src="notes.js";
+      const sc=document.createElement("script"); sc.src="notes.js?v="+(window.HELIX_VER||"0");
       sc.onload=()=>res(true); sc.onerror=()=>res(false);
       document.head.appendChild(sc);
     });
