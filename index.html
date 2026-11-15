@@ -12,6 +12,7 @@
     --accent:#a78bfa;
     --pink:#a78bfa;--cyan:#a78bfa;--purple:#a78bfa;--blue:#a78bfa;
     --green:#34dfaa;--amber:#ffab00;--red:#ff2d55;
+    --on-accent:#12091f;
     --shadow:0 18px 50px rgba(0,0,0,.75);
   }
   html[data-theme="light"]{
@@ -19,9 +20,20 @@
     --ink:#0b0f10;--ink2:#3a3f42;--muted:#6d7276;
     --accent:#6d3ff0;
     --pink:#6d3ff0;--cyan:#6d3ff0;--purple:#6d3ff0;--blue:#6d3ff0;
-    --green:#0a9d68;--amber:#a67400;--red:#c8392c;--shadow:0 18px 40px rgba(11,15,16,.12);
+    --green:#06744e;--amber:#8a5f00;--red:#c8392c;--shadow:0 18px 40px rgba(11,15,16,.12);
+    --on-accent:#fff;
   }
   *{box-sizing:border-box}
+  /* keyboard focus: one visible ring everywhere, offset inward where a row or cell would clip */
+  *:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .hsearch input:focus-visible,.search input:focus-visible,.rangeRow input:focus-visible,
+  .tsrow input:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:6px}
+  thead th[data-sort]:focus-visible,tbody tr:focus-visible,.mcard:focus-visible,.pickrow:focus-visible{outline-offset:-2px}
+  .skip{position:absolute;left:10px;top:-70px;z-index:300;background:var(--accent);color:var(--on-accent);
+    padding:10px 14px;border-radius:9px;font-size:12.5px;font-weight:800;text-decoration:none}
+  .skip:focus{top:10px}
+  main:focus,main:focus-visible{outline:none}
+  .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   *{scrollbar-width:thin;scrollbar-color:#2b3539 transparent}
   ::-webkit-scrollbar{width:10px;height:10px}
   ::-webkit-scrollbar-track{background:transparent}
@@ -132,16 +144,16 @@
   .chgB b{color:var(--ink)}
   .rangeRow input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
     padding:5px 8px;color:var(--ink);font-size:12px;font-family:inherit}
-  .rangeRow input:focus{outline:none;border-color:var(--accent)}
+  .rangeRow input:focus-visible{border-color:var(--accent)}
   .rangeRow span{color:var(--muted);font-size:12px}
   .chips2 button{font-size:11.5px;padding:4px 9px;border-radius:9999px;border:1px solid var(--line2);
     background:transparent;color:var(--ink2);cursor:pointer;font-family:inherit}
-  .chips2 button.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
+  .chips2 button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
   .navitem{position:relative;display:inline-flex}
   .dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:240px;background:var(--panel);
     border:1px solid var(--line2);border-radius:12px;padding:6px;box-shadow:var(--shadow);
     opacity:0;pointer-events:none;transform:translateY(-4px);transition:.14s;z-index:60}
-  .navitem:hover .dropdown{opacity:1;pointer-events:auto;transform:none}
+  .navitem:hover .dropdown,.navitem:focus-within .dropdown,.navitem.open .dropdown{opacity:1;pointer-events:auto;transform:none}
   .dropdown::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
   .dropdown a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
     font-size:12.5px;color:var(--ink2);text-decoration:none;white-space:nowrap}
@@ -202,7 +214,7 @@
   .iconbtn:hover{color:var(--ink);border-color:var(--muted)}
   .lang{display:flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
   .lang button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer}
-  .lang button.on{background:var(--accent);color:#0b0f10}
+  .lang button.on{background:var(--accent);color:var(--on-accent)}
   .shell{max-width:none;margin:0;padding:16px 16px 28px;display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
   .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;
     position:sticky;top:70px;max-height:calc(100vh - 92px);overflow-y:auto;overscroll-behavior:contain}
@@ -213,7 +225,7 @@
   .opt{font-size:12px;padding:5px 10px;border-radius:9999px;border:1px solid var(--line2);color:var(--ink2);
     background:transparent;cursor:pointer;font-family:inherit;white-space:nowrap}
   .opt:hover{border-color:var(--muted);color:var(--ink)}
-  .opt.on{background:var(--accent);border-color:var(--accent);color:#0b0f10;font-weight:700}
+  .opt.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
   .range{display:flex;gap:8px;align-items:center}
   .range input{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);
     font:inherit;font-size:12.5px;padding:7px 9px}
@@ -276,9 +288,9 @@
   .pop .pb{display:flex;gap:7px}
   .pop button{flex:1;border-radius:9px;padding:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--line2);
     background:transparent;color:var(--ink2)}
-  .pop button.primary{background:var(--accent);border-color:var(--accent);color:#0b0f10}
+  .pop button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
   .pop button:hover{color:var(--ink)}
-  .pop button.primary:hover{color:#0b0f10;filter:brightness(1.08)}
+  .pop button.primary:hover{color:var(--on-accent);filter:brightness(1.08)}
   /* compare bar + modal */
   .cbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line2);
     transform:translateY(120%);transition:transform .22s;z-index:48;padding:11px 0}
@@ -288,7 +300,7 @@
     border-radius:9999px;padding:6px 12px;font-size:12px;white-space:nowrap}
   .cchip b{font-weight:700}
   .cchip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 2px}
-  .btn{background:var(--accent);border:0;color:#0b0f10;border-radius:9px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .btn{background:var(--accent);border:0;color:var(--on-accent);border-radius:9px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .btn:disabled{background:var(--line2);color:var(--muted);cursor:not-allowed}
   .btn.g{background:transparent;border:1px solid var(--line2);color:var(--ink2)}
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:40}
@@ -501,6 +513,19 @@
   .minibar span{display:block;height:100%}
   footer{padding:26px 0 90px;color:var(--muted);font-size:12px;line-height:1.7;max-width:860px}
   @media(max-width:1080px){.shell{grid-template-columns:1fr}.filters{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
+  /* the header used to clip its right-hand controls between 760px and ~1080px */
+  @media(max-width:1080px){
+    .top .in{gap:10px;padding:0 12px}
+    .meta{display:none}
+    .hsearch{width:auto;min-width:110px;flex:0 1 230px}
+    .navpill{margin:0;flex:0 0 auto}
+    .navpill a{padding:6px 9px;font-size:12px}
+    .lang{flex:none}
+  }
+  @media(max-width:900px){
+    .hsearch{display:none}
+    .navpill a{padding:6px 8px;font-size:11.5px}
+  }
   #fMobile{display:none}
   @media(max-width:760px){
     .top .in{gap:6px;padding:0 10px;overflow-x:auto}
@@ -511,7 +536,7 @@
     .stat .n{font-size:20px}
     h1{font-size:19px}
     #fMobile{display:inline-flex;align-items:center;gap:6px;position:fixed;left:12px;bottom:16px;z-index:90;
-      background:var(--accent);color:#12091f;border:0;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;
+      background:var(--accent);color:var(--on-accent);border:0;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;
       box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer}
     .filters{position:fixed;left:0;top:0;bottom:0;width:min(88vw,330px);max-height:100vh;z-index:95;
       transform:translateX(-102%);transition:transform .22s ease;border-radius:0 14px 14px 0;background:var(--panel);
@@ -527,6 +552,8 @@
   }
 </style></head><body>
 
+<a class="skip" id="skipLink" href="#main">본문으로 건너뛰기 · Skip to content</a>
+<a class="skip" id="skipTable" href="#tableView">표 데이터로 건너뛰기 · Skip to the table</a>
 <div class="top"><div class="in">
   <a href="#home" class="brand" style="text-decoration:none;color:inherit"><svg class="mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
       <path d="M13 3.2c-4.9 0-8.6 3.2-8.6 7.4 0 4.2 3.7 7.2 8.6 7.2 4.4 0 7.6-2.4 8.2-5.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
@@ -534,8 +561,8 @@
       <path d="M10.1 8.1v9.4M10.1 12.6h4.6M14.7 8.1v9.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
     </svg><div><b class="wm">helix</b><span id="brandSub"></span></div></a>
   <div class="grow"></div>
-  <div class="hsearch"><span class="dim">⌕</span><input id="gq" autocomplete="off"></div>
-  <div class="navpill" id="subnav">
+  <div class="hsearch" role="search"><span class="dim" aria-hidden="true">⌕</span><input id="gq" autocomplete="off" type="search" aria-label="브랜드·상품 검색 / Search brands and products"></div>
+  <div class="navpill" id="subnav" role="navigation" aria-label="주 메뉴 / Main menu">
     <span class="navitem">
       <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
       <div class="dropdown" id="chMenu">
@@ -554,24 +581,24 @@
   </div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
-  <div class="lang"><button data-lang="ko" class="on">KO</button><button data-lang="en">EN</button></div>
-  <button class="iconbtn" id="theme" title="theme">☾</button>
+  <div class="lang" role="group" aria-label="언어 / Language"><button data-lang="ko" class="on" lang="ko" aria-pressed="true" aria-label="한국어로 보기">KO</button><button data-lang="en" lang="en" aria-pressed="false" aria-label="View in English">EN</button></div>
+  <button class="iconbtn" id="theme" title="theme" aria-label="테마 전환 / Toggle theme" aria-pressed="false">☾</button>
 </div>
 </div>
 
 <div class="shell" id="pageChallenges">
-  <aside class="filters">
+  <aside class="filters" id="filterAside" aria-label="필터 / Filters">
     <div style="display:flex;align-items:center;gap:8px">
       <h3 id="fTitle" style="margin:0"></h3>
-      <button class="iconbtn" id="fsetBtn" style="margin-left:auto;width:28px;height:28px;font-size:12px" title="필터 설정">⚙</button>
+      <button class="iconbtn" id="fsetBtn" style="margin-left:auto;width:28px;height:28px;font-size:12px" title="필터 설정" aria-label="필터 설정 / Filter settings" aria-expanded="false" aria-controls="filterSettings">⚙</button>
     </div>
     <div id="filterSettings" style="display:none;margin:10px 0 8px"></div>
     <div class="fpanel" id="filterPanel"></div>
     <button class="reset" id="reset"></button>
   </aside>
 
-  <main>
-    <button id="fMobile" aria-label="filters">☰ ${lang==="ko"?"필터":"Filters"}</button>
+  <main id="main" tabindex="-1">
+    <button id="fMobile" aria-label="필터 열기 / Open filters" aria-expanded="false" aria-controls="filterAside">☰ ${lang==="ko"?"필터":"Filters"}</button>
     <div class="freshbar" id="freshBar"></div>
     <div class="stats">
       <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
@@ -581,24 +608,24 @@
     </div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
       <div class="resbar" id="resbar" style="flex:1;margin:0"></div>
-      <select class="selsort" id="sortSel"></select>
+      <select class="selsort" id="sortSel" aria-label="정렬 기준 / Sort by"></select>
       <div class="navitem" id="tsWrap">
-        <button class="iconbtn" id="tsBtn" title="Table settings">⚙</button>
+        <button class="iconbtn" id="tsBtn" title="Table settings" aria-label="표 설정 / Table settings" aria-expanded="false" aria-controls="tsMenu">⚙</button>
         <div class="dropdown" id="tsMenu" style="right:0;left:auto;min-width:250px"></div>
       </div>
-      <div class="viewtoggle" id="viewToggle">
-        <button data-view="list">List</button><button data-view="table" class="on">Table</button>
+      <div class="viewtoggle" id="viewToggle" role="group" aria-label="보기 방식 / View">
+        <button data-view="list" aria-pressed="false">List</button><button data-view="table" class="on" aria-pressed="true">Table</button>
       </div>
       <button class="btn" id="cmpGo">Compare</button>
     </div>
     <div class="mlist" id="listView" style="display:none"></div>
-    <div class="card" id="tableView"><div class="scroll"><table><thead><tr>
-      <th data-sort="f" id="thFirm"></th><th data-sort="p" id="thPlan"></th><th data-sort="mk" id="thMkt"></th>
-      <th data-sort="s" class="num" id="thSize"></th><th data-sort="pr" class="num" id="thPrice"></th>
-      <th data-sort="ac" class="num" id="thAct"></th><th data-sort="sp" class="num" id="thSplit"></th>
-      <th data-sort="ml" class="num" id="thMax"></th><th data-sort="tg" id="thTarget"></th>
-      <th data-sort="md" class="num" id="thDays"></th><th data-sort="vf" id="thVer"></th>
-      <th id="thEv"></th><th data-sort="ao" id="thUpd"></th>
+    <div class="card" id="tableView"><div class="scroll"><table><caption class="sr" id="tbCaption">상품 목록 — 정렬 가능한 표</caption><thead><tr>
+      <th scope="col" data-sort="f" id="thFirm"></th><th scope="col" data-sort="p" id="thPlan"></th><th scope="col" data-sort="mk" id="thMkt"></th>
+      <th scope="col" data-sort="s" class="num" id="thSize"></th><th scope="col" data-sort="pr" class="num" id="thPrice"></th>
+      <th scope="col" data-sort="ac" class="num" id="thAct"></th><th scope="col" data-sort="sp" class="num" id="thSplit"></th>
+      <th scope="col" data-sort="ml" class="num" id="thMax"></th><th scope="col" data-sort="tg" id="thTarget"></th>
+      <th scope="col" data-sort="md" class="num" id="thDays"></th><th scope="col" data-sort="vf" id="thVer"></th>
+      <th scope="col" id="thEv"></th><th scope="col" data-sort="ao" id="thUpd"></th>
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
     <footer id="foot"></footer>
@@ -626,8 +653,8 @@
     <div class="rulesbar" id="rulesLegend"></div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
       <table class="rulesT"><thead><tr>
-        <th id="rFirm"></th><th class="num" id="rN"></th><th id="rEa"></th><th id="rNews"></th>
-        <th id="rOn"></th><th id="rCp"></th><th id="rWk"></th><th id="rKr"></th><th id="rM5"></th><th id="rGrade"></th>
+        <th scope="col" id="rFirm"></th><th scope="col" class="num" id="rN"></th><th scope="col" id="rEa"></th><th scope="col" id="rNews"></th>
+        <th scope="col" id="rOn"></th><th scope="col" id="rCp"></th><th scope="col" id="rWk"></th><th scope="col" id="rKr"></th><th scope="col" id="rM5"></th><th scope="col" id="rGrade"></th>
       </tr></thead><tbody id="rulesBody"></tbody></table>
     </div></div>
     <div id="rPfm"></div>
@@ -640,9 +667,9 @@
 
 <div class="pop" id="pop"></div>
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-hidden="true">
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true" tabindex="-1">
   <div class="dhead"><div class="t"><h2 id="dTitle"></h2><div class="sub" id="dSub"></div></div>
-    <div id="dCta"></div><button class="iconbtn" id="dClose">✕</button></div>
+    <div id="dCta"></div><button class="iconbtn" id="dClose" aria-label="상세 닫기 / Close details">✕</button></div>
   <div class="dbody" id="dBody"></div>
 </aside>
 
@@ -654,8 +681,8 @@
   <button class="btn" id="cGo" disabled></button>
 </div></div>
 
-<div class="cmpmod" id="cmpmod"><div class="panel">
-  <div class="head"><h2 id="cmpTitle"></h2><button class="iconbtn x" id="cmpClose">✕</button></div>
+<div class="cmpmod" id="cmpmod" role="dialog" aria-modal="true" aria-labelledby="cmpTitle" aria-hidden="true"><div class="panel">
+  <div class="head"><h2 id="cmpTitle"></h2><button class="iconbtn x" id="cmpClose" aria-label="비교 닫기 / Close compare">✕</button></div>
   <div class="cmpgrid" id="cmpBody"></div>
 </div></div>
 
@@ -1019,6 +1046,37 @@ function evidenceBlock(r){
 }
 
 /* ---------- filters / table ---------- */
+const URLSETS={firm:"firm",mk:"mk",st:"st",dd:"dd",vf:"vf",cycle:"cycle",paym:"paym",plat:"plat",fee:"fee",flags:"flags"};
+const URLSCALARS=[["sizeMin","sizeMin"],["sizeMax","sizeMax"],["priceMax","priceMax"],["splitMin","splitMin"],
+                  ["ratingMin","ratingMin"],["daysBand","days"],["levBand","lev"],["target","target"]];
+function applyURLState(p, force){
+  Object.entries(URLSETS).forEach(([key,setKey])=>{
+    const v=p.get(key);
+    if(v!=null){ F[setKey].clear(); v.split(",").filter(Boolean).forEach(x=>F[setKey].add(x)); }
+    else if(force) F[setKey].clear();
+  });
+  URLSCALARS.forEach(([field,key])=>{
+    if(p.get(key)!=null){ const raw=p.get(key); F[field]= (raw===""||raw==="null")?null:(isNaN(Number(raw))?raw:Number(raw)); }
+    else if(force) F[field]=null;
+  });
+  q = p.get("q") || "";
+  if(p.get("sort")) sortKey=p.get("sort");
+  sortDir = p.get("dir") ? (Number(p.get("dir"))||1) : 1;
+  activePreset = p.get("preset") || null;
+}
+function syncURL(){
+  if(!/^#challenges(\?|$)/.test(location.hash||"#challenges")) return;
+  const p=new URLSearchParams();
+  Object.entries(URLSETS).forEach(([key,setKey])=>{ if(F[setKey].size) p.set(key,[...F[setKey]].join(",")); });
+  URLSCALARS.forEach(([field,key])=>{ const v=F[field]; if(v!=null&&v!=="") p.set(key,v); });
+  if(q) p.set("q",q);
+  if(sortKey!=="f") p.set("sort",sortKey);
+  if(sortDir!==1) p.set("dir",sortDir);
+  if(activePreset) p.set("preset",activePreset);
+  const qs=p.toString();
+  const url="#challenges"+(qs?"?"+qs:"");
+  if(location.hash!==url) history.replaceState(null,"",url);
+}
 function filterSignature(){
   return JSON.stringify([[...F.firm],[...F.mk],[...F.st],[...F.dd],[...F.vf],[...F.flags],[...F.cycle],[...F.fee],[...F.paym],[...F.plat],
     F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,activePreset]);
@@ -1078,6 +1136,7 @@ function chipRow(host,values,set,labelFn){
   host.innerHTML="";
   values.forEach(v=>{const b=document.createElement("button");
     b.className="opt"+(set.has(v)?" on":""); b.textContent=labelFn?labelFn(v):v;
+    b.setAttribute("aria-pressed",set.has(v)?"true":"false");
     b.onclick=()=>{set.has(v)?set.delete(v):set.add(v);render();}; host.appendChild(b);});
 }
 let firmSearch="";
@@ -1274,7 +1333,11 @@ function render(){
       </div></div>`;
   }).join("");
   el("listView").querySelectorAll(".mcard").forEach(c=>{
+    c.tabIndex=0;
     c.onclick=()=>openDrawer(c.dataset.id);
+    c.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(c.dataset.id);}};
+    const nm=c.querySelector(".nm"), pl=c.querySelector(".sub");
+    c.setAttribute("aria-label",(lang==="ko"?"상세 열기: ":"Open details: ")+((nm?nm.textContent:"")+" "+(pl?pl.textContent:"")).trim());
   });
   el("listView").style.display = view==="list" ? "flex" : "none";
   el("tableView").style.display = view==="table" ? "block" : "none";
@@ -1283,7 +1346,7 @@ function render(){
   el("tb").innerHTML=page.map(r=>{
     const g=r.vf||"—";
     const ea = ok(r.ec)?"yes":(r.ec===false?"no":"dim");
-    return `<tr data-id="${esc(r.i)}" class="${activeId===r.i?"open":""}">
+    return `<tr data-id="${esc(r.i)}" tabindex="0" aria-label="${esc((lang==="ko"?"상세 열기: ":"Open details: ")+r.f+" — "+r.p)}" class="${activeId===r.i?"open":""}">
       <td class="firm"><a href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(r.f)}</a></td>
       <td class="plan" title="${esc(r.p)}">${esc(r.p)}${(r.co||r.pt)?`<span class="tagpromo">PROMO</span>`:""}</td>
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}" title="${esc(ASSET_TIP[lang])}">${esc(assetLabel(r.mk))}</span></td>
@@ -1301,17 +1364,23 @@ function render(){
     ? `<tr class="moreRow"><td colspan="13"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
     : "");
   {const mb=el("moreBtn"); if(mb) mb.onclick=()=>{shownRows+=120; render();};}
-  document.querySelectorAll("#tb tr").forEach(tr=>{
+  syncURL();
+  document.querySelectorAll("#tb tr[data-id]").forEach(tr=>{
+    tr.tabIndex=0;
     tr.onclick=()=>openDrawer(tr.dataset.id);
     tr.onmouseleave=hidePop;
+    tr.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(tr.dataset.id);}};
   });
   document.querySelectorAll("thead th[data-sort]").forEach(th=>{
     th.querySelectorAll(".ar").forEach(a=>a.remove());
     if(th.dataset.sort===sortKey){const s=document.createElement("span");s.className="ar";
-      s.textContent=sortDir>0?"▲":"▼";th.appendChild(s);}});
+      s.setAttribute("aria-hidden","true");
+      s.textContent=sortDir>0?"▲":"▼";th.appendChild(s);}
+    th.setAttribute("aria-sort", th.dataset.sort===sortKey ? (sortDir>0?"ascending":"descending") : "none");
+  });
   el("empty").style.display=out.length?"none":"block";
   const chips=[];
-  const pushChip=(label,clear)=>{chips.push(`<span class="fchip">${esc(label)}<button data-clr="${clear}">✕</button></span>`);};
+  const pushChip=(label,clear)=>{chips.push(`<span class="fchip">${esc(label)}<button data-clr="${clear}" aria-label="${esc((lang==="ko"?"필터 해제: ":"Remove filter: ")+label)}">✕</button></span>`);};
   F.firm.forEach(v=>pushChip(v,"firm:"+v));
   F.mk.forEach(v=>pushChip(assetLabel(v),"mk:"+v));
   F.st.forEach(v=>pushChip(enumv(v),"st:"+v));
@@ -1491,6 +1560,7 @@ function pfmLink(r){
   const slug = (meta&&meta.pfm) || r.pm;
   return slug ? `https://propfirmmatch.com/prop-firms/${slug}` : null;
 }
+let drawerReturn=null;
 function openDrawer(id){
   const r=rows.find(x=>x.i===id); if(!r) return;
   activeId=id;
@@ -1558,16 +1628,24 @@ function openDrawer(id){
     (r.ur?`<a class="btn" href="${esc(r.ur)}" target="_blank" rel="noopener">${esc(t("visit"))} ↗</a>`:"");
   {const _d=el("dDetail"); if(_d) _d.onclick=()=>{const id=r.i; closeDrawer(); location.hash="#challenge/"+encodeURIComponent(id); route();};}
   {const _k=el("dCmp"); if(_k) _k.onclick=()=>{if(!addPick(r.i)) flashCmpFull(); closeDrawer(); renderBar(); location.hash="#compare"; route();};}
+  const wasOpen=el("drawer").classList.contains("on");
+  if(!wasOpen) drawerReturn=document.activeElement;
   el("drawer").classList.add("on"); el("drawer").setAttribute("aria-hidden","false");
   el("scrim").classList.add("on");
+  if(!wasOpen){const dc=el("dClose"); if(dc) dc.focus({preventScroll:true});}
   document.querySelectorAll("#tb tr").forEach(tr=>tr.classList.toggle("open",tr.dataset.id===id));
 }
-function closeDrawer(){el("drawer").classList.remove("on");el("drawer").setAttribute("aria-hidden","true");
+function closeDrawer(){const wasOpen=el("drawer").classList.contains("on");
+  el("drawer").classList.remove("on");el("drawer").setAttribute("aria-hidden","true");
   el("scrim").classList.remove("on");activeId=null;
-  document.querySelectorAll("#tb tr.open").forEach(tr=>tr.classList.remove("open"));}
+  document.querySelectorAll("#tb tr.open").forEach(tr=>tr.classList.remove("open"));
+  if(wasOpen&&drawerReturn&&document.contains(drawerReturn)){try{drawerReturn.focus({preventScroll:true});}catch(e){}}
+  drawerReturn=null;}
 
 function applyTheme(){document.documentElement.setAttribute("data-theme",theme);
-  el("theme").textContent=theme==="dark"?"☾":"☀";}
+  const b=el("theme"); b.textContent=theme==="dark"?"☾":"☀";
+  b.setAttribute("aria-pressed",theme==="light"?"true":"false");
+  b.setAttribute("aria-label",theme==="dark"?"밝은 테마로 전환 / Switch to light theme":"어두운 테마로 전환 / Switch to dark theme");}
 let pageSuffix="";
 function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx):"helix"; }
 const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
@@ -1609,19 +1687,45 @@ function applyStatics(){
   el("foot").innerHTML=t("foot");
   if(el("chFaq")) el("chFaq").innerHTML=faqBlock(FAQ.challenges)+
     srcNote(lang==="ko"?"상품 값은 HELIX 기록입니다. 각 상품 상세의 근거 링크에서 원문을 확인하세요.":"Product values are HELIX records; verify via the evidence links in each product.");
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
+  document.querySelectorAll(".lang button").forEach(b=>{const on=b.dataset.lang===lang;
+    b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false");});
+  {const g=el("gq"); if(g) g.setAttribute("aria-label", lang==="ko"?"브랜드·상품 검색":"Search brands and products");}
+  {const fm=el("fMobile"); if(fm) fm.setAttribute("aria-label", lang==="ko"?"필터 열기":"Open filters");}
+  {const ss=el("sortSel"); if(ss) ss.setAttribute("aria-label", lang==="ko"?"정렬 기준":"Sort by");}
+  {const vt=el("viewToggle"); if(vt) vt.setAttribute("aria-label", lang==="ko"?"보기 방식":"View");}
+  {const sl=document.getElementById("skipLink"); if(sl) sl.textContent=lang==="ko"?"본문으로 건너뛰기":"Skip to content";}
+  {const st=document.getElementById("skipTable"); if(st) st.textContent=lang==="ko"?"표 데이터로 건너뛰기":"Skip to the table";}
+  Tset("tbCaption", lang==="ko"?"상품 목록 — 정렬 가능한 표":"Product list — sortable table");
   renderBar();
 }
+{const sl=document.getElementById("skipLink"); if(sl) sl.onclick=e=>{e.preventDefault();
+  const shells=[...document.querySelectorAll(".shell")].filter(x=>x.style.display&&x.style.display!=="none");
+  const m=(shells[0]&&shells[0].querySelector("main"))||null;
+  if(m){ if(!m.hasAttribute("tabindex")) m.setAttribute("tabindex","-1"); m.focus(); m.scrollIntoView({block:"start"}); }
+};}
+{const st=document.getElementById("skipTable"); if(st) st.onclick=e=>{e.preventDefault();
+  const ch=document.getElementById("pageChallenges");
+  const onCh=ch&&ch.style.display!=="none";
+  const target=onCh?(document.querySelector("#pageChallenges thead th[data-sort]")||document.querySelector("#tb tr[data-id]"))
+                   :document.querySelector(".shell:not([style*='display: none']) main");
+  if(target){ if(!target.hasAttribute("tabindex")) target.setAttribute("tabindex","0");
+    target.focus(); target.scrollIntoView({block:"center"}); }
+};}
 el("theme").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setItem("helix-theme",theme);applyTheme();};
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
   lang=b.dataset.lang;localStorage.setItem("helix-lang",lang);
   applyStatics();render();if(activeId)openDrawer(activeId);route();});
 el("gq").addEventListener("input",e=>{q=e.target.value.toLowerCase().trim();render();});
-document.querySelectorAll("thead th[data-sort]").forEach(th=>th.onclick=()=>{
-  const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();});
+document.querySelectorAll("thead th[data-sort]").forEach(th=>{
+  th.tabIndex=0; th.setAttribute("aria-sort","none");
+  th.onclick=()=>{
+  const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}render();};
+  th.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();th.click();}};
+});
 document.querySelectorAll("#viewToggle button").forEach(b=>b.onclick=()=>{
   view=b.dataset.view;
-  document.querySelectorAll("#viewToggle button").forEach(x=>x.classList.toggle("on",x.dataset.view===view));
+  document.querySelectorAll("#viewToggle button").forEach(x=>{const on=x.dataset.view===view;
+    x.classList.toggle("on",on); x.setAttribute("aria-pressed",on?"true":"false");});
   render();});
 el("reset").onclick=()=>{["firm","mk","st","dd","vf","flags","cycle"].forEach(k=>F[k].clear());
   ["sizeMin","sizeMax","priceMax","splitMin"].forEach(k=>{F[k]=null;});
@@ -1639,7 +1743,9 @@ el("cClear").onclick=()=>{picked.clear();renderBar();render();};
 el("cmpClose").onclick=()=>el("cmpmod").classList.remove("on");
 el("cmpmod").onclick=e=>{if(e.target.id==="cmpmod")el("cmpmod").classList.remove("on");};
 el("dClose").onclick=closeDrawer;el("scrim").onclick=closeDrawer;
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();el("cmpmod").classList.remove("on");
+  const fa=document.querySelector(".filters"); if(fa&&fa.classList.contains("on")){fa.classList.remove("on");
+    const fm=el("fMobile"); if(fm){fm.setAttribute("aria-expanded","false"); fm.focus();}}}});
 
 
 /* ---------- shared page bits ---------- */
@@ -1961,7 +2067,7 @@ function renderDiscover(){
         :`${capRows.length} products and ${capLead.length} brands record a numeric cap out of ${rows.length.toLocaleString('en-US')} rows. Unrecorded caps are not estimated and stay out of the ranking.`}</div></div>
     <div class="panel"><h3>${lang==="ko"?"무료 (참가비 0)":"Free (entry fee 0)"} <span>${lang==="ko"?`${free.length}개 상품 · ${freeFirms.length}개 브랜드`:`${free.length} product${free.length===1?"":"s"} · ${freeFirms.length} brand${freeFirms.length===1?"":"s"}`}</span></h3>
       ${free.length?`<table class="fx"><tbody>
-        <tr><th style="text-align:left">${lang==="ko"?"브랜드 · 플랜":"Brand · plan"}</th><th class="num">${lang==="ko"?"계좌":"Size"}</th><th class="num">${lang==="ko"?"분배":"Split"}</th><th>${lang==="ko"?"지급 주기":"Cycle"}</th><th class="num">${lang==="ko"?"참가비":"Fee"}</th></tr>
+        <tr><th scope="col" style="text-align:left">${lang==="ko"?"브랜드 · 플랜":"Brand · plan"}</th><th scope="col" class="num">${lang==="ko"?"계좌":"Size"}</th><th scope="col" class="num">${lang==="ko"?"분배":"Split"}</th><th scope="col">${lang==="ko"?"지급 주기":"Cycle"}</th><th scope="col" class="num">${lang==="ko"?"참가비":"Fee"}</th></tr>
         ${free.map(r=>`<tr>
         <td><a href="#challenge/${encodeURIComponent(r.i)}" style="color:inherit;text-decoration:none"><b>${esc(r.f)}</b> <span class="dim">${esc(r.p||"")}</span></a></td>
         <td class="num">${r.s?Number(r.s).toLocaleString('en-US'):"—"}</td>
@@ -2129,7 +2235,7 @@ function renderMethod(){
 
     <div class="panel"><h3>${ko?"검증 등급 A/B/C":"Verification grades"}</h3>
       <div class="scroll"><table class="fx"><thead><tr>
-        <th>${ko?"등급":"Grade"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"행":"Rows"}</th><th class="num">${ko?"비율":"Share"}</th>
+        <th scope="col">${ko?"등급":"Grade"}</th><th scope="col">${ko?"뜻":"Meaning"}</th><th scope="col" class="num">${ko?"행":"Rows"}</th><th scope="col" class="num">${ko?"비율":"Share"}</th>
       </tr></thead><tbody>
         ${G.map(([k,d])=>`<tr><td><span class="pill p-${k}">${k}</span></td><td class="dim">${esc(d)}</td>
           <td class="num mono">${g[k].toLocaleString("en-US")}</td><td class="num mono">${pct(g[k])}</td></tr>`).join("")}
@@ -2144,7 +2250,7 @@ function renderMethod(){
         ?"오른쪽 두 열은 실제 데이터에서 계산한 값입니다 — 이 필드가 채워진 행 수와 비율. 빈 칸은 그만큼 확인되지 않았다는 뜻입니다."
         :"The last two columns are computed from the live data — how many rows carry this field. An empty field is simply a field not yet confirmed."}</div>
       <div class="scroll"><table class="fx"><thead><tr>
-        <th>${ko?"필드":"Field"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"기록된 행":"Rows with value"}</th><th class="num">${ko?"비율":"Share"}</th>
+        <th scope="col">${ko?"필드":"Field"}</th><th scope="col">${ko?"뜻":"Meaning"}</th><th scope="col" class="num">${ko?"기록된 행":"Rows with value"}</th><th scope="col" class="num">${ko?"비율":"Share"}</th>
       </tr></thead><tbody>
         ${FDICT.map(([k,koD,enD])=>{const c=cnt(k);return `<tr>
           <td style="font-family:ui-monospace,monospace;font-size:12px;color:var(--ink)">${esc(k)}</td>
@@ -2163,7 +2269,7 @@ function renderMethod(){
         <li>${ko?"값이 비어 있으면 조사 과제로 남깁니다 — 백로그 9번(결측 보완 조사)이 그 목록입니다.":"A missing value becomes a research task; backlog item 9 is that list."}</li>
       </ul>
       <div class="scroll" style="margin-top:12px"><table class="fx"><thead><tr>
-        <th>${ko?"필드":"Field"}</th><th class="num">${ko?"기록":"Recorded"}</th><th class="num">${ko?"미기록":"Missing"}</th><th class="num">${ko?"미기록 비율":"Missing share"}</th>
+        <th scope="col">${ko?"필드":"Field"}</th><th scope="col" class="num">${ko?"기록":"Recorded"}</th><th scope="col" class="num">${ko?"미기록":"Missing"}</th><th scope="col" class="num">${ko?"미기록 비율":"Missing share"}</th>
       </tr></thead><tbody>
         ${missKeys.map(k=>{const c=cnt(k);return `<tr><td style="font-family:ui-monospace,monospace;font-size:12px">${esc(k)}</td>
           <td class="num mono">${c.toLocaleString("en-US")}</td><td class="num mono">${(total-c).toLocaleString("en-US")}</td>
@@ -2173,7 +2279,7 @@ function renderMethod(){
 
     <div class="panel"><h3>${ko?"출처 정책":"Source policy"}</h3>
       <div class="scroll"><table class="fx"><thead><tr>
-        <th>${ko?"출처 유형":"Source type"}</th><th>${ko?"뜻":"Meaning"}</th><th class="num">${ko?"행":"Rows"}</th>
+        <th scope="col">${ko?"출처 유형":"Source type"}</th><th scope="col">${ko?"뜻":"Meaning"}</th><th scope="col" class="num">${ko?"행":"Rows"}</th>
       </tr></thead><tbody>
         ${Object.entries(srcCnt).sort((a,b)=>b[1]-a[1]).map(([k,n])=>{
           const s=SRC[k]||[k,k];
@@ -2231,8 +2337,8 @@ function renderFirms(){
       <p>${lang==="ko"?`${list.length}개 브랜드. 회사를 누르면 상품·규칙·프로모션가 담긴 상세 페이지로 이동합니다.`:`${list.length} brands. Click a firm for its products, rules and offers.`}</p></div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
       <table class="fx" style="min-width:820px"><thead><tr>
-        <th>${esc(t("fFirm"))}</th><th class="num">${esc(t("rows"))}</th><th>${esc(t("fAsset"))}</th>
-        <th class="num">${esc(t("fSplit"))}</th><th class="num">${esc(t("fSize"))}</th><th>${esc(t("grade"))}</th><th></th>
+        <th scope="col">${esc(t("fFirm"))}</th><th scope="col" class="num">${esc(t("rows"))}</th><th scope="col">${esc(t("fAsset"))}</th>
+        <th scope="col" class="num">${esc(t("fSplit"))}</th><th scope="col" class="num">${esc(t("fSize"))}</th><th scope="col">${esc(t("grade"))}</th><th scope="col"></th>
       </tr></thead><tbody>${list.map(o=>`<tr>
         <td class="firm"><a href="#firm/${encodeURIComponent(o.f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.f)}</a>
           ${o.promo?`<span class="tagpromo">PROMO</span>`:""}</td>
@@ -2279,9 +2385,9 @@ function renderOffers(){
     </div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 340px)">
       <table class="fx" style="min-width:920px"><thead><tr>
-        <th>${lang==="ko"?"브랜드":"Brand"}</th><th>${lang==="ko"?"공식 코드":"Official code"}</th>
-        <th>${lang==="ko"?"할인 내용":"Discount"}</th><th>${lang==="ko"?"만료":"Expiry"}</th>
-        <th>PFM ${lang==="ko"?"코드":"code"}</th><th>PFM ${lang==="ko"?"할인":"discount"}</th><th></th>
+        <th scope="col">${lang==="ko"?"브랜드":"Brand"}</th><th scope="col">${lang==="ko"?"공식 코드":"Official code"}</th>
+        <th scope="col">${lang==="ko"?"할인 내용":"Discount"}</th><th scope="col">${lang==="ko"?"만료":"Expiry"}</th>
+        <th scope="col">PFM ${lang==="ko"?"코드":"code"}</th><th scope="col">PFM ${lang==="ko"?"할인":"discount"}</th><th scope="col"></th>
       </tr></thead><tbody>${list.map(([f,o])=>`<tr>
         <td class="firm"><a href="#firm/${encodeURIComponent(f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(f)}</a></td>
         <td>${o.code?`<span class="code" style="font-size:12px;padding:3px 8px">${esc(o.code)}</span>`:'<span class="dim">—</span>'}</td>
@@ -2321,9 +2427,9 @@ function renderPayouts(){
       <p>${lang==="ko"?"회사별 수익 분배·지급 주기·첫 지급·최소 지급액·상한을 상품 기록에서 집계했습니다.":"Profit split, cycle, first payout, minimum and cap aggregated from product records."}</p></div>
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
       <table class="fx" style="min-width:860px"><thead><tr>
-        <th>${lang==="ko"?"회사":"Firm"}</th><th class="num">${lang==="ko"?"상품":"Products"}</th>
-        <th>${esc(t("cSplit"))}</th><th>${esc(t("cCycle"))}</th><th>${esc(t("cFirst"))}</th>
-        <th class="num">${esc(t("cMinPay"))}</th><th class="num">${esc(t("cCap"))}</th>
+        <th scope="col">${lang==="ko"?"회사":"Firm"}</th><th scope="col" class="num">${lang==="ko"?"상품":"Products"}</th>
+        <th scope="col">${esc(t("cSplit"))}</th><th scope="col">${esc(t("cCycle"))}</th><th scope="col">${esc(t("cFirst"))}</th>
+        <th scope="col" class="num">${esc(t("cMinPay"))}</th><th scope="col" class="num">${esc(t("cCap"))}</th>
       </tr></thead><tbody>${list.map(o=>`<tr>
         <td class="firm"><a href="#firm/${encodeURIComponent(o.f)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.f)}</a></td>
         <td class="num">${o.n}</td>
@@ -2346,7 +2452,7 @@ function renderSpreads(){
     <div class="hero2"><h1>${lang==="ko"?"스프레드 비교":"Prop firm spreads"}</h1>
       <p>${lang==="ko"?"업체별 EUR/USD · USD/JPY · GBP/USD · XAU/USD · US30 · BTC/USD 스프레드.":"Per-firm spreads across major symbols."}</p></div>
     <div class="panel"><h3>${lang==="ko"?"랏당 커미션":"Per-lot commissions"} <span>${withCm.length} / ${names.length}</span></h3>
-      ${withCm.length?`<table class="fx"><thead><tr><th>${esc(t("fFirm"))}</th><th>${lang==="ko"?"커미션 (자산별)":"Commission by asset"}</th></tr></thead>
+      ${withCm.length?`<table class="fx"><thead><tr><th scope="col">${esc(t("fFirm"))}</th><th scope="col">${lang==="ko"?"커미션 (자산별)":"Commission by asset"}</th></tr></thead>
         <tbody>${withCm.map(o=>`<tr><td class="firm"><a href="#firm/${encodeURIComponent(o.n)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.n)}</a></td>
         <td style="white-space:pre-wrap;font-size:12px;line-height:1.6">${esc(o.q.commissions)}</td></tr>`).join("")}</tbody></table>`
         :`<div class="empty-inline">${lang==="ko"?"수집된 커미션 데이터가 없습니다.":"No commission data collected."}</div>`}
@@ -2508,8 +2614,11 @@ function renderCompare(){
   });
   if(!arr.length && el("pickerHost")) openPicker();
  }catch(err){ el("compareMain").innerHTML=`<div class="panel"><h3>${lang==="ko"?"비교를 불러오지 못했습니다":"Comparison failed"}</h3><p class="meta">${esc(String(err))}</p></div>`; }
-  el("compareMain").querySelectorAll(".pickrow").forEach(x=>x.onclick=()=>{
-    if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull();
+  el("compareMain").querySelectorAll(".pickrow").forEach(x=>{
+    x.tabIndex=0; x.setAttribute("role","button");
+    x.onclick=()=>{ if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull(); };
+    x.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();
+      if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull(); } };
   });
 }
 function openPicker(){
@@ -2537,7 +2646,12 @@ function openPicker(){
           <b class="mono">${r.s?Number(r.s).toLocaleString('en-US'):"—"}</b>
           <span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span>
         </span></div>`).join("")}</div>`;
-    host.querySelectorAll(".pickrow").forEach(x=>x.onclick=()=>{picked.add(x.dataset.id);renderBar();renderCompare();});
+    host.querySelectorAll(".pickrow").forEach(x=>{
+      x.tabIndex=0; x.setAttribute("role","button");
+      x.onclick=()=>{picked.add(x.dataset.id);renderBar();renderCompare();};
+      x.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();
+        picked.add(x.dataset.id);renderBar();renderCompare();} };
+    });
     const q2=el("pickQ"); if(q2){ q2.focus(); q2.oninput=()=>renderList(q2.value); }
   };
   renderList("");
@@ -2739,8 +2853,8 @@ function renderFirm(name){
 
       <div class="panel"><h3>${lang==="ko"?"레버리지":"Leverage"} <span>${lang==="ko"?"자산 × 프로그램":"asset × program"}</span></h3>
         <div style="overflow-x:auto">
-        <table class="fx"><thead><tr><th>${lang==="ko"?"자산":"Asset"}</th>
-          ${cols.map(c=>`<th class="num">${esc(enumv(c)||c)}</th>`).join("")}</tr></thead>
+        <table class="fx"><thead><tr><th scope="col">${lang==="ko"?"자산":"Asset"}</th>
+          ${cols.map(c=>`<th scope="col" class="num">${esc(enumv(c)||c)}</th>`).join("")}</tr></thead>
           <tbody>${levRows.map(o=>`<tr><td>${esc(mkName(o.a))}</td>
             ${o.cells.map(v=>typeof v==="object"&&v.raw
               ?`<td class="num mono dim" title="${esc(lang==="ko"?"원본 표기 · 미검증":"raw recorded value · unverified")}">${esc(v.raw)}*</td>`
@@ -2768,9 +2882,9 @@ function renderFirm(name){
     <div class="panel"><h3>${lang==="ko"?"상품 전체":"All products"} <span>${rs.length}</span></h3>
       <div style="overflow:auto;max-height:460px">
         <table class="fx"><thead><tr>
-          <th>${esc(t("fPlan"))}</th><th>${esc(t("fSteps"))}</th><th class="num">${esc(t("fSize"))}</th>
-          <th class="num">${esc(t("fPrice"))}</th><th class="num">${esc(t("fSplit"))}</th>
-          <th class="num">${esc(t("fMax"))}</th><th class="num">${esc(t("fDays"))}</th><th></th><th>${esc(t("fVer"))}</th>
+          <th scope="col">${esc(t("fPlan"))}</th><th scope="col">${esc(t("fSteps"))}</th><th scope="col" class="num">${esc(t("fSize"))}</th>
+          <th scope="col" class="num">${esc(t("fPrice"))}</th><th scope="col" class="num">${esc(t("fSplit"))}</th>
+          <th scope="col" class="num">${esc(t("fMax"))}</th><th scope="col" class="num">${esc(t("fDays"))}</th><th scope="col"></th><th scope="col">${esc(t("fVer"))}</th>
         </tr></thead><tbody>${tableRows}</tbody></table>
       </div>
     </div>
@@ -2780,7 +2894,7 @@ function renderFirm(name){
       return `<div class="panel"><h3>PFM ${lang==="ko"?"데이터":"data"} <span>${esc(q.slug)}</span></h3>
         ${q.rating?`<div style="margin-bottom:12px"><span class="rating">★ ${esc(q.rating)} <small>${esc(q.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span></div>`:""}
         ${lev.length?`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;margin:10px 0 6px">${lang==="ko"?"레버리지":"Leverage"}</div>
-          <table class="fx"><thead><tr><th>${lang==="ko"?"자산":"Asset"}</th><th class="num">Instant</th><th class="num">1-Step</th><th class="num">2-Step</th><th class="num">3-Step</th></tr></thead>
+          <table class="fx"><thead><tr><th scope="col">${lang==="ko"?"자산":"Asset"}</th><th scope="col" class="num">Instant</th><th scope="col" class="num">1-Step</th><th scope="col" class="num">2-Step</th><th scope="col" class="num">3-Step</th></tr></thead>
           <tbody>${lev.map(r=>`<tr><td>${esc(r[0])}</td>${[1,2,3,4].map(i=>`<td class="num mono">${esc(r[i]||"—")}</td>`).join("")}</tr>`).join("")}</tbody></table>`:""}
         ${q.commissions?`<div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;margin:14px 0 6px">${lang==="ko"?"랏당 커미션":"Commissions"}</div>
           <div class="note" style="white-space:pre-wrap">${esc(q.commissions)}</div>`:""}
@@ -2805,7 +2919,11 @@ function renderFirm(name){
     b.onclick=()=>{const box=document.getElementById(b.dataset.go);
       if(box) box.scrollIntoView({behavior:"smooth",block:"start"});};
   });
-  el("firmMain").querySelectorAll("tr[data-id]").forEach(tr=>tr.onclick=()=>openDrawer(tr.dataset.id));
+  el("firmMain").querySelectorAll("tr[data-id]").forEach(tr=>{tr.tabIndex=0;
+    tr.onclick=()=>openDrawer(tr.dataset.id);
+    tr.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(tr.dataset.id);}};
+    const tds=tr.querySelectorAll("td");
+    tr.setAttribute("aria-label",(lang==="ko"?"상세 열기: ":"Open details: ")+((tds[0]?tds[0].textContent:"")+" "+(tds[1]?tds[1].textContent:"")).trim());});
 }
 
 /* ---------- rules page ---------- */
@@ -2896,8 +3014,10 @@ const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDoc
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
   const _q=h.indexOf("?");
-  if(_q>=0){ const _p=new URLSearchParams(h.slice(_q+1)); const _f=_p.get("fee");
-    if(_f){ F.fee.clear(); F.fee.add(_f); feeFilter=_f; } h=h.slice(0,_q); }
+  if(_q>=0){ const _p=new URLSearchParams(h.slice(_q+1));
+    if(h.slice(0,_q)==="challenges") applyURLState(_p, true);
+    const _f=_p.get("fee"); if(_f) feeFilter=_f;
+    h=h.slice(0,_q); }
   const isFirm=h.startsWith("firm/");
   const isCh=h.startsWith("challenge/");
   const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
@@ -2941,14 +3061,23 @@ document.querySelectorAll("#chMenu a").forEach(a=>a.onclick=e=>{
 {const _fs=document.getElementById("fsetBtn"); if(_fs) _fs.onclick=()=>{
   const b=el("filterSettings");
   b.style.display = b.style.display==="none" ? "block" : "none";
+  _fs.setAttribute("aria-expanded", b.style.display==="none"?"false":"true");
   if(b.style.display==="block") buildFilterSettings();
 };}
 document.querySelectorAll("#chMenu a").forEach(a=>{
   if(a.dataset.cmp) a.addEventListener("click",e=>{ e.preventDefault(); picked.clear(); location.hash="#compare"; route(); });
   if(a.dataset.discover) a.addEventListener("click",e=>{ e.preventDefault(); location.hash="#discover"; route(); });
 });
+/* the gear menus are hover popovers; a click toggles them so keyboards can open them too */
+{const _tb=document.getElementById("tsBtn"); if(_tb) _tb.onclick=e=>{e.stopPropagation();
+  const w=el("tsWrap"); const on=w.classList.toggle("open"); _tb.setAttribute("aria-expanded",on?"true":"false");};}
+document.addEventListener("click",e=>{const w=document.getElementById("tsWrap");
+  if(w&&w.classList.contains("open")&&!w.contains(e.target)){w.classList.remove("open");
+    const tb=document.getElementById("tsBtn"); if(tb) tb.setAttribute("aria-expanded","false");}});
 const __step=(n,f)=>{try{f()}catch(e){console.error('[helix] init '+n+' failed',e);}};
-{const fm=document.getElementById("fMobile"); if(fm) fm.onclick=()=>{document.querySelector(".filters")?.classList.toggle("on");};}
+{const fm=document.getElementById("fMobile"); if(fm) fm.onclick=()=>{
+  const fa=document.querySelector(".filters"); if(!fa) return;
+  const on=fa.classList.toggle("on"); fm.setAttribute("aria-expanded",on?"true":"false");};}
 __step('theme',applyTheme);__step('prefs',applyTablePrefs);__step('tsettings',buildTableSettings);
 __step('sort',buildSort);__step('statics',applyStatics);__step('filters',buildFilters);
 __step('render',render);__step('route',route);
