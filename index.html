@@ -139,6 +139,11 @@
   .rangeRow{display:flex;align-items:center;gap:6px;margin-top:8px}
   .chg{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .chg:last-child{border-bottom:0}
+  .evwrap{cursor:help;outline-offset:2px}
+  .evwrap:focus-visible{outline:2px solid var(--accent);border-radius:4px}
+  .qi{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid var(--line2);
+    color:var(--muted);font-size:9px;line-height:11px;text-align:center;font-style:normal;margin-left:2px}
+  .evwrap:hover .qi{color:var(--accent);border-color:var(--accent)}
   .fav{background:transparent;border:0;cursor:pointer;color:var(--line2);font-size:13px;padding:0 4px 0 0;line-height:1}
   .fav.on{color:var(--accent)}
   .fav:hover{color:var(--accent)}
@@ -855,7 +860,9 @@ function evCell(r){
   const g=r.vf||"—", sy=r.sy||"";
   const short=sy?String(sy).replace(/^official-live$/,"official").slice(0,10):"—";
   const link=r.ur?` <a href="${esc(r.ur)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="text-decoration:none">↗</a>`:"";
-  return `<span class="pill p-${esc(g)}" style="margin-right:5px">${esc(g)}</span><span class="dim" style="font-size:11px">${esc(short)}</span>${link}`;
+  const q=(r.no||"").slice(0,320);
+  const tip=q?` title="${esc(q)}" aria-label="${esc(q)}"`:"";
+  return `<span class="evwrap"${tip}${q?' tabindex="0" role="note"':''}><span class="pill p-${esc(g)}" style="margin-right:5px">${esc(g)}</span><span class="dim" style="font-size:11px">${esc(short)}</span></span>${link}${q?' <span class="qi" aria-hidden="true">i</span>':''}`;
 }
 function dateLabel(r){
   // local (KST) calendar date — toISOString() is UTC and would call today's records "future"
@@ -2570,6 +2577,11 @@ function cmpPresets(){
           [lang==="ko"?"최고 분배":"Highest split",split],[lang==="ko"?"후불":"Pay later",later]]
     .filter(([,l])=>l.length>=2);
 }
+function syncCompareURL(){
+  const ids=[...picked];
+  const want=ids.length? "#compare/"+ids.join(",") : "#compare";
+  if(location.hash!==want) history.replaceState(null,"",want);
+}
 function renderCompare(){
  try{
   const arr=[...picked].map(id=>rows.find(r=>r.i===id)).filter(Boolean);
@@ -2633,7 +2645,7 @@ function renderCompare(){
       [lang==="ko"?"몇 개까지 비교할 수 있나요?":"How many can I compare?",
       lang==="ko"?`최대 ${CMP_MAX}개입니다. ‘차이만 보기’를 켜면 모든 상품이 같은 값인 항목은 표에서 빠집니다.`:`Up to ${CMP_MAX}. "Differences only" drops rows where every compared product has the same value.`]])}
     ${srcNote(lang==="ko"?"값은 HELIX 기록입니다. 최종 조건은 업체 공식 사이트에서 확인하세요.":"Values are HELIX records. Confirm final terms on the firm's official site.")}`;
-  el("compareMain").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{picked.delete(b.dataset.rm);renderBar();renderCompare();});
+  el("compareMain").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{picked.delete(b.dataset.rm);renderBar();renderCompare();syncCompareURL();});
   const sw=el("hlSwitch"); if(sw) sw.onclick=()=>{compareBest=!compareBest;renderCompare();};
   const ds=el("diffSwitch");
   if(ds){ ds.onclick=()=>{compareDiffOnly=!compareDiffOnly;renderCompare();};
@@ -2642,13 +2654,13 @@ function renderCompare(){
   const add=el("addSlot"); if(add) add.onclick=openPicker;
   el("compareMain").querySelectorAll("[data-preset]").forEach(c=>c.onclick=()=>{
     const list=presets[Number(c.dataset.preset)][1];
-    picked.clear(); list.slice(0,CMP_MAX).forEach(r=>picked.add(r.i)); renderBar(); renderCompare();
+    picked.clear(); list.slice(0,CMP_MAX).forEach(r=>picked.add(r.i)); renderBar(); renderCompare(); syncCompareURL();
   });
   if(!arr.length && el("pickerHost")) openPicker();
  }catch(err){ el("compareMain").innerHTML=`<div class="panel"><h3>${lang==="ko"?"비교를 불러오지 못했습니다":"Comparison failed"}</h3><p class="meta">${esc(String(err))}</p></div>`; }
   el("compareMain").querySelectorAll(".pickrow").forEach(x=>{
     x.tabIndex=0; x.setAttribute("role","button");
-    x.onclick=()=>{ if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull(); };
+    x.onclick=()=>{ if(addPick(x.dataset.id)){ renderBar(); renderCompare(); syncCompareURL(); } else flashCmpFull(); };
     x.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();
       if(addPick(x.dataset.id)){ renderBar(); renderCompare(); } else flashCmpFull(); } };
   });
@@ -3051,6 +3063,8 @@ function route(){
     const _f=_p.get("fee"); if(_f) feeFilter=_f;
     h=h.slice(0,_q); }
   urlReady=true;
+  if(h.startsWith("compare/")){ const ids=h.slice(8).split(",").filter(Boolean);
+    if(ids.length){ picked.clear(); ids.forEach(x=>picked.add(decodeURIComponent(x))); } h="compare"; }
   const isFirm=h.startsWith("firm/");
   const isCh=h.startsWith("challenge/");
   const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
