@@ -147,6 +147,8 @@
     background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);color:var(--accent);
     font-size:12px;font-weight:700;text-decoration:none}
   .goalCTA:hover{background:rgba(167,139,250,.22)}
+  .breg,.bplat{display:flex;flex-wrap:wrap;gap:3px;max-width:220px}
+  .btag{background:rgba(167,139,250,.10);border-radius:4px;padding:0 5px;font-size:10px;color:var(--ink2);line-height:16px}
   .ghero{margin:6px 0 14px}
   .ghero h1{font-size:24px;margin:0 0 6px}
   .gsub{color:var(--muted);font-size:13px;margin:0}
@@ -596,6 +598,7 @@
     <a href="#firms" data-page="firms">Firms</a>
     <a href="#offers" data-page="offers">Offers</a>
     <a href="#rules" data-page="rules">Rules</a>
+    <a href="#brokers" data-page="brokers">Brokers</a>
     <a href="#tools" data-page="tools">Tools</a>
     <a href="#spreads" data-page="spreads">Spreads</a>
     <a href="#payouts" data-page="payouts">Payouts</a>
@@ -667,6 +670,7 @@
 <div class="shell" id="pageMethod" style="display:none"><main id="methodMain"></main></div>
 <div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
 <div class="shell" id="pageGoal" style="display:none"><main id="goalMain"></main></div>
+<div class="shell" id="pageBrokers" style="display:none"><main id="brokersMain"></main></div>
 <div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
@@ -2320,6 +2324,38 @@ const cycLabel=d=>d===0?(lang==="ko"?"수시/즉시":"On demand")
   :d===1?(lang==="ko"?"매일":"Daily")
   :(lang==="ko"?d+"일":d+" days");
 
+function renderBrokers(){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const list=((DB.brokers||{}).brokers||[]);
+  const ok=list.filter(b=>b.status==="verified");
+  const row=b=>`<tr>
+    <td class="firm"><a href="${esc(b.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(b.name)}</a></td>
+    <td class="breg">${b.reg&&b.reg.length?b.reg.slice(0,3).map(r=>`<span class="btag">${esc(r)}</span>`).join(""):'<span class="dim">—</span>'}${b.reg&&b.reg.length>3?`<span class="dim">+${b.reg.length-3}</span>`:""}</td>
+    <td class="num">${b.min!=null?money(b.min,b.cur||"USD"):'<span class="dim">—</span>'}</td>
+    <td class="bplat">${b.plat&&b.plat.length?b.plat.map(x=>`<span class="btag">${esc(x)}</span>`).join(""):'<span class="dim">—</span>'}</td>
+    <td class="num">${b.spread!=null?`<span class="mono">${b.spread}</span>`:'<span class="dim">—</span>'}</td>
+    <td class="num">${b.comm!=null?`<span class="mono">$${b.comm}</span>`:'<span class="dim">—</span>'}</td>
+    <td class="mono">${b.lev?esc(b.lev):'<span class="dim">—</span>'}</td>
+    <td>${b.nbp===true?'<span class="yes">✓</span>':b.nbp===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
+    <td>${b.seg===true?'<span class="yes">✓</span>':b.seg===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
+    <td class="num">${b.founded||'<span class="dim">—</span>'}</td>
+    <td class="evc"><span class="evwrap" title="${esc((b.q||"")+" — "+b.src)}" tabindex="0">✓</span> <a href="${esc(b.src)}" target="_blank" rel="noopener" style="text-decoration:none">↗</a></td>
+  </tr>`;
+  el("brokersMain").innerHTML=`
+    <div class="ghero"><h1>${T("브로커 마스터 DB","Broker master database")}</h1>
+      <p class="gsub">${T("챌린지를 통과한 계좌를 실행할 브로커를 같은 기준으로 비교합니다. 모든 값은 각 브로커의 공식 페이지에서 확인한 것이며, 인용문은 근거 아이콘에 있습니다.","Where you execute after passing — compared on the same basis. Every value comes from the broker's own page; the quote sits behind the evidence icon.")}</p></div>
+    <div class="card"><div class="scroll"><table>
+      <thead><tr>
+        <th scope="col">${T("브로커","Broker")}</th><th scope="col">${T("규제","Regulation")}</th>
+        <th scope="col" class="num">${T("최소입금","Min deposit")}</th><th scope="col">${T("플랫폼","Platforms")}</th>
+        <th scope="col" class="num">EUR/USD</th><th scope="col" class="num">${T("수수료","Commission")}</th>
+        <th scope="col">${T("레버리지","Leverage")}</th><th scope="col">${T("NBP","NBP")}</th>
+        <th scope="col">${T("자금분리","Segregated")}</th><th scope="col" class="num">${T("설립","Founded")}</th><th scope="col">${T("근거","Source")}</th>
+      </tr></thead><tbody>${ok.map(row).join("")}</tbody></table></div></div>
+    <div class="panel" style="margin-top:14px"><h3>${T("아직 확인하지 못한 브로커","Not yet verifiable")} <span>${list.length-ok.length}</span></h3>
+      ${list.filter(b=>b.status!=="verified").map(b=>`<div class="meta">${esc(b.name)} — ${esc(b.note)} <a href="${esc(b.src)}" target="_blank" rel="noopener">↗</a></div>`).join("")||`<div class="dim">${T("없음","none")}</div>`}
+      <div class="srcline">${T("데이터 기준일","Data as of")}: ${esc((DB.brokers||{}).as_of||"—")}</div></div>`;
+}
 const GOAL={size:100000, mk:"cfd", budget:300, speed:"any", rules:new Set()};
 function goalPrice(p){ const n=Number(r_priceOf(p)); return isNaN(n)?null:n; }
 function r_priceOf(r){ return r.pr; }
@@ -3432,7 +3468,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={brokers:"pageBrokers",goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
@@ -3454,7 +3490,7 @@ function route(){
   if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",brokers:"Brokers",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else if(!isCh) setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
@@ -3464,6 +3500,7 @@ function route(){
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
   else if(page==="method") renderMethod();
+  else if(page==="brokers") renderBrokers();
   else if(page==="goal") renderGoal();
   else if(page==="discover") renderDiscover();
   else if(page==="challenge") renderChallenge(decodeURIComponent(h.slice(10)));
