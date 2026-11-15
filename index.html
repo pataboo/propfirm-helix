@@ -157,6 +157,7 @@
   .goalCTA:hover{background:rgba(167,139,250,.22)}
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
+  .stale{color:var(--amber);font-weight:700}
   .gcheck{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
   .gcheck .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px;background:var(--muted)}
   .gcheck.no{border-color:rgba(239,125,125,.35);background:rgba(239,125,125,.06)} .gcheck.no .dot{background:#ef7d7d}
@@ -758,7 +759,7 @@ const I18N = {
   empty:"조건에 맞는 상품이 없습니다.",
   thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
-  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록",
+  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록", fFresh:"최근 확인(14일)", fStale:"갱신 필요(14일+)",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
   kTarget:"이익 목표", kDaily:"일일 손실", kMax:"최대 손실", kDays:"최소 거래일",
   sectCost:"비용", sectCond:"거래 조건", sectPay:"지급 조건", sectFloor:"낙폭 구조", sectSrc:"데이터 출처",
@@ -810,7 +811,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   empty:"No products match these filters.",
   thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
-  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded",
+  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded", fFresh:"Checked in 14 days", fStale:"Needs refresh (14d+)",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
   kTarget:"Profit target", kDaily:"Daily loss", kMax:"Max loss", kDays:"Min days",
   sectCost:"Cost", sectCond:"Trading conditions", sectPay:"Payout", sectFloor:"Loss floor", sectSrc:"Data source",
@@ -986,13 +987,23 @@ function evCell(r){
   const tip=q?` title="${esc(q)}" aria-label="${esc(q)}"`:"";
   return `<span class="evwrap"${tip}${q?' tabindex="0" role="note"':''}><span class="pill p-${esc(g)}" style="margin-right:5px">${esc(g)}</span><span class="dim" style="font-size:11px">${esc(short)}</span></span>${link}${q?' <span class="qi" aria-hidden="true">i</span>':''}`;
 }
+function ageDays(r){
+  const a=(r.ao||"").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(a)) return null;
+  const t=new Date(a+"T00:00:00"), n=new Date();
+  return Math.round((n - t)/86400000);
+}
 function dateLabel(r){
   // local (KST) calendar date — toISOString() is UTC and would call today's records "future"
   const _n=new Date(), _p2=n=>String(n).padStart(2,"0");
   const today=`${_n.getFullYear()}-${_p2(_n.getMonth()+1)}-${_p2(_n.getDate())}`;
   const ok=d=>/^\d{4}-\d{2}-\d{2}/.test(d||"") && d.slice(0,10)<=today;
   const a=(r.ao||"").slice(0,10);
-  if(ok(a)) return a;
+  if(ok(a)){
+    const ag=ageDays(r);
+    if(ag!=null && ag>14) return `<span class="stale" title="${lang==="ko"?ag+"일 전 확인 — 가격이 바뀌었을 수 있습니다":ag+" days old — the price may have moved"}">${a} ⏳</span>`;
+    return a;
+  }
   if(r.dst==="unknown_future_legacy_date"||(r.la&&!ok(r.la)))
     return lang==="ko"?"미검증":"unverified";
   if(/^\d{4}-\d{2}-\d{2}/.test(a))
@@ -1378,7 +1389,7 @@ function buildFilters(){
     ${[80,85,90,95].map(v=>`<button data-split="${v}" class="${F.splitMin===v?"on":""}">≥ ${v}%</button>`).join("")}</div></div></details>`);
   add("dd", `<details class="fgroup" data-g="dd" ${OPEN.dd?"open":""}><summary title="${esc((TIPS.dd)[lang])}">${esc(t("ddF"))}</summary><div class="body">
     ${[...DB.dd].sort((a,b)=>(isNA(a)?1:0)-(isNA(b)?1:0)||String(a).localeCompare(String(b))).map(v=>chk(tx(v),F.dd.has(v),"dd",v,rowCount(r=>r.dd===v))).join("")}</div></details>`);
-  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"],["tot","fTot"]];
+  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"],["tot","fTot"],["fresh","fFresh"],["stale14","fStale"]];
   add("flags", `<details class="fgroup" data-g="flags" ${OPEN.flags?"open":""}><summary title="${esc((TIPS.flags)[lang])}">${esc(t("flags"))}</summary><div class="body">
     ${flags.map(([k,lab])=>chk(t(lab),F.flags.has(k),"flags",k)).join("")}</div></details>`);
   add("ver", `<details class="fgroup" data-g="ver" ${OPEN.ver?"open":""}><summary title="${esc((TIPS.ver)[lang])}">${esc(t("ver"))}</summary><div class="body">
@@ -2121,6 +2132,7 @@ const PRESETS=[
   {k:"A",    ko:"등급 A",        en:"Grade A",     vf:["A"]},
   {k:"rules",ko:"규칙 확인됨",   en:"Rules recorded", flags:["allrules"]},
   {k:"paf",  ko:"후불",          en:"Pay later",   fee:["later"]},
+  {k:"fresh",ko:"최근 확인",     en:"Recently checked", flags:["fresh"]},
   {k:"cheap",ko:"총액 낮은 순",  en:"Lowest total",sort:"to"},
   {k:"best", ko:"가성비 순",     en:"Best value",  sort:"pr"},
 ];
@@ -2161,6 +2173,8 @@ function flagOk(r,f){
   if(f==="wk")    return ok(r.wk);
   if(f==="tot")   return r.to!=null;
   if(f==="allrules") return r.ec!=null && r.nc!=null && r.oc!=null && r.wk!=null;
+  if(f==="fresh"){ const ag=ageDays(r); return ag!=null && ag<=14; }
+  if(f==="stale14"){ const g=ageDays(r); return g==null || g>14; }
   return true;
 }
 function rowHasCond(r,c){
