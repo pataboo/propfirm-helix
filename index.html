@@ -3846,7 +3846,12 @@ function renderRules(){
       <td class="num">${o.n}</td>
       <td>${cell(o.ea)}</td><td>${cell(o.news)}</td><td>${cell(o.on)}</td>
       <td>${cell(o.cp)}</td><td>${cell(o.wk)}</td><td>${cell(o.kr)}</td><td>${cell(o.m5)}</td>
-      <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
+      <td>${(()=>{
+        const gs=["A","B","C"].filter(g=>o.g[g]);
+        if(!gs.length) return '<span class="dim">—</span>';
+        const tip=gs.map(g=>`${g} ${o.g[g]}${lang==="ko"?"행":" rows"}`).join(" · ");
+        return `<span title="${esc(tip)}">`+gs.map(g=>`<span class="pill p-${g}" style="margin-right:4px">${g}<span class="dim" style="font-weight:600"> ${o.g[g]}</span></span>`).join("")+`</span>`;
+      })()}</td>
     </tr>`).join("");
   if(el("foot2")) el("foot2").innerHTML=t("foot");
   if(el("rPfm")) el("rPfm").innerHTML=pfmRulesBlock();
