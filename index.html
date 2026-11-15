@@ -286,6 +286,8 @@
   th .ar{color:var(--pink);font-size:8px;margin-left:3px}
   tbody td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
   tbody tr{cursor:pointer}
+  #tb tr.vsPad{cursor:default;background:none!important}
+  #tb tr.vsPad td{padding:0;border:0;line-height:0;font-size:0}
   tbody tr:hover{background:var(--panel2)}
   tbody tr.open{background:var(--panel2);box-shadow:inset 3px 0 0 var(--pink)}
   .firm{font-weight:700}
@@ -842,7 +844,6 @@ let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
 let urlReady=false,
     favOnly=false, favs=new Set(JSON.parse(localStorage.getItem("helix-favs")||"[]")),
-    shownRows=120,
     unitMode=localStorage.getItem("helix-unit")||"auto",
     q="", sortKey="to", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
      colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols-v2")||"null"); const n=20; if(!v) return [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0]; const o=v.slice(0,n); while(o.length<n) o.push(0); return o;})(),
@@ -1436,57 +1437,15 @@ function buildFilters(){
     const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; fapply();});
   if(typeof syncFilterUI==="function"){ syncFilterUI(); updateGroupBadges(); }
 }
-function render(){
-  if(window.__filterTick!==filterSignature()){ shownRows=120; window.__filterTick=filterSignature(); }
-
-  let key=sortKey, dir=sortDir;
-  if(sortPreset==="cheap"){ key="to"; dir=1; }
-  if(sortPreset==="best"){ key="pr"; dir=1; }
-  const out=rows.filter(matches).sort((a,b)=>{
-    if(sortPreset==="best"){
-      const ra=num(a.pr)/Math.max(num(a.s)||1,1), rb=num(b.pr)/Math.max(num(b.s)||1,1);
-      return ra-rb;
-    }
-    const A=a[key],B=b[key];
-    if(["s","pr","sp","dl","ml","to","ac","md"].includes(key))return ((num(A)??1e12)-(num(B)??1e12))*dir;
-    return String(A??"").localeCompare(String(B??""))*dir;});
-  el("listView").innerHTML=out.map(r=>{
-    const g=r.vf||"—";
-    return `<div class="mcard" data-id="${esc(r.i)}">
-      <div class="top">
-        <span class="nm">${esc(r.f)}</span>
-        <span class="sub">${esc(r.p)}</span>
-        <span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span>
-        ${r.co?`<span class="tagpromo">PROMO ${esc(r.co)}</span>`:""}
-        ${fclassBadge(r)}
-        <span class="pill p-${esc(g)}" style="margin-left:auto">${esc(t("grade"))} ${esc(g)}</span>
-      </div>
-      <div class="metrics">
-        <span>${esc(t("fSize"))} <b>${r.s?Number(r.s).toLocaleString('en-US'):"—"}</b></span>
-        <span>${esc(t("fPrice"))} <b>${r.pr!=null?"$"+Number(r.pr).toLocaleString('en-US'):"—"}</b></span>
-        <span>${esc(t("fSplit"))} <b>${r.sp?esc(r.sp)+"%":"—"}</b></span>
-        <span>${esc(t("fMax"))} <b>${r.ml!=null?esc(r.ml)+"%":"—"}</b></span>
-        <span>${esc(t("fDaily"))} <b>${r.dl!=null?esc(r.dl)+"%":"—"}</b></span>
-        <span>${esc(t("fDays"))} <b>${(r.mf??r.md)!=null?esc(r.mf??r.md):"—"}</b></span>
-        <span>${esc(t("fCycle"))} <b>${esc(tx(r.pc)||"—")}</b></span>
-        <a href="#challenge/${encodeURIComponent(r.i)}" onclick="event.stopPropagation()" style="margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none">${lang==="ko"?"자세히 →":"Details →"}</a>
-      </div></div>`;
-  }).join("");
-  el("listView").querySelectorAll(".mcard").forEach(c=>{
-    c.tabIndex=0;
-    c.onclick=()=>openDrawer(c.dataset.id);
-    c.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(c.dataset.id);}};
-    const nm=c.querySelector(".nm"), pl=c.querySelector(".sub");
-    c.setAttribute("aria-label",(lang==="ko"?"상세 열기: ":"Open details: ")+((nm?nm.textContent:"")+" "+(pl?pl.textContent:"")).trim());
-  });
-  el("listView").style.display = view==="list" ? "flex" : "none";
-  el("tableView").style.display = view==="table" ? "block" : "none";
-  const PAGE=shownRows;
-  const page=out.slice(0,PAGE);
-  el("tb").innerHTML=page.map(r=>{
-    const g=r.vf||"—";
-    const ea = ok(r.ec)?"yes":(r.ec===false?"no":"dim");
-    return `<tr data-id="${esc(r.i)}" tabindex="0" aria-label="${esc((lang==="ko"?"상세 열기: ":"Open details: ")+r.f+" — "+r.p)}" class="${activeId===r.i?"open":""}">
+/* ---------- PERF/A11Y: virtual scrolling for the challenges table ---------- */
+/* Only the rows near the scroll position exist in the DOM; two spacer rows carry
+   the height of the rest so the scrollbar is honest. Rows are uniform height
+   (every cell is nowrap), so one measurement is enough. */
+const VS={out:[],rowH:37,buf:6,start:0,end:0,raf:0,focusId:null};
+function vsScrollEl(){ return document.querySelector("#tableView .scroll"); }
+function vsRowHtml(r,idx){
+  const g=r.vf||"—";
+  return `<tr data-id="${esc(r.i)}" tabindex="0" aria-rowindex="${idx+2}" aria-label="${esc((lang==="ko"?"상세 열기: ":"Open details: ")+r.f+" — "+r.p)}" class="${activeId===r.i?"open":""}">
       <td class="firm"><button class="fav${favs.has(r.i)?" on":""}" data-fav="${esc(r.i)}" title="${lang==="ko"?"관심":""}">★</button><a href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(r.f)}</a></td>
       <td class="plan" title="${esc(r.p)}">${esc(r.p)}${(r.co||r.pt)?`<span class="tagpromo">PROMO</span>`:""}</td>
       <td class="num">${money(r.s,r.cu)}</td>
@@ -1510,15 +1469,28 @@ function render(){
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
       <td class="evc">${evCell(r)}</td>
       <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td></tr>`;
-  }).join("") + (out.length>PAGE
-    ? `<tr class="moreRow"><td colspan="19"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
-    : "");
-  window.__lastOut=out;
-  {const b=el("fcount"); if(b){const n=activeConditionCount(); b.textContent=n; b.style.display=n?"inline-block":"none";}}
-  {const mb=el("moreBtn"); if(mb) mb.onclick=()=>{shownRows+=120; render();};}
-  syncURL();
-  syncFilterUI(); updateGroupBadges();
-  document.querySelectorAll("#tb .fav").forEach(b=>b.onclick=e=>{
+}
+function vsMetrics(){
+  const sc=vsScrollEl(); if(!sc) return null;
+  const rect=sc.getBoundingClientRect();
+  const content=VS.out.length*VS.rowH;
+  /* when the container scrolls itself, scrollTop is the offset; when it is
+     taller than the viewport (<=760px) the page scrolls instead */
+  const pageHidden=Math.max(0,-rect.top);
+  let top=sc.scrollTop+pageHidden;
+  top=Math.max(0, Math.min(top, Math.max(0,content-VS.rowH)));
+  const availTop=Math.max(0,rect.top);
+  const availBot=Math.min(window.innerHeight, rect.bottom);
+  const h=Math.max(160, availBot-availTop);
+  return {top,h};
+}
+function vsWireRows(tb){
+  tb.querySelectorAll("tr[data-id]").forEach(tr=>{
+    tr.onclick=()=>openDrawer(tr.dataset.id);
+    tr.onmouseleave=hidePop;
+    tr.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(tr.dataset.id);}};
+  });
+  tb.querySelectorAll(".fav").forEach(b=>b.onclick=e=>{
     e.preventDefault(); e.stopPropagation();
     const id=b.dataset.fav;
     if(favs.has(id)) favs.delete(id); else favs.add(id);
@@ -1527,12 +1499,145 @@ function render(){
     const fc=document.getElementById("favChip");
     if(fc) fc.textContent=`★ ${lang==="ko"?"관심":"Saved"} ${favs.size}`;
   });
-  document.querySelectorAll("#tb tr[data-id]").forEach(tr=>{
-    tr.tabIndex=0;
-    tr.onclick=()=>openDrawer(tr.dataset.id);
-    tr.onmouseleave=hidePop;
-    tr.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(tr.dataset.id);}};
+}
+function vsPaint(force,nomeasure){
+  const tb=el("tb"); if(!tb) return;
+  const out=VS.out, n=out.length;
+  const table=tb.closest("table");
+  if(table) table.setAttribute("aria-rowcount", String(n+1));
+  if(!n){ VS.start=VS.end=0; tb.innerHTML=""; return; }
+  const m=vsMetrics(); if(!m) return;
+  const per=Math.max(1, Math.ceil(m.h/VS.rowH));
+  let start=Math.max(0, Math.floor(m.top/VS.rowH)-VS.buf);
+  start=Math.min(start, Math.max(0, n-per-VS.buf));
+  let end=Math.min(n, start+per+VS.buf*2+2);
+  /* never drop the row that has keyboard focus out of the DOM */
+  const fIdx=VS.focusId?out.findIndex(r=>r.i===VS.focusId):-1;
+  if(fIdx>=0&&(fIdx<start||fIdx>=end)){ start=Math.max(0, fIdx-VS.buf); end=Math.min(n, start+per+VS.buf*2+2); }
+  if(!force && start===VS.start && end===VS.end) return;
+  const ae=document.activeElement;
+  const inTb=!!(ae && ae!==tb && tb.contains(ae));
+  const fRow=inTb&&ae.closest?ae.closest("tr[data-id]"):null;
+  const fid=fRow?fRow.dataset.id:null;
+  const fFav=inTb&&ae.classList.contains("fav")?ae.dataset.fav:null;
+  VS.start=start; VS.end=end;
+  const pad=px=>`<tr class="vsPad" aria-hidden="true"><td colspan="20"><div style="height:${Math.max(0,Math.round(px))}px"></div></td></tr>`;
+  tb.innerHTML=(start>0?pad(start*VS.rowH):"") +
+    out.slice(start,end).map((r,i)=>vsRowHtml(r,start+i)).join("") +
+    (end<n?pad((n-end)*VS.rowH):"");
+  vsWireRows(tb);
+  /* one measurement, then repaint the spacers with the true row height */
+  if(!nomeasure){
+    const tr0=tb.querySelector("tr[data-id]");
+    if(tr0){ const hh=tr0.getBoundingClientRect().height;
+      if(hh>12 && Math.abs(hh-VS.rowH)>0.5){ VS.rowH=hh; vsPaint(true,true); return; } }
+  }
+  if(fid){
+    const tr=[...tb.querySelectorAll("tr[data-id]")].find(t=>t.dataset.id===fid);
+    if(tr){
+      if(fFav){ const b=tr.querySelector(".fav"); if(b) b.focus({preventScroll:true}); }
+      else tr.focus({preventScroll:true});
+    }
+  }
+}
+function vsSetData(out){ VS.out=out; VS.start=VS.end=-1; vsPaint(true); }
+let vsWired=false;
+function vsFocusRow(idx){
+  const out=VS.out; if(!out||!out.length) return false;
+  idx=Math.max(0, Math.min(idx, out.length-1));
+  const id=out[idx].i, sc=vsScrollEl();
+  const find=()=>[...el("tb").querySelectorAll("tr[data-id]")].find(t=>t.dataset.id===id);
+  let tr=find();
+  const visible=!!(tr&&sc&&(()=>{const r=tr.getBoundingClientRect(), c=sc.getBoundingClientRect(); return r.top>=c.top+30&&r.bottom<=c.bottom;})());
+  if(!visible&&sc){ sc.scrollTop=Math.max(0, idx*VS.rowH - VS.rowH*2); vsPaint(true); tr=find(); }
+  if(!tr) return false;
+  tr.focus({preventScroll:true});
+  return true;
+}
+function vsWire(){
+  if(vsWired) return; vsWired=true;
+  const kick=()=>{ if(VS.raf) return; VS.raf=requestAnimationFrame(()=>{ VS.raf=0; vsPaint(false); }); };
+  const sc=vsScrollEl(); if(sc) sc.addEventListener("scroll",kick,{passive:true});
+  window.addEventListener("scroll",kick,{passive:true});
+  window.addEventListener("resize",()=>{ vsPaint(true); });
+  const tb=el("tb");
+  if(tb) tb.addEventListener("focusin",e=>{
+    const tr=e.target&&e.target.closest?e.target.closest("tr[data-id]"):null;
+    VS.focusId=tr?tr.dataset.id:null;
   });
+  /* keyboard: walk the whole result set even though only a window is in the DOM */
+  if(tb) tb.addEventListener("keydown",e=>{
+    const tr=e.target.closest?e.target.closest("tr[data-id]"):null;
+    if(!tr) return;
+    const idx=Number(tr.getAttribute("aria-rowindex"))-2;
+    if(e.key==="ArrowDown"){ e.preventDefault(); vsFocusRow(idx+1); return; }
+    if(e.key==="ArrowUp"){ e.preventDefault(); vsFocusRow(idx-1); return; }
+    if(e.key==="PageDown"){ e.preventDefault(); vsFocusRow(idx+10); return; }
+    if(e.key==="PageUp"){ e.preventDefault(); vsFocusRow(idx-10); return; }
+    if(e.key!=="Tab") return;
+    const rows=[...tb.querySelectorAll("tr[data-id]")]; if(!rows.length) return;
+    const tail=row=>{const f=[...row.querySelectorAll("button,a")].filter(x=>x.tabIndex>=0); return f.length?f[f.length-1]:row;};
+    if(!e.shiftKey && tr===rows[rows.length-1] && e.target===tail(tr) && VS.end<VS.out.length){
+      e.preventDefault(); vsFocusRow(VS.end);
+    } else if(e.shiftKey && tr===rows[0] && e.target===tr && VS.start>0){
+      e.preventDefault(); vsFocusRow(VS.start-1);
+    }
+  });
+}
+
+function render(){
+  let key=sortKey, dir=sortDir;
+  if(sortPreset==="cheap"){ key="to"; dir=1; }
+  if(sortPreset==="best"){ key="pr"; dir=1; }
+  const out=rows.filter(matches).sort((a,b)=>{
+    if(sortPreset==="best"){
+      const ra=num(a.pr)/Math.max(num(a.s)||1,1), rb=num(b.pr)/Math.max(num(b.s)||1,1);
+      return ra-rb;
+    }
+    const A=a[key],B=b[key];
+    if(["s","pr","sp","dl","ml","to","ac","md"].includes(key))return ((num(A)??1e12)-(num(B)??1e12))*dir;
+    return String(A??"").localeCompare(String(B??""))*dir;});
+  /* a new filter/sort/search answers from the first row, not from wherever the
+     old list happened to be scrolled to */
+  {const sig=filterSignature()+sortKey+"/"+dir+"/"+sortPreset;
+   if(window.__viewSig!==sig){ window.__viewSig=sig; const sc=vsScrollEl(); if(sc&&sc.scrollTop) sc.scrollTop=0; }}
+  if(view==="list") el("listView").innerHTML=out.map(r=>{
+    const g=r.vf||"—";
+    return `<div class="mcard" data-id="${esc(r.i)}">
+      <div class="top">
+        <span class="nm">${esc(r.f)}</span>
+        <span class="sub">${esc(r.p)}</span>
+        <span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span>
+        ${r.co?`<span class="tagpromo">PROMO ${esc(r.co)}</span>`:""}
+        ${fclassBadge(r)}
+        <span class="pill p-${esc(g)}" style="margin-left:auto">${esc(t("grade"))} ${esc(g)}</span>
+      </div>
+      <div class="metrics">
+        <span>${esc(t("fSize"))} <b>${r.s?Number(r.s).toLocaleString('en-US'):"—"}</b></span>
+        <span>${esc(t("fPrice"))} <b>${r.pr!=null?"$"+Number(r.pr).toLocaleString('en-US'):"—"}</b></span>
+        <span>${esc(t("fSplit"))} <b>${r.sp?esc(r.sp)+"%":"—"}</b></span>
+        <span>${esc(t("fMax"))} <b>${r.ml!=null?esc(r.ml)+"%":"—"}</b></span>
+        <span>${esc(t("fDaily"))} <b>${r.dl!=null?esc(r.dl)+"%":"—"}</b></span>
+        <span>${esc(t("fDays"))} <b>${(r.mf??r.md)!=null?esc(r.mf??r.md):"—"}</b></span>
+        <span>${esc(t("fCycle"))} <b>${esc(tx(r.pc)||"—")}</b></span>
+        <a href="#challenge/${encodeURIComponent(r.i)}" onclick="event.stopPropagation()" style="margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none">${lang==="ko"?"자세히 →":"Details →"}</a>
+      </div></div>`;
+  }).join("");
+  if(view==="list") el("listView").querySelectorAll(".mcard").forEach(c=>{
+    c.tabIndex=0;
+    c.onclick=()=>openDrawer(c.dataset.id);
+    c.onkeydown=e=>{if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();openDrawer(c.dataset.id);}};
+    const nm=c.querySelector(".nm"), pl=c.querySelector(".sub");
+    c.setAttribute("aria-label",(lang==="ko"?"상세 열기: ":"Open details: ")+((nm?nm.textContent:"")+" "+(pl?pl.textContent:"")).trim());
+  });
+  el("listView").style.display = view==="list" ? "flex" : "none";
+  el("tableView").style.display = view==="table" ? "block" : "none";
+  window.__lastOut=out;
+  vsWire();
+  vsSetData(out);
+  syncURL();
+  syncFilterUI(); updateGroupBadges();
+  document.querySelectorAll("#tb tr[data-id]").forEach(tr=>{tr.tabIndex=0;});
   document.querySelectorAll("thead th[data-sort]").forEach(th=>{
     th.querySelectorAll(".ar").forEach(a=>a.remove());
     if(th.dataset.sort===sortKey){const s=document.createElement("span");s.className="ar";
