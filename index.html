@@ -140,6 +140,8 @@
   .chg{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .chg:last-child{border-bottom:0}
   .pcnt{opacity:.55;font-size:10px;margin-left:2px}
+  .gbadge{margin-left:auto;background:var(--accent);color:#150b23;border-radius:999px;padding:0 6px;
+    font-size:10px;font-weight:800;line-height:15px}
   .fbadge{display:none;margin-left:6px;background:var(--accent);color:#150b23;border-radius:999px;
     padding:1px 7px;font-size:10.5px;font-weight:800;vertical-align:middle}
   .phases{display:inline-flex;align-items:center;gap:2px;font-family:ui-monospace,monospace;font-size:11.5px}
@@ -734,7 +736,7 @@ const I18N = {
   empty:"조건에 맞는 상품이 없습니다.",
   thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
-  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말",
+  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
   kTarget:"이익 목표", kDaily:"일일 손실", kMax:"최대 손실", kDays:"최소 거래일",
   sectCost:"비용", sectCond:"거래 조건", sectPay:"지급 조건", sectFloor:"낙폭 구조", sectSrc:"데이터 출처",
@@ -788,7 +790,7 @@ const I18N = {
   empty:"No products match these filters.",
   thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
-  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend",
+  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
   kTarget:"Profit target", kDaily:"Daily loss", kMax:"Max loss", kDays:"Min days",
   sectCost:"Cost", sectCond:"Trading conditions", sectPay:"Payout", sectFloor:"Loss floor", sectSrc:"Data source",
@@ -1133,7 +1135,6 @@ function applyURLState(p, force){
   q = p.get("q") || "";
   if(p.get("sort")) sortKey=p.get("sort");
   sortDir = p.get("dir") ? (Number(p.get("dir"))||1) : 1;
-  activePresets = new Set((p.get("preset")||"").split(",").filter(Boolean));
   sortPreset = p.get("spreset") || null;
 }
 function syncURL(){
@@ -1145,7 +1146,6 @@ function syncURL(){
   if(q) p.set("q",q);
   if(sortKey!=="f") p.set("sort",sortKey);
   if(sortDir!==1) p.set("dir",sortDir);
-  if(activePresets.size) p.set("preset",[...activePresets].join(","));
   if(sortPreset) p.set("spreset",sortPreset);
   const qs=p.toString();
   const url="#challenges"+(qs?"?"+qs:"");
@@ -1153,7 +1153,7 @@ function syncURL(){
 }
 function filterSignature(){
   return JSON.stringify([[...F.firm],[...F.mk],[...F.st],[...F.dd],[...F.vf],[...F.flags],[...F.cycle],[...F.fee],[...F.paym],[...F.plat],
-    F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,[...activePresets],sortPreset]);
+    F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,sortPreset]);
 }
 function matches(r){
   if(q){
@@ -1168,15 +1168,7 @@ function matches(r){
   if(F.st.size&&!F.st.has(r.st||"—"))return false;
   if(F.dd.size&&!F.dd.has(r.dd||"—"))return false;
   if(F.vf.size&&!F.vf.has(r.vf||"—"))return false;
-  for(const f of F.flags){
-    if(f==="promo"&&!(r.co||r.pt))return false;
-    if(f==="ea"&&!(ok(r.ec)||r.ec==="cond"))return false;
-    if(f==="news"&&!(ok(r.nc)||r.nc==="cond"))return false;
-    if(f==="korea"&&r.kr!=="yes")return false;
-    if(f==="on"&&!ok(r.oc))return false;
-    if(f==="cp"&&!ok(r.cc))return false;
-    if(f==="wk"&&!ok(r.wk))return false;
-  }
+  for(const f of F.flags){ if(!flagOk(r,f)) return false; }
   const s=num(r.s); if(F.sizeMin!=null&&(s==null||s<F.sizeMin))return false;
   if(F.sizeMax!=null&&(s==null||s>F.sizeMax))return false;
   const pr=num(r.pr); if(F.priceMax!=null&&(pr==null||pr>F.priceMax))return false;
@@ -1190,7 +1182,7 @@ function matches(r){
   if(F.paym && F.paym.size){ const pm=payMethods(r); if(![...F.paym].some(k=>pm.includes(k))) return false; }
   if(F.plat && F.plat.size){ const e=(DB.eap||{})[r.f]; const ps=(e&&e.platforms)||[];
     if(![...F.plat].some(k=>ps.includes(k))) return false; }
-  for(const k of activePresets){ const ap=PRESETS.find(x=>x.k===k); if(ap && ap.kind==="filter" && !presetOk(r,k)) return false; }
+
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
   if(F.target && /^\d+$/.test(F.target) && !(num(r.tg)>=Number(F.target)))return false;
@@ -1271,8 +1263,8 @@ function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
   const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
     <div class="body" style="max-height:none"><div class="chips2">
-    ${PRESETS.map(p=>{const n=p.kind==="sort"?rows.length:rows.filter(r=>presetOk(r,p.k)).length;
-      return `<button data-preset="${p.k}" class="${(activePresets.has(p.k)||sortPreset===p.k)?"on":""}" title="${esc(p.kind==="sort"?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터":"filter"))}">${esc(pname(p.k))}${p.kind==="sort"?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
+    ${PRESETS.map(p=>{const n=p.sort?rows.length:presetCount(p);
+      return `<button data-preset="${p.k}" class="${(p.sort? sortPreset===p.k : presetActive(p))?"on":""}" title="${esc(p.sort?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터 "+(presetConds(p).length)+"개":"filter x"+presetConds(p).length))}">${esc(pname(p.k))}${p.sort?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
     </div></div></details>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
@@ -1297,7 +1289,7 @@ function buildFilters(){
     ${[80,85,90,95].map(v=>`<button data-split="${v}" class="${F.splitMin===v?"on":""}">≥ ${v}%</button>`).join("")}</div></div></details>`);
   add("dd", `<details class="fgroup" data-g="dd" ${OPEN.dd?"open":""}><summary title="${esc((TIPS.dd)[lang])}">${esc(t("ddF"))}</summary><div class="body">
     ${[...DB.dd].sort((a,b)=>(isNA(a)?1:0)-(isNA(b)?1:0)||String(a).localeCompare(String(b))).map(v=>chk(tx(v),F.dd.has(v),"dd",v,rowCount(r=>r.dd===v))).join("")}</div></details>`);
-  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"]];
+  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"],["tot","fTot"]];
   add("flags", `<details class="fgroup" data-g="flags" ${OPEN.flags?"open":""}><summary title="${esc((TIPS.flags)[lang])}">${esc(t("flags"))}</summary><div class="body">
     ${flags.map(([k,lab])=>chk(t(lab),F.flags.has(k),"flags",k)).join("")}</div></details>`);
   add("ver", `<details class="fgroup" data-g="ver" ${OPEN.ver?"open":""}><summary title="${esc((TIPS.ver)[lang])}">${esc(t("ver"))}</summary><div class="body">
@@ -1375,6 +1367,7 @@ function buildFilters(){
     F.levBand = F.levBand===b.dataset.lev?null:b.dataset.lev; render();});
   host.querySelectorAll("button[data-rating]").forEach(b=>b.onclick=()=>{
     const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; render();});
+  if(typeof syncFilterUI==="function"){ syncFilterUI(); updateGroupBadges(); }
 }
 function render(){
   if(window.__filterTick!==filterSignature()){ shownRows=120; window.__filterTick=filterSignature(); }
@@ -1454,6 +1447,7 @@ function render(){
   {const b=el("fcount"); if(b){const n=activeConditionCount(); b.textContent=n; b.style.display=n?"inline-block":"none";}}
   {const mb=el("moreBtn"); if(mb) mb.onclick=()=>{shownRows+=120; render();};}
   syncURL();
+  syncFilterUI(); updateGroupBadges();
   document.querySelectorAll("#tb .fav").forEach(b=>b.onclick=e=>{
     e.preventDefault(); e.stopPropagation();
     const id=b.dataset.fav;
@@ -1846,7 +1840,7 @@ el("cGo").onclick=()=>{location.hash="#compare";route();};
 ["st1","st3"].forEach(id=>{const a=document.getElementById(id); if(a) a.onclick=e=>{e.preventDefault();
   ["firm","mk","st","dd","vf","flags","cycle","fee"].forEach(k=>F[k].clear());
   F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null;
-  activePresets.clear(); sortPreset=null; q=""; const g=el("gq"); if(g) g.value="";
+  sortPreset=null; q=""; const g=el("gq"); if(g) g.value="";
   location.hash="#challenges"; route(); render();};});
 {const a=document.getElementById("st4"); if(a) a.onclick=e=>{e.preventDefault();
   F.vf.clear(); F.vf.add("A"); location.hash="#challenges"; route(); render();};}
@@ -1971,56 +1965,99 @@ function feeClass(r){
 const FCLASS={ko:{free:"무료",normal:"일반",later:"후불"},en:{free:"Free",normal:"Normal",later:"Pay Later"}};
 const fclassLabel=k=>(FCLASS[lang]||FCLASS.en)[k]||k;
 const fclassBadge=r=>{const k=feeClass(r);return `<span class="fclass ${k}">${esc(fclassLabel(k))}</span>`;};
-let feeFilter=null, activePresets=new Set(), sortPreset=null;
+let feeFilter=null, sortPreset=null;
 const PRESETS=[
-  {k:"buy",  ko:"★ 실구매 후보", en:"★ Shortlist", kind:"filter"},
-  {k:"kr",   ko:"한국 가능",     en:"Korea OK",    kind:"filter"},
-  {k:"tot",  ko:"총액 확인",     en:"Total known", kind:"filter"},
-  {k:"eqa",  ko:"EA+카피 허용",  en:"EA+copy OK",  kind:"filter"},
-  {k:"A",    ko:"등급 A",        en:"Grade A",     kind:"filter"},
-  {k:"paf",  ko:"후불",          en:"Pay later",   kind:"filter"},
-  {k:"cheap",ko:"총액 낮은 순",  en:"Lowest total",kind:"sort", key:"to"},
-  {k:"best", ko:"가성비 순",     en:"Best value",  kind:"sort", key:"value"},
+  {k:"buy",  ko:"★ 실구매 후보", en:"★ Shortlist", flags:["korea","tot"], vf:["A"]},
+  {k:"kr",   ko:"한국 가능",     en:"Korea OK",    flags:["korea"]},
+  {k:"tot",  ko:"총액 확인",     en:"Total known", flags:["tot"]},
+  {k:"eqa",  ko:"EA+카피 허용",  en:"EA+copy OK",  flags:["ea","cp"]},
+  {k:"A",    ko:"등급 A",        en:"Grade A",     vf:["A"]},
+  {k:"paf",  ko:"후불",          en:"Pay later",   fee:["later"]},
+  {k:"cheap",ko:"총액 낮은 순",  en:"Lowest total",sort:"to"},
+  {k:"best", ko:"가성비 순",     en:"Best value",  sort:"pr"},
 ];
 const pname=k=>{const p=PRESETS.find(x=>x.k===k); return p?(lang==="ko"?p.ko:p.en):k;};
-function presetOk(r,k){
-  const ok=v=>v===true||v==="cond";
-  switch(k){
-    case "buy": return r.vf==="A" && r.to!=null && r.kr==="yes";
-    case "kr":  return r.kr==="yes";
-    case "tot": return r.to!=null;
-    case "eqa": return ok(r.ec)&&ok(r.cc);
-    case "A":   return r.vf==="A";
-    case "paf": return feeClass(r)==="later";
-    default: return true;
-  }
+function presetConds(p){
+  return (p.flags||[]).map(v=>["flags",v])
+    .concat((p.vf||[]).map(v=>["vf",v]))
+    .concat((p.fee||[]).map(v=>["fee",v]));
 }
-function clearAllFilters(){
-  ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>F[k].clear());
-  ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>F[k]=null);
-  q=""; const g=el("gq"); if(g) g.value="";
+function presetActive(p){
+  const c=presetConds(p);
+  return c.length>0 && c.every(([set,v])=>F[set].has(v));
 }
 function applyPreset(k){
   const p=PRESETS.find(x=>x.k===k); if(!p) return;
-  if(p.kind==="sort"){
+  if(p.sort){
     sortPreset = (sortPreset===k) ? null : k;
-    if(sortPreset){ sortKey=(k==="best"?"pr":"to"); sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
+    if(sortPreset){ sortKey=p.sort; sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
     render(); return;
   }
-  if(activePresets.has(k)) activePresets.delete(k); else activePresets.add(k);
+  const conds=presetConds(p);
+  const on=presetActive(p);
+  conds.forEach(([set,v])=>{ if(on) F[set].delete(v); else F[set].add(v); });
+  // open the groups we just touched so the change is visible
+  if(!on) conds.forEach(([set])=>{
+    const g=document.querySelector(`#filterPanel details[data-g="${set}"]`); if(g) g.open=true;
+  });
   render();
+}
+function flagOk(r,f){
+  const ok=v=>v===true||v==="cond";
+  if(f==="promo") return !!(r.co||r.pt);
+  if(f==="ea")    return ok(r.ec);
+  if(f==="news")  return ok(r.nc);
+  if(f==="korea") return r.kr==="yes";
+  if(f==="on")    return ok(r.oc);
+  if(f==="cp")    return ok(r.cc);
+  if(f==="wk")    return ok(r.wk);
+  if(f==="tot")   return r.to!=null;
+  return true;
+}
+function rowHasCond(r,c){
+  const [set,v]=c;
+  if(set==="flags") return flagOk(r,v);
+  if(set==="vf")    return (r.vf||"—")===v;
+  if(set==="fee")   return feeClass(r)===v;
+  return true;
+}
+function presetCount(p){
+  const c=presetConds(p);
+  if(!c.length) return rows.length;
+  return rows.filter(r=>c.every(cc=>rowHasCond(r,cc))).length;
+}
+const G2F={firm:"firm",mk:"mk",st:"st",dd:"dd",ver:"vf",cycle:"cycle",paym:"paym",plat:"plat",flags:"flags",fee:"fee"};
+function groupActive(g){
+  if(G2F[g]) return F[G2F[g]].size;
+  const map={size:["sizeMin","sizeMax"],price:["priceMax"],split:["splitMin"],target:["target"],
+             days:["daysBand"],lev:["levBand"],rating:["ratingMin"]};
+  return (map[g]||[]).filter(k=>F[k]!=null).length;
+}
+function syncFilterUI(){
+  document.querySelectorAll("#filterPanel input[type=checkbox][data-k]").forEach(cb=>{
+    const set=F[cb.dataset.k];
+    if(!set || !set.has) return;
+    const on=set.has(cb.dataset.v);
+    if(cb.checked!==on) cb.checked=on;
+  });
+}
+function updateGroupBadges(){
+  document.querySelectorAll("#filterPanel details[data-g]").forEach(d=>{
+    const g=d.dataset.g, n=groupActive(g), sum=d.querySelector("summary");
+    if(!sum) return;
+    let b=sum.querySelector(".gbadge");
+    if(n){ if(!b){ b=document.createElement("span"); b.className="gbadge"; sum.appendChild(b);} b.textContent=n; }
+    else if(b) b.remove();
+  });
 }
 function activeConditionCount(){
   let n=0;
   ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>n+=F[k].size);
   ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>{ if(F[k]!=null) n++; });
   if(q) n++;
-  n += activePresets.size;
   if(sortPreset) n++;
   return n;
 }
-
-
 const SORTS=[["f","회사","Firm"],["to","총액","Total"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
   ["ml","최대 손실","Max loss"],["s","계좌 규모","Size"],["rt","평점","Rating"],["mf","최소일수","Min days"]];
 function buildSort(){
