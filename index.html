@@ -168,6 +168,11 @@
     background:rgba(167,139,250,.16);color:var(--accent);font-weight:800;font-size:11px}
   .rulecard b{font-size:13px}
   .rulecard p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}
+  .rulegrid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px 14px;margin:8px 0 4px}
+  .rulegrid2>div{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:4px 0}
+  .rulegrid2 .glabel{font-weight:600}
+  .rquote{margin-top:8px;padding:10px 12px;border-left:2px solid var(--accent);background:var(--panel2);font-size:12px;line-height:1.65;color:var(--ink2)}
+  .rnote{margin-top:6px;font-size:11.5px;color:var(--muted);line-height:1.6}
   .srcnote2{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.6}
   .sitefoot{border-top:1px solid var(--line);background:var(--panel);margin-top:40px}
   .sitefoot .in{max-width:1500px;margin:0 auto;padding:26px 22px;display:grid;grid-template-columns:1.6fr .7fr .7fr .7fr;gap:24px}
@@ -776,6 +781,7 @@
       </tr></thead><tbody id="rulesBody"></tbody></table>
     </div></div>
     <div id="rulesDocs" style="margin-top:20px"></div>
+    <div id="rulesDetail"></div>
     <div id="rPfm"></div>
     <div id="rChanges"></div>
     <footer id="foot2"></footer>
@@ -802,8 +808,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="889521a3";</script>
-<script src="data.js?v=889521a3"></script>
+<script>window.HELIX_VER="ba0eeb3d";</script>
+<script src="data.js?v=ba0eeb3d"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -842,6 +848,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   navCh:"챌린지", navRules:"규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모션", navCmp:"비교", navTools:"도구", navSpreads:"스프레드", navPayouts:"지급",
   rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
   rFirm:"회사", rN:"상품", rGrade:"검증 등급",
+  rEa:"EA", rNews:"뉴스", rOn:"오버나이트", rCp:"카피", rWk:"주말", rKr:"한국 계좌", rM5:"MT5",
   stYes:"허용", stNo:"불가", stMix:"혼합", stUnk:"미확인", stCond:"조건부",
   resFound:"개 상품", resOf:"/ 전체", clearAll:"필터 해제",
   cPrice:"참가비", cAct:"활성화 비용", cTotal:"확인된 총비용", cPromo:"프로모션", cCode:"코드",
@@ -894,6 +901,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   navCh:"Challenges", navRules:"Rules", navHome:"Home", navFirms:"Firms", navDocs:"Docs", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
   rulesH1:"Rules across firms", rulesSub:"Click a firm to filter its challenges. Allowed / conditional / not allowed / unknown aggregated from per-product records.",
   rFirm:"Firm", rN:"Products", rGrade:"Grade",
+  rEa:"EA", rNews:"News", rOn:"Overnight", rCp:"Copy", rWk:"Weekend", rKr:"Korea", rM5:"MT5",
   stYes:"Allowed", stNo:"Not allowed", stMix:"Mixed", stUnk:"Unknown", stCond:"Conditional",
   resFound:"products", resOf:"/ of", clearAll:"Clear filters",
   cPrice:"Entry fee", cAct:"Activation", cTotal:"Total known", cPromo:"Promotion", cCode:"Code",
@@ -3921,6 +3929,10 @@ function changesBlock(){
     <div class="srcline">${lang==="ko"?"출처":"Source"}: propfirmmatch.com/prop-firm-rule-changes</div></div>`;
 }
 function renderRules(){
+  // 제목·부제·표 헤더가 비어 있던 원인: 사전에만 있고 DOM에 넣는 코드가 없었음
+  const Tset2=(id,key)=>{const e=document.getElementById(id); if(e) e.textContent=t(key);};
+  ["rFirm","rN","rEa","rNews","rOn","rCp","rWk","rKr","rM5","rGrade"].forEach(k=>Tset2(k,k));
+  Tset2("rulesH1","rulesH1"); Tset2("rulesSub","rulesSub");
   const map={};
   rows.forEach(r=>{
     const o=map[r.f]||(map[r.f]={n:0,ea:[],news:[],on:[],cp:[],wk:[],kr:[],m5:[],g:{A:0,B:0,C:0}});
@@ -3957,6 +3969,34 @@ function renderRules(){
      "지급 또는 통과에 필요한 최소 거래일입니다. '0일'은 업체가 명시적으로 최소 없음이라고 밝힌 것이고, 비어 있으면 확인하지 못한 것입니다.",
      "The minimum number of trading days before passing or requesting a payout. A recorded 0 means the firm states there is no minimum; blank means we could not confirm it."]
   ];
+  if(el("rulesDetail")){
+    const T=(ko,en)=>lang==="ko"?ko:en;
+    const lbl=(v)=>v===true?`<span class="rstate yes"><i></i>${T("허용","allowed")}</span>`
+      :v==="cond"?`<span class="rstate mix"><i></i>${T("조건부","conditional")}</span>`
+      :v===false?`<span class="rstate no"><i></i>${T("금지","forbidden")}</span>`
+      :`<span class="rstate unk"><i></i>${T("미기록","unrecorded")}</span>`;
+    const rowsD=Object.entries(DB.rbrand||{}).filter(([,v])=>v&&v.status==="verified")
+      .sort((a,b)=>(rows.filter(r=>r.f===b[0]).length)-(rows.filter(r=>r.f===a[0]).length));
+    el("rulesDetail").innerHTML=`<div class="sect" style="margin-top:26px">${T("브랜드별 규칙 상세","Rule detail by brand")} <span class="dim">${rowsD.length}</span></div>
+      ${rowsD.map(([f,v])=>`<details class="fgroup rulebrand">
+        <summary><b>${esc(f)}</b> <span class="dim">${rows.filter(r=>r.f===f).length} ${T("상품","products")}</span></summary>
+        <div class="pfmbody">
+          <div class="rulegrid2">
+            <div><span class="glabel">EA ${T("평가","eval")}</span>${lbl(v.ea_eval)}</div>
+            <div><span class="glabel">EA ${T("펀딩","funded")}</span>${lbl(v.ea_funded)}</div>
+            <div><span class="glabel">${T("뉴스","News")} ${T("평가","eval")}</span>${lbl(v.news_eval)}</div>
+            <div><span class="glabel">${T("뉴스","News")} ${T("펀딩","funded")}</span>${lbl(v.news_funded)}</div>
+            <div><span class="glabel">${T("오버나이트","Overnight")} ${T("평가","eval")}</span>${lbl(v.on_eval)}</div>
+            <div><span class="glabel">${T("오버나이트","Overnight")} ${T("펀딩","funded")}</span>${lbl(v.on_funded)}</div>
+            <div><span class="glabel">${T("주말","Weekend")}</span>${lbl(v.week)}</div>
+            <div><span class="glabel">${T("카피(본인)","Copy own")}</span>${lbl(v.copy_own)}</div>
+            <div><span class="glabel">${T("카피(외부)","Copy external")}</span>${lbl(v.copy_ext)}</div>
+          </div>
+          ${v.quote?`<div class="rquote">“${esc(v.quote)}”</div>`:""}
+          ${v.note?`<div class="rnote">${esc(v.note)}</div>`:""}
+          ${v.src?`<div class="srcline">${T("출처","Source")}: <a href="${esc(v.src)}" target="_blank" rel="noopener">${esc(v.src)}</a></div>`:""}
+        </div></details>`).join("")}`;
+  }
   if(el("rulesDocs")) el("rulesDocs").innerHTML=`
     <div class="sect" style="margin-top:22px">${lang==="ko"?"규칙 용어 설명":"What each rule means"}</div>
     <div class="rulegrid">${ruleDocs.map(([ch,ko,en,koD,enD])=>`
