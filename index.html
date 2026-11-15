@@ -736,8 +736,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="21b46ec3";</script>
-<script src="data.js?v=21b46ec3"></script>
+<script>window.HELIX_VER="deae30ea";</script>
+<script src="data.js?v=deae30ea"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -2407,10 +2407,12 @@ function planCopyVerdict(r){
 function cycleDays(pc){
   const t=String(pc||"").toLowerCase();
   if(!t) return null;
-  if(/on demand|anytime|즉시|수시/.test(t)) return 0;
-  if(/daily|매일|every 24h/.test(t)) return 1;
-  if(/weekly|주간|every 7/.test(t)) return 7;
-  const m=t.match(/(\d+)\s*(?:day|일)/);
+  if(/on demand|anytime|when requirements|즉시|수시|온디맨드/.test(t)) return 0;
+  if(/daily|매일|일일|every 24h|24h/.test(t)) return 1;
+  if(/bi-?weekly|2주|격주|every 14/.test(t)) return 14;
+  if(/weekly|주간|매주|every 7/.test(t)) return 7;
+  if(/monthly|월간|매월|30 days/.test(t)) return 30;
+  const m=t.match(/(\d+)\s*(?:business\s*)?(?:day|days|일)/);
   if(m) return Number(m[1]);
   return null;
 }
