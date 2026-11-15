@@ -904,7 +904,7 @@ function payTokens(raw){
     else if(/after (the )?(trading )?period|기간 후/.test(t)) out.push("기간 후");
     else if(/after (passing|challenge)|통과 후/.test(t)) out.push("통과 후");
   }
-  return out.slice(0,3);
+  return out.filter(x=>x!=="0일").slice(0,3);
 }
 function payCell(raw){
   if(!raw) return '<span class="dim">—</span>';
@@ -1500,7 +1500,10 @@ function render(){
       <td>${r.m5===true?'<span class="yes">✓</span>':r.m5===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
       <td class="rulesCell">${rulesCell(r)}</td>
       <td class="num">${money(r.pr,r.cu)}</td>
-      <td class="num">${(r.ac==null||r.ac===""||r.ac===0)?'<span class="dim">—</span>':money(r.ac,r.cu)}</td>
+      <td class="num">${(r.ac==null||r.ac==="")?'<span class="dim">—</span>':
+        (typeof r.ac==="number"||/^[\d.,]+$/.test(String(r.ac)))
+          ? (Number(r.ac)===0?'<span class="dim">—</span>':money(r.ac,r.cu))
+          : (/no activation|none|없음|n\/a/i.test(String(r.ac))?'<span class="dim">없음</span>':esc(String(r.ac).slice(0,10)))}</td>
       <td class="num">${r.to!=null?money(r.to,r.cu):'<span class="dim">—</span>'}</td>
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${lossCell(r.ml, r.mlT, r)}</td>
