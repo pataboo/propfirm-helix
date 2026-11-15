@@ -140,8 +140,16 @@
   .chg{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .chg:last-child{border-bottom:0}
   .pcnt{opacity:.55;font-size:10px;margin-left:2px}
-  .rulesIcons{display:inline-flex;gap:3px;font-size:11px}
-  .rulesIcons .cond{color:var(--amber)}
+  .phases{display:inline-flex;align-items:center;gap:2px;font-family:ui-monospace,monospace;font-size:11.5px}
+  .phv{color:var(--ink)}
+  .phsep{color:var(--muted);opacity:.6}
+  .stg{color:var(--muted);font-size:9px;margin-left:2px;cursor:help}
+  .pcode{display:inline-flex;gap:2px;font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.02em}
+  .pl{display:inline-block;min-width:12px;text-align:center;border-radius:3px;padding:0 1px;line-height:1.35}
+  .pl.py{color:var(--green);background:rgba(74,222,128,.12)}
+  .pl.pcond{color:var(--amber);background:rgba(255,194,71,.14)}
+  .pl.pno{color:#ef7d7d;background:rgba(239,125,125,.12)}
+  .pl.puk{color:var(--muted);background:transparent;border:1px dashed var(--line2)}
   .evwrap{cursor:help;outline-offset:2px}
   .evwrap:focus-visible{outline:2px solid var(--accent);border-radius:4px}
   .qi{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid var(--line2);
@@ -722,7 +730,7 @@ const I18N = {
   search:"회사 · 상품 검색…", filters:"필터", firm:"회사", mkt:"자산군", step:"단계", ddF:"낙폭 방식",
   ver:"검증 등급", flags:"규칙", size:"계좌 규모", price:"최대 참가비", reset:"필터 초기화",
   empty:"조건에 맞는 상품이 없습니다.",
-  thFirm:"회사", thPlan:"상품", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
+  thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
   fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
@@ -776,7 +784,7 @@ const I18N = {
   search:"Search firm, product…", filters:"Filters", firm:"Firm", mkt:"Asset", step:"Step", ddF:"Drawdown",
   ver:"Grade", flags:"Rules", size:"Account size", price:"Max entry fee", reset:"Reset filters",
   empty:"No products match these filters.",
-  thFirm:"Firm", thPlan:"Product", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
+  thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
   fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
@@ -863,12 +871,42 @@ function unitCell(numVal, txt){
   }
   return pct || usd || '<span class="dim">—</span>';
 }
+function stageTag(r){
+  const n=Number(r.sg||0);
+  if(n<2) return "";
+  const t=lang==="ko"?"기록된 값은 1단계 기준 · 이후 단계 미기록":"value recorded for phase 1 only";
+  return `<sup class="stg" title="${esc(t)}">①</sup>`;
+}
+function targetCell(r){
+  const tx=Array.isArray(r.tx)?r.tx:null;
+  if(tx && tx.length>1){
+    const t=lang==="ko"?"단계별 목표":"targets per phase";
+    return `<span class="phases" title="${esc(t)}: ${tx.map((v,i)=>(i+1)+"단계 "+v+"%").join(" · ")}">${tx.map(v=>`<span class="phv">${esc(v)}%</span>`).join('<span class="phsep">/</span>')}</span>`;
+  }
+  if(r.tg==="0") return '<span class="dim">—</span>';
+  return unitCell(num(r.tg)||null, r.tgT);
+}
+function lossCell(val, txt, r){
+  if(val==null && !txt) return '<span class="dim">—</span>';
+  return unitCell(num(val), txt) + stageTag(r);
+}
 function rulesCell(r){
-  const f=(v)=>v===true?'<span class="yes">✓</span>':(v==="cond"?'<span class="cond">◐</span>':'<span class="no">✕</span>');
-  const items=[[r.nc,lang==="ko"?"뉴스":"N"],[r.oc,lang==="ko"?"보유":"H"],[r.cc,lang==="ko"?"카피":"C"],[r.wk,lang==="ko"?"주말":"W"]];
-  const has=items.some(([v])=>v!=null);
-  if(!has) return '<span class="dim">—</span>';
-  return `<span class="rulesIcons">${items.map(([v,lab])=>v==null?'':`<span title="${esc(lab)}">${f(v)}</span>`).join("")}</span>`;
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const items=[
+    ["E", r.ec, T("EA · 평가 단계","EA · evaluation")],
+    ["E", r.ef, T("EA · 펀딩 단계","EA · funded")],
+    ["C", r.cc, T("카피트레이딩 · 평가","Copy trading · evaluation")],
+    ["C", r.cf, T("카피트레이딩 · 펀딩","Copy trading · funded")],
+    ["N", r.nc, T("뉴스 거래","News trading")],
+    ["O", r.oc, T("오버나이트 보유","Overnight holding")],
+    ["W", r.wk,  T("주말 보유","Weekend holding")],
+  ];
+  const known=items.filter(([,v])=>v!=null);
+  if(!known.length) return '<span class="dim">—</span>';
+  const cls=(v)=> v===true?"py":(v==="cond"?"pcond":(v===false?"pno":"puk"));
+  return `<span class="pcode">${items.map(([ch,v,tip])=>
+    `<span class="pl ${cls(v)}" title="${esc(tip)}: ${esc(v===true?T("허용","allowed"):v==="cond"?T("조건부·애드온","conditional / add-on"):v===false?T("금지","prohibited"):T("미확인","unknown"))}">${ch}</span>`
+  ).join("")}</span>`;
 }
 function evCell(r){
   const g=r.vf||"—", sy=r.sy||"";
@@ -1190,7 +1228,8 @@ function buildFilterSettings(){
   const box=el("filterSettings"); if(!box) return;
   const NAMES={firm:t("firm"),mk:t("mkt"),st:t("step"),size:t("size"),price:t("price"),split:t("fSplit"),
     dd:t("ddF"),flags:t("flags"),ver:t("ver"),cycle:t("fCycleL"),target:t("fTarget"),days:t("fDays"),fee:lang==="ko"?"결제 유형":"Payment",
-    lev:t("fLev"),rating:t("fRating")};
+    lev:t("fLev"),rating:t("fRating"),
+    paym:lang==="ko"?"지급 방식":"Payout method", plat:lang==="ko"?"플랫폼":"Platform"};
   box.innerHTML=`<div class="tshead">${lang==="ko"?"표시할 필터":"Visible filters"}</div>`+
     visGroups.concat(ALL_GROUPS.filter(g=>!visGroups.includes(g)))
       .map(g=>`<label class="tsrow draggable" draggable="true" data-drag="${g}">
@@ -1383,8 +1422,8 @@ function render(){
       <td class="firm"><button class="fav${favs.has(r.i)?" on":""}" data-fav="${esc(r.i)}" title="${lang==="ko"?"관심":""}">★</button><a href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(r.f)}</a></td>
       <td class="plan" title="${esc(r.p)}">${esc(r.p)}${(r.co||r.pt)?`<span class="tagpromo">PROMO</span>`:""}</td>
       <td class="num">${money(r.s,r.cu)}</td>
-      <td class="mono">${r.tg==="0" ? '<span class="dim">—</span>' : unitCell(num(r.tg)||null, r.tgT)}</td>
-      <td class="num">${pc(r.dl)}</td>
+      <td class="mono">${targetCell(r)}</td>
+      <td class="num">${lossCell(r.dl, r.dlT, r)}</td>
       <td class="num">${daysCell(r)}</td>
       <td>${r.pc?`<span class="mono" style="font-size:11.5px">${esc(r.pc)}</span>`:'<span class="dim">—</span>'}</td>
       <td class="mono">${r.pf?esc(r.pf):'<span class="dim">—</span>'}</td>
@@ -1396,7 +1435,7 @@ function render(){
       <td class="num">${(r.ac==null||r.ac===""||r.ac===0)?'<span class="dim">—</span>':money(r.ac,r.cu)}</td>
       <td class="num">${r.to!=null?money(r.to,r.cu):'<span class="dim">—</span>'}</td>
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span></td>
-      <td class="num">${unitCell(num(r.ml), r.mlT)}</td>
+      <td class="num">${lossCell(r.ml, r.mlT, r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
       <td class="evc">${evCell(r)}</td>
       <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td></tr>`;
