@@ -799,8 +799,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="91f72756";</script>
-<script src="data.js?v=91f72756"></script>
+<script>window.HELIX_VER="34ecb45f";</script>
+<script src="data.js?v=34ecb45f"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -3299,7 +3299,7 @@ function renderSiteFoot(){
   f.innerHTML=`<div class="in">
     <div class="fabout"><b>helix</b>
       <p>${T("프랍펌 챌린지와 브로커를 같은 기준으로 비교합니다. 모든 값에는 출처 URL과 검증 등급이 붙고, 확인하지 못한 값은 비워 둡니다.","Prop-firm challenges and brokers compared on one basis. Every value carries a source URL and a grade; what we could not confirm stays blank.")}</p>
-      <p class="dim">${T("데이터 기준일","Data as of")}: ${esc((DB.generated||"").slice(0,10)||"—")} · ${T("지급 실적 출처","Payout figures")}: propfirmmatch.com</p></div>
+      <p class="dim">${T("빌드 기준일","Built")}: ${esc(DB.built||"—")} · ${T("상품 데이터 출처","Product data")}: 각 업체 공식 페이지 + propfirmmatch.com · <a href="sitemap.xml">sitemap.xml</a></p></div>
     ${col(T("데이터","Data"),[["challenges",T("챌린지","Challenges")],["firms",T("프랍펌","Firms")],["brokers",T("브로커","Brokers")],["rules",T("규칙","Rules")],["offers",T("프로모션","Offers")]])}
     ${col(T("도구","Tools"),[["goal",T("목표로 찾기","Goal finder")],["plan",T("가족 플랜","Family plan")],["compare",T("비교","Compare")],["spreads",T("스프레드","Spreads")],["payouts",T("지급","Payouts")]])}
     ${col(T("정보","About"),[["method",T("방법론·필드","Method")],["docs",T("문서","Docs")],["sitemap",T("사이트맵","Site map")]])}
