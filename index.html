@@ -264,6 +264,7 @@
     border:1px solid var(--line2);border-radius:12px;padding:6px;box-shadow:var(--shadow);
     opacity:0;pointer-events:none;transform:translateY(-4px);transition:.14s;z-index:60}
   .navitem:hover .dropdown,.navitem:focus-within .dropdown,.navitem.open .dropdown{opacity:1;pointer-events:auto;transform:none}
+  #subnav .navitem:hover > .dropdown,#subnav .navitem:focus-within > .dropdown,#subnav .navitem.open > .dropdown{opacity:1!important;pointer-events:auto!important;transform:none!important;visibility:visible}
   .dropdown::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
   .dropdown a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;
     font-size:12.5px;color:var(--ink2);text-decoration:none;white-space:nowrap}
@@ -642,14 +643,26 @@
         <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
       </div>
     </span>
-    <a href="#firms" data-page="firms" data-ko="프랍펌" data-en="Firms">프랍펌</a>
+    <span class="navitem">
+      <a href="#firms" data-page="firms" data-also="brokers" data-ko="프랍펌" data-en="Firms">프랍펌 ▾</a>
+      <div class="dropdown" id="firmsMenu">
+        <a href="#firms"><b>프랍펌 전체</b><span id="fmFirms">—</span></a>
+        <a href="#brokers"><b>브로커</b><span id="fmBrokers">—</span></a>
+        <a href="#rules"><b>규칙 요약</b><span>§</span></a>
+      </div>
+    </span>
     <a href="#offers" data-page="offers" data-ko="프로모션" data-en="Offers">프로모션</a>
     <a href="#rules" data-page="rules" data-ko="규칙" data-en="Rules">규칙</a>
-    <a href="#brokers" data-page="brokers" data-ko="브로커" data-en="Brokers">브로커</a>
-    <a href="#plan" data-page="plan" data-ko="가족 플랜" data-en="Family plan">가족 플랜</a>
-    <a href="#tools" data-page="tools" data-ko="도구" data-en="Tools">도구</a>
-    <a href="#spreads" data-page="spreads" data-ko="스프레드" data-en="Spreads">스프레드</a>
-    <a href="#payouts" data-page="payouts" data-ko="지급" data-en="Payouts">지급</a>
+    <span class="navitem">
+      <a href="#tools" data-page="tools" data-also="plan,spreads,payouts" data-ko="도구" data-en="Tools">도구 ▾</a>
+      <div class="dropdown" id="toolsMenu">
+        <a href="#plan"><b>가족 플랜</b><span>→</span></a>
+        <a href="#spreads"><b>스프레드</b><span>→</span></a>
+        <a href="#payouts"><b>지급</b><span>→</span></a>
+        <a href="#tools"><b>도구 전체</b><span>→</span></a>
+      </div>
+    </span>
+
   </div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
@@ -1930,6 +1943,12 @@ function applyTheme(){document.documentElement.setAttribute("data-theme",theme);
 let pageSuffix="";
 function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx):"helix"; }
 const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+function fillMenuCounts(){
+  const f=document.getElementById("fmFirms"), b=document.getElementById("fmBrokers");
+  if(f) f.textContent=(DB.firms||[]).length.toLocaleString("en-US");
+  if(b){ const n=((DB.brokers||{}).brokers||[]).filter(x=>x.status==="verified").length;
+         b.textContent=n.toLocaleString("en-US"); }
+}
 function applyStatics(){
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-ko][data-en]").forEach(a=>{a.textContent=lang==="ko"?a.dataset.ko:a.dataset.en;});
@@ -1952,7 +1971,10 @@ function applyStatics(){
   {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
              tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
              firms:"navFirms",docs:"navDocs"};
-   document.querySelectorAll("#subnav a").forEach(a=>{const k=NM[a.dataset.page]; if(k) a.textContent=t(k);});}
+   document.querySelectorAll("#subnav a").forEach(a=>{
+     const k=NM[a.dataset.page];
+     if(k){ const nx=a.nextElementSibling; const caret=(nx&&nx.classList&&nx.classList.contains("dropdown"))?" ▾":""; a.textContent=t(k)+caret; }
+   });}
   Tset("thFirm",t("thFirm")); Tset("thPlan",t("thPlan"));
   Tset("thMkt",t("thMkt")); Tset("thSize",t("thSize"));
   Tset("thPrice",t("thPrice")); Tset("thSplit",t("thSplit"));
@@ -3221,6 +3243,8 @@ function renderSpreads(){
 /* ---------- Tools ---------- */
 function renderTools(){
   const tools=[
+    {n:lang==="ko"?"가족 플랜":"Family plan",d:lang==="ko"?"인원·1인 자본·총예산을 넣으면 총자본, 참가비, 카피 규칙, 첫 지급 시점, 실행 브로커까지 계산합니다.":"Enter people, capital each and a budget; get total capital, fees, copy rules, first-payout timing and the brokers to run it.",s:"live",u:"#plan"},
+    {n:lang==="ko"?"브로커 DB":"Broker DB",d:lang==="ko"?"19개 브로커의 규제·비용·플랫폼·NBP를 공식 페이지 근거로 비교합니다.":"19 brokers compared on regulation, cost, platforms and NBP, each sourced to its own page.",s:"live",u:"#brokers"},
     {n:"HELIX",d:lang==="ko"?"이 데이터베이스. 프랍펌·브로커 비교 및 근거 추적.":"This database. Prop firm comparison with evidence trails.",s:"live",u:"#home"},
     {n:"MT5 Tools",d:lang==="ko"?"주문·리스크 관리 보조 스크립트.":"Order and risk helper scripts.",s:"planned"},
     {n:"SQX Configs",d:lang==="ko"?"StrategyQuant X 빌더 설정 템플릿.":"StrategyQuant X builder templates.",s:"planned"},
@@ -3881,7 +3905,10 @@ function route(){
      challenges table itself must not stay stacked above the brand page */
   if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
-  document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
+  document.querySelectorAll("#subnav a").forEach(a=>{
+    const also=(a.dataset.also||"").split(",").filter(Boolean);
+    a.classList.toggle("on",a.dataset.page===page||also.includes(page));
+  });
   const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",brokers:"Brokers",plan:"Family plan",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
@@ -3936,7 +3963,7 @@ const __step=(n,f)=>{try{f()}catch(e){console.error('[helix] init '+n+' failed',
   const fa=document.querySelector(".filters"); if(!fa) return;
   const on=fa.classList.toggle("on"); fm.setAttribute("aria-expanded",on?"true":"false");};}
 __step('theme',applyTheme);__step('prefs',applyTablePrefs);__step('tsettings',buildTableSettings);
-__step('sort',buildSort);__step('statics',applyStatics);__step('filters',buildFilters);
+__step('sort',buildSort);__step('statics',applyStatics);__step('menucounts',fillMenuCounts);__step('filters',buildFilters);
 __step('render',render);__step('route',route);
 </script>
 </body></html>
