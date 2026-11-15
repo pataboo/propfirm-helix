@@ -3051,7 +3051,12 @@ function renderFirms(){
         <td>${o.mk.map(m=>`<span class="tag t-${esc(m)}">${esc(assetLabel(m))}</span>`).join(" ")}</td>
         <td class="num">${o.sp?esc(o.sp)+"%":'<span class="dim">—</span>'}</td>
         <td class="num">${o.min!=null?"$"+Math.min(o.min).toLocaleString('en-US')+"–"+Math.max(o.max).toLocaleString('en-US'):'<span class="dim">—</span>'}</td>
-        <td>${["A","B","C"].filter(g=>o.g[g]).map(g=>`<span class="pill p-${g}">${g}</span>`).join(" ")||'<span class="dim">—</span>'}</td>
+        <td>${(()=>{
+        const gs=["A","B","C"].filter(g=>o.g[g]);
+        if(!gs.length) return '<span class="dim">—</span>';
+        const tip=gs.map(g=>`${g} ${o.g[g]}${lang==="ko"?"행":" rows"}`).join(" · ");
+        return `<span title="${esc(tip)}">`+gs.map(g=>`<span class="pill p-${g}" style="margin-right:4px">${g}<span class="dim" style="font-weight:600"> ${o.g[g]}</span></span>`).join("")+`</span>`;
+      })()}</td>
         <td>${o.site?`<a href="${esc(o.site)}" target="_blank" rel="noopener" style="font-size:12px">site ↗</a>`:""}</td>
       </tr>`).join("")}</tbody></table></div></div>
     ${faqBlock([[lang==="ko"?"브랜드 수가 자주 바뀌나요?":"Do brands change often?",
