@@ -143,6 +143,36 @@
     font-size:10px;font-weight:800;line-height:15px}
   .fbadge{display:none;margin-left:6px;background:var(--accent);color:#150b23;border-radius:999px;
     padding:1px 7px;font-size:10.5px;font-weight:800;vertical-align:middle}
+  .goalCTA{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px;padding:7px 14px;border-radius:999px;
+    background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);color:var(--accent);
+    font-size:12px;font-weight:700;text-decoration:none}
+  .goalCTA:hover{background:rgba(167,139,250,.22)}
+  .ghero{margin:6px 0 14px}
+  .ghero h1{font-size:24px;margin:0 0 6px}
+  .gsub{color:var(--muted);font-size:13px;margin:0}
+  .gpanel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .grow{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+  .grow:last-of-type{border-bottom:0}
+  .glabel{font-size:12px;color:var(--muted);font-weight:700}
+  .gopts{display:flex;flex-wrap:wrap;gap:6px}
+  .gopt{background:transparent;border:1px solid var(--line2);color:var(--ink2);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
+  .gopt.on{background:rgba(167,139,250,.16);border-color:var(--accent);color:var(--accent);font-weight:700}
+  .gopt:hover{color:var(--accent);border-color:var(--accent)}
+  .gactions{display:flex;align-items:center;gap:12px;margin-top:14px}
+  .gcount{font-size:11.5px;color:var(--muted)}
+  .gresults{display:flex;flex-direction:column;gap:8px}
+  .gcard{display:grid;grid-template-columns:28px 1fr 90px;gap:12px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer}
+  .gcard:hover{border-color:var(--accent)}
+  .grank{font-size:12px;color:var(--muted);font-weight:800}
+  .gname{font-size:13.5px;font-weight:700;color:var(--ink)}
+  .gname span{font-weight:400;color:var(--muted);font-size:12px}
+  .gmeta{font-size:11.5px;color:var(--ink2);margin:2px 0 4px;display:flex;gap:8px;flex-wrap:wrap}
+  .gwhy{margin:0;padding-left:14px;color:var(--muted);font-size:11px}
+  .gnum{font-size:16px;font-weight:800;color:var(--accent);text-align:right}
+  .gbar{height:4px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:4px}
+  .gbar i{display:block;height:100%;background:var(--accent)}
+  @media(max-width:760px){.grow{grid-template-columns:1fr}.gcard{grid-template-columns:24px 1fr 60px}}
   .emptyTitle{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
   .emptySub{font-size:11.5px;color:var(--muted);margin-bottom:8px}
   .emptyChips{display:flex;flex-wrap:wrap;gap:8px}
@@ -590,6 +620,7 @@
 
   <main id="main" tabindex="-1">
     <button id="fMobile" aria-label="필터 열기 / Open filters" aria-expanded="false" aria-controls="filterAside">☰ <span id="fMobileTxt">필터</span></button>
+    <a class="goalCTA" href="#goal">🎯 <span id="goalCTATxt">목표로 찾기</span></a>
     <div class="freshbar" id="freshBar"></div>
     <div class="stats">
       <a class="stat statlink" id="st1" href="#challenges"><div class="n" id="s1">—</div><div class="l" id="s1l"></div></a>
@@ -635,6 +666,7 @@
 <div class="shell" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
 <div class="shell" id="pageMethod" style="display:none"><main id="methodMain"></main></div>
 <div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
+<div class="shell" id="pageGoal" style="display:none"><main id="goalMain"></main></div>
 <div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
@@ -2288,6 +2320,108 @@ const cycLabel=d=>d===0?(lang==="ko"?"수시/즉시":"On demand")
   :d===1?(lang==="ko"?"매일":"Daily")
   :(lang==="ko"?d+"일":d+" days");
 
+const GOAL={size:100000, mk:"cfd", budget:300, speed:"any", rules:new Set()};
+function goalPrice(p){ const n=Number(r_priceOf(p)); return isNaN(n)?null:n; }
+function r_priceOf(r){ return r.pr; }
+function goalScore(r){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const why=[]; let sc=0;
+  const pr=num(r.pr);
+  if(pr!=null){
+    if(pr<=GOAL.budget){ sc+=25; why.push(T(`예산 $${GOAL.budget} 이내 ($${pr})`,`within $${GOAL.budget} budget ($${pr})`)); }
+    else if(pr<=GOAL.budget*1.5){ sc+=12; why.push(T(`예산 50% 초과지만 근접 ($${pr})`,`up to 50% over budget ($${pr})`)); }
+  }
+  const sz=num(r.s);
+  if(sz!=null && GOAL.size){
+    const ratio=sz/GOAL.size;
+    if(ratio===1){ sc+=20; why.push(T("목표 규모와 정확히 일치","exact target size")); }
+    else if(ratio>=0.9&&ratio<=1.1){ sc+=15; why.push(T("목표 규모와 거의 일치","close to target size")); }
+    else if(ratio>1.1){ sc+=8; why.push(T("목표보다 큰 계좌","larger than target")); }
+  }
+  if(r.mk===GOAL.mk) sc+=15; else return -1;
+  const t=(r.pc||"").toLowerCase();
+  const isOD=/on[- ]?demand|수시|instant/.test(t), isDaily=/daily|매일/.test(t),
+        isWeek=/weekly|주간|7일/.test(t), isBi=/bi-?weekly|격주|14/.test(t), isMon=/monthly|월간/.test(t);
+  let fast = isOD?15:isDaily?14:isWeek?12:isBi?9:isMon?5:6;
+  if(GOAL.speed==="fast") fast += (isOD||isDaily)?4:0;
+  if(GOAL.speed==="cycle") fast += (isWeek||isBi)?4:0;
+  sc+=fast;
+  if(fast>=13) why.push(T("지급이 빠름","fast payouts"));
+  const sp=num(r.sp); if(sp!=null){ sc+=Math.min(10,Math.max(0,(sp-70)/3)); if(sp>=90) why.push(T(`분배 ${sp}%`,"split "+sp+"%")); }
+  const ml=num(r.ml); if(ml!=null){ sc+=Math.min(10,ml/2); }
+  let ruleHit=0;
+  GOAL.rules.forEach(k=>{ const v=(k==="ea")?r.ec:(k==="news")?r.nc:(k==="wk")?r.wk:null;
+    if(v===true||v==="cond"){ ruleHit++; sc+=5; } });
+  if(ruleHit>0) why.push(T(`원하는 규칙 ${ruleHit}개 충족`,`meets ${ruleHit} preferred rule(s)`));
+  if(r.vf==="A"){ sc+=15; why.push(T("공식 검증 완료","officially verified")); }
+  else if(r.vf==="B") sc+=8;
+  if(r.ao==="2026-11-15"||String(r.ao||"")>="2026-11-01") sc+=5;
+  return Math.min(100, Math.round(sc));
+}
+function goalResults(){
+  return rows.map(r=>({r,s:goalScore(r)})).filter(x=>x.s>=0).sort((a,b)=>b.s-a.s).slice(0,6);
+}
+function renderGoal(){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const opt=(k,v,label)=>`<button class="gopt${GOAL[k]===v?" on":""}" data-gk="${k}" data-gv="${v}">${esc(label)}</button>`;
+  const ruleOpt=(k,label)=>`<button class="gopt${GOAL.rules.has(k)?" on":""}" data-gr="${k}">${esc(label)}</button>`;
+  const res=goalResults();
+  el("goalMain").innerHTML=`
+    <div class="ghero">
+      <h1>${T("목표로 챌린지 찾기","Find a challenge that fits your goal")}</h1>
+      <p class="gsub">${T("5개만 고르면, 기록된 숫자로 점수를 매겨 추천합니다. 추천 근거는 항목별로 표시됩니다.","Five choices, then a score built from recorded numbers — with the reasons shown.")}</p>
+    </div>
+    <div class="gpanel">
+      <div class="grow"><div class="glabel">${T("목표 계좌 규모","Target account size")}</div><div class="gopts">
+        ${[10000,25000,50000,100000,200000].map(v=>opt("size",v,v>=1000?Math.round(v/1000)+"K":"$"+v)).join("")}</div></div>
+      <div class="grow"><div class="glabel">${T("자산군","Market")}</div><div class="gopts">
+        ${opt("mk","cfd",T("FX·CFD","FX/CFD"))}${opt("mk","fut",T("선물","Futures"))}${opt("mk","crypto",T("크립토","Crypto"))}</div></div>
+      <div class="grow"><div class="glabel">${T("참가비 상한","Fee ceiling")}</div><div class="gopts">
+        ${opt("budget",100,"≤ $100")}${opt("budget",300,"≤ $300")}${opt("budget",600,"≤ $600")}</div></div>
+      <div class="grow"><div class="glabel">${T("원하는 지급 속도","Payout speed")}</div><div class="gopts">
+        ${opt("speed","any",T("상관없음","Any"))}${opt("speed","fast",T("빠를수록","As fast as possible"))}${opt("speed","cycle",T("정기적","Regular cycle"))}</div></div>
+      <div class="grow"><div class="glabel">${T("꼭 필요한 규칙","Rules you need")}</div><div class="gopts">
+        ${ruleOpt("ea","EA "+T("허용","allowed"))}${ruleOpt("news",T("뉴스 거래","News trading"))}${ruleOpt("wk",T("주말 보유","Weekend holding"))}</div></div>
+      <div class="gactions">
+        <button class="btn g" id="gShow">${T("이 조건으로 표에서 보기","See all matches in the table")}</button>
+        <span class="gcount">${T("상위","top")} ${res.length} ${T("개 추천","picks")}</span>
+      </div>
+    </div>
+    <div class="gresults">${res.map((x,i)=>goalCard(x,i)).join("")}</div>`;
+  el("goalMain").querySelectorAll("[data-gk]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.gk, v=b.dataset.gv;
+    GOAL[k] = (k==="size"||k==="budget") ? Number(v) : v; renderGoal();});
+  el("goalMain").querySelectorAll(".gcard").forEach(c=>c.onclick=()=>{ location.hash="#challenge/"+encodeURIComponent(c.dataset.id); route(); });
+  el("goalMain").querySelectorAll("[data-gr]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.gr; GOAL.rules.has(k)?GOAL.rules.delete(k):GOAL.rules.add(k); renderGoal();});
+  const gs=el("gShow"); if(gs) gs.onclick=()=>{
+    F.mk.clear(); F.mk.add(GOAL.mk);
+    F.priceMax=GOAL.budget; F.sizeMin=null;F.sizeMax=null;
+    if(GOAL.rules.size){ F.flags.clear(); GOAL.rules.forEach(k=>F.flags.add(k)); }
+    location.hash="#challenges"; route(); render();
+  };
+}
+function goalCard(x,i){
+  const T=(ko,en)=>lang==="ko"?ko:en; const r=x.r;
+  return `<div class="gcard" data-id="${esc(r.i)}">
+    <div class="grank">${i+1}</div>
+    <div class="gbody">
+      <div class="gname">${esc(r.f)} <span>${esc(r.p)}</span></div>
+      <div class="gmeta">${money(r.s,r.cu)} · ${money(r.pr,r.cu)} · ${r.sp?esc(r.sp)+"%":"—"} · ${payCell(r.pc)}</div>
+      <ul class="gwhy">${goalWhy(r).slice(0,3).map(w=>`<li>${esc(w)}</li>`).join("")}</ul>
+    </div>
+    <div class="gscore"><div class="gnum">${x.s}</div><div class="gbar"><i style="width:${Math.min(100,x.s)}%"></i></div></div>
+  </div>`;
+}
+function goalWhy(r){
+  const T=(ko,en)=>lang==="ko"?ko:en; const out=[];
+  const pr=num(r.pr); if(pr!=null&&pr<=GOAL.budget) out.push(T(`예산 이내 $${pr}`,"within budget $"+pr));
+  if(num(r.s)===GOAL.size) out.push(T("목표 규모 일치","exact target size"));
+  if(r.sp>=90) out.push(T(`분배 ${r.sp}%`,"split "+r.sp+"%"));
+  if(r.vf==="A") out.push(T("공식 검증","officially verified"));
+  const t=(r.pc||"").toLowerCase(); if(/on[- ]?demand|수시|instant/.test(t)) out.push(T("수시 지급","on-demand payout"));
+  return out.length?out:[T("기록된 조건 충족","matches recorded conditions")];
+}
 function renderDiscover(){
   const byRating=[...rows].filter(r=>Number(r.rt)>0).sort((a,b)=>Number(b.rt)-Number(a.rt));
   const cheapest=[...rows].filter(r=>Number(r.s)>=100000&&Number(r.pr)>0)
@@ -3298,7 +3432,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
@@ -3320,7 +3454,7 @@ function route(){
   if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else if(!isCh) setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
@@ -3330,6 +3464,7 @@ function route(){
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
   else if(page==="method") renderMethod();
+  else if(page==="goal") renderGoal();
   else if(page==="discover") renderDiscover();
   else if(page==="challenge") renderChallenge(decodeURIComponent(h.slice(10)));
   else if(page==="challenges"){ if(_q>=0) render(); }
