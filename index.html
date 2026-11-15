@@ -140,6 +140,8 @@
   .chg{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .chg:last-child{border-bottom:0}
   .pcnt{opacity:.55;font-size:10px;margin-left:2px}
+  .fbadge{display:none;margin-left:6px;background:var(--accent);color:#150b23;border-radius:999px;
+    padding:1px 7px;font-size:10.5px;font-weight:800;vertical-align:middle}
   .phases{display:inline-flex;align-items:center;gap:2px;font-family:ui-monospace,monospace;font-size:11.5px}
   .phv{color:var(--ink)}
   .phsep{color:var(--muted);opacity:.6}
@@ -899,14 +901,18 @@ function rulesCell(r){
     ["C", r.cf, T("카피트레이딩 · 펀딩","Copy trading · funded")],
     ["N", r.nc, T("뉴스 거래","News trading")],
     ["O", r.oc, T("오버나이트 보유","Overnight holding")],
-    ["W", r.wk,  T("주말 보유","Weekend holding")],
+    ["W", (r.wc!=null?r.wc:r.wk), T("주말 보유","Weekend holding")],
   ];
   const known=items.filter(([,v])=>v!=null);
   if(!known.length) return '<span class="dim">—</span>';
   const cls=(v)=> v===true?"py":(v==="cond"?"pcond":(v===false?"pno":"puk"));
-  return `<span class="pcode">${items.map(([ch,v,tip])=>
-    `<span class="pl ${cls(v)}" title="${esc(tip)}: ${esc(v===true?T("허용","allowed"):v==="cond"?T("조건부·애드온","conditional / add-on"):v===false?T("금지","prohibited"):T("미확인","unknown"))}">${ch}</span>`
-  ).join("")}</span>`;
+  const lbl=(v)=> v===true?T("허용","allowed"):v==="cond"?T("조건부·애드온","conditional / add-on"):v===false?T("금지","prohibited"):T("미확인","unknown");
+  return `<span class="pcode">${items.map(([ch,v,tip])=>{
+    let extra="";
+    if(ch==="W" && r.wf!=null && String(r.wf)!==String(r.wc!=null?r.wc:r.wk))
+      extra = T(" · 펀딩 단계: "," · funded: ") + lbl(r.wf);
+    return `<span class="pl ${cls(v)}" title="${esc(tip)}: ${esc(lbl(v))}${esc(extra)}">${ch}</span>`;
+  }).join("")}</span>`;
 }
 function evCell(r){
   const g=r.vf||"—", sy=r.sy||"";
@@ -1127,7 +1133,8 @@ function applyURLState(p, force){
   q = p.get("q") || "";
   if(p.get("sort")) sortKey=p.get("sort");
   sortDir = p.get("dir") ? (Number(p.get("dir"))||1) : 1;
-  activePreset = p.get("preset") || null;
+  activePresets = new Set((p.get("preset")||"").split(",").filter(Boolean));
+  sortPreset = p.get("spreset") || null;
 }
 function syncURL(){
   if(!urlReady) return;
@@ -1138,14 +1145,15 @@ function syncURL(){
   if(q) p.set("q",q);
   if(sortKey!=="f") p.set("sort",sortKey);
   if(sortDir!==1) p.set("dir",sortDir);
-  if(activePreset) p.set("preset",activePreset);
+  if(activePresets.size) p.set("preset",[...activePresets].join(","));
+  if(sortPreset) p.set("spreset",sortPreset);
   const qs=p.toString();
   const url="#challenges"+(qs?"?"+qs:"");
   if(location.hash!==url) history.replaceState(null,"",url);
 }
 function filterSignature(){
   return JSON.stringify([[...F.firm],[...F.mk],[...F.st],[...F.dd],[...F.vf],[...F.flags],[...F.cycle],[...F.fee],[...F.paym],[...F.plat],
-    F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,activePreset]);
+    F.target,F.sizeMin,F.sizeMax,F.priceMax,F.splitMin,F.daysBand,F.levBand,F.ratingMin,q,[...activePresets],sortPreset]);
 }
 function matches(r){
   if(q){
@@ -1182,7 +1190,7 @@ function matches(r){
   if(F.paym && F.paym.size){ const pm=payMethods(r); if(![...F.paym].some(k=>pm.includes(k))) return false; }
   if(F.plat && F.plat.size){ const e=(DB.eap||{})[r.f]; const ps=(e&&e.platforms)||[];
     if(![...F.plat].some(k=>ps.includes(k))) return false; }
-  if(activePreset){ const ap=PRESETS.find(x=>x.k===activePreset); if(ap&&ap.kind==="filter"&&!presetOk(r,activePreset)) return false; }
+  for(const k of activePresets){ const ap=PRESETS.find(x=>x.k===k); if(ap && ap.kind==="filter" && !presetOk(r,k)) return false; }
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
   if(F.target && /^\d+$/.test(F.target) && !(num(r.tg)>=Number(F.target)))return false;
@@ -1264,7 +1272,7 @@ function buildFilters(){
   const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
     <div class="body" style="max-height:none"><div class="chips2">
     ${PRESETS.map(p=>{const n=p.kind==="sort"?rows.length:rows.filter(r=>presetOk(r,p.k)).length;
-      return `<button data-preset="${p.k}" class="${activePreset===p.k?"on":""}" title="${esc(p.kind==="sort"?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터":"filter"))}">${esc(pname(p.k))}${p.kind==="sort"?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
+      return `<button data-preset="${p.k}" class="${(activePresets.has(p.k)||sortPreset===p.k)?"on":""}" title="${esc(p.kind==="sort"?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터":"filter"))}">${esc(pname(p.k))}${p.kind==="sort"?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
     </div></div></details>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
@@ -1372,10 +1380,10 @@ function render(){
   if(window.__filterTick!==filterSignature()){ shownRows=120; window.__filterTick=filterSignature(); }
 
   let key=sortKey, dir=sortDir;
-  if(activePreset==="cheap"){ key="to"; dir=1; }
-  if(activePreset==="best"){ key="pr"; dir=1; }
+  if(sortPreset==="cheap"){ key="to"; dir=1; }
+  if(sortPreset==="best"){ key="pr"; dir=1; }
   const out=rows.filter(matches).sort((a,b)=>{
-    if(activePreset==="best"){
+    if(sortPreset==="best"){
       const ra=num(a.pr)/Math.max(num(a.s)||1,1), rb=num(b.pr)/Math.max(num(b.s)||1,1);
       return ra-rb;
     }
@@ -1443,6 +1451,7 @@ function render(){
     ? `<tr class="moreRow"><td colspan="19"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
     : "");
   window.__lastOut=out;
+  {const b=el("fcount"); if(b){const n=activeConditionCount(); b.textContent=n; b.style.display=n?"inline-block":"none";}}
   {const mb=el("moreBtn"); if(mb) mb.onclick=()=>{shownRows+=120; render();};}
   syncURL();
   document.querySelectorAll("#tb .fav").forEach(b=>b.onclick=e=>{
@@ -1747,7 +1756,7 @@ function applyStatics(){
   Tset("s3",DB.mkts.length);
   Tset("s1l",t("s1"));Tset("s2l",t("s2"));Tset("s3l",t("s3"));Tset("s4l",t("s4"));
   renderFreshBar();
-  Tset("fTitle",t("filters"));
+  Tset("fTitle",t("filters")); {const b=el("fTitle"); if(b) b.innerHTML=`${esc(t("filters"))} <span id="fcount" class="fbadge">0</span>`;}
   Tset("reset",t("reset"));
   el("gq").placeholder=t("search"); Tset("empty",t("empty"));
   {const vt=document.querySelectorAll("#viewToggle button");
@@ -1837,7 +1846,7 @@ el("cGo").onclick=()=>{location.hash="#compare";route();};
 ["st1","st3"].forEach(id=>{const a=document.getElementById(id); if(a) a.onclick=e=>{e.preventDefault();
   ["firm","mk","st","dd","vf","flags","cycle","fee"].forEach(k=>F[k].clear());
   F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null;
-  activePreset=null; q=""; const g=el("gq"); if(g) g.value="";
+  activePresets.clear(); sortPreset=null; q=""; const g=el("gq"); if(g) g.value="";
   location.hash="#challenges"; route(); render();};});
 {const a=document.getElementById("st4"); if(a) a.onclick=e=>{e.preventDefault();
   F.vf.clear(); F.vf.add("A"); location.hash="#challenges"; route(); render();};}
@@ -1962,7 +1971,7 @@ function feeClass(r){
 const FCLASS={ko:{free:"무료",normal:"일반",later:"후불"},en:{free:"Free",normal:"Normal",later:"Pay Later"}};
 const fclassLabel=k=>(FCLASS[lang]||FCLASS.en)[k]||k;
 const fclassBadge=r=>{const k=feeClass(r);return `<span class="fclass ${k}">${esc(fclassLabel(k))}</span>`;};
-let feeFilter=null, activePreset=null;
+let feeFilter=null, activePresets=new Set(), sortPreset=null;
 const PRESETS=[
   {k:"buy",  ko:"★ 실구매 후보", en:"★ Shortlist", kind:"filter"},
   {k:"kr",   ko:"한국 가능",     en:"Korea OK",    kind:"filter"},
@@ -1993,12 +2002,24 @@ function clearAllFilters(){
 }
 function applyPreset(k){
   const p=PRESETS.find(x=>x.k===k); if(!p) return;
-  if(activePreset===k){ activePreset=null; render(); return; }
-  clearAllFilters();
-  activePreset=k;
-  if(p.kind==="sort"){ sortKey=(p.k==="best"?"pr":(p.key||"to")); sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
+  if(p.kind==="sort"){
+    sortPreset = (sortPreset===k) ? null : k;
+    if(sortPreset){ sortKey=(k==="best"?"pr":"to"); sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
+    render(); return;
+  }
+  if(activePresets.has(k)) activePresets.delete(k); else activePresets.add(k);
   render();
 }
+function activeConditionCount(){
+  let n=0;
+  ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>n+=F[k].size);
+  ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>{ if(F[k]!=null) n++; });
+  if(q) n++;
+  n += activePresets.size;
+  if(sortPreset) n++;
+  return n;
+}
+
 
 const SORTS=[["f","회사","Firm"],["to","총액","Total"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
   ["ml","최대 손실","Max loss"],["s","계좌 규모","Size"],["rt","평점","Rating"],["mf","최소일수","Min days"]];
