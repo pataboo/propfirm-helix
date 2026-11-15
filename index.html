@@ -158,6 +158,9 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .pbasis{display:inline-block;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid var(--line2);color:var(--muted)}
+  .pbasis.promo{color:var(--amber);border-color:rgba(255,171,0,.45)}
+  .pbasis.list{color:var(--green);border-color:rgba(52,223,170,.35)}
   .rulegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:10px}
   .rulecard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
   .rulecard .rh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -799,8 +802,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="2a28ccb5";</script>
-<script src="data.js?v=2a28ccb5"></script>
+<script>window.HELIX_VER="889521a3";</script>
+<script src="data.js?v=889521a3"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -1824,6 +1827,12 @@ function renderBar(){
 }
 
 /* ---------- drawer ---------- */
+function priceBasisBadge(firm){
+  const b=(DB.pbasis||{})[firm];
+  if(b==="promo-recorded") return ` <span class="pbasis promo" title="${lang==="ko"?"이 브랜드의 가격은 사이트에 표시된 프로모션 가격으로 기록되어 있습니다. 정가와 다를 수 있습니다.":"This brand's fee was recorded as the promotional price the site displays; the list price may differ."}">${lang==="ko"?"프로모가":"promo"}</span>`;
+  if(b==="list") return ` <span class="pbasis list" title="${lang==="ko"?"정가(list price) 기준입니다.":"Recorded at list price."}">${lang==="ko"?"정가":"list"}</span>`;
+  return "";
+}
 function drawerRow(k,v){return `<div class="k">${esc(k)}</div><div>${v}</div>`;}
 function ruleChip(label,v){
   const cls=v===true?"ok":(v===false?"no":"un");
@@ -1896,7 +1905,7 @@ function openDrawer(id){
     </div>
     ${promoBlock(r)}
     <div class="sect">${esc(t("sectCost"))}</div>
-    <div class="kv">${drawerRow(t("cPrice"),money(r.pr,r.cu))}${drawerRow(t("cAct"),money(r.ac,r.cu))}
+    <div class="kv">${drawerRow(t("cPrice"),money(r.pr,r.cu)+(priceBasisBadge(r.f)))}${drawerRow(t("cAct"),money(r.ac,r.cu))}
       ${drawerRow(t("cTotal"),money(r.to,r.cu))}${r.po?drawerRow(t("cPromo"),esc(r.po)):""}
       ${r.co?drawerRow(t("cCode"),`<b>${esc(r.co)}</b>`):""}</div>
     <div class="sect">${esc(t("sectCond"))}</div>
