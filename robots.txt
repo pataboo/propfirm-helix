@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pataboo.github.io/propfirm-helix/sitemap.xml
