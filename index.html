@@ -2436,10 +2436,24 @@ function renderPlan(){
     const k=b.dataset.pk, v=b.dataset.pv;
     PLAN[k]=(k==="mk")?v:Number(v); renderPlan();});
 }
+const BK={plat:new Set(), reg:new Set(), nbp:false, maxDep:null};
+function brokerFiltered(){
+  const list=((DB.brokers||{}).brokers||[]).filter(b=>b.status==="verified");
+  return list.filter(b=>{
+    if(BK.plat.size){ const keys=(b.plat||[]).map(platKey).filter(Boolean); if(![...BK.plat].some(k=>keys.includes(k))) return false; }
+    if(BK.reg.size){ const txt=(b.reg||[]).join(" ").toLowerCase(); if(![...BK.reg].some(r=>txt.includes(r.toLowerCase()))) return false; }
+    if(BK.nbp && b.nbp!==true) return false;
+    if(BK.maxDep!=null){ if(b.min==null || Number(b.min)>BK.maxDep) return false; }
+    return true;
+  });
+}
 function renderBrokers(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const list=((DB.brokers||{}).brokers||[]);
-  const ok=list.filter(b=>b.status==="verified");
+  const ok=brokerFiltered();
+  const allPlat=[...new Set(list.flatMap(b=>(b.plat||[]).map(platKey).filter(Boolean)))];
+  const allReg=[...new Set(list.flatMap(b=>(b.reg||[]).map(r=>r.split(" (")[0])))];
+  const chip=(on,label,attr)=>`<button class="gopt${on?" on":""}" ${attr}>${esc(label)}</button>`;
   const row=b=>`<tr>
     <td class="firm"><a href="${esc(b.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(b.name)}</a></td>
     <td class="breg">${b.reg&&b.reg.length?b.reg.slice(0,3).map(r=>`<span class="btag">${esc(r)}</span>`).join(""):'<span class="dim">—</span>'}${b.reg&&b.reg.length>3?`<span class="dim">+${b.reg.length-3}</span>`:""}</td>
@@ -2457,6 +2471,16 @@ function renderBrokers(){
   el("brokersMain").innerHTML=`
     <div class="ghero"><h1>${T("브로커 마스터 DB","Broker master database")}</h1>
       <p class="gsub">${T("챌린지를 통과한 계좌를 실행할 브로커를 같은 기준으로 비교합니다. 모든 값은 각 브로커의 공식 페이지에서 확인한 것이며, 인용문은 근거 아이콘에 있습니다.","Where you execute after passing — compared on the same basis. Every value comes from the broker's own page; the quote sits behind the evidence icon.")}</p></div>
+    <div class="gpanel" style="padding:12px">
+      <div class="grow" style="grid-template-columns:70px 1fr"><div class="glabel">${T("플랫폼","Platform")}</div><div class="gopts">
+        ${allPlat.map(k=>chip(BK.plat.has(k), k.toUpperCase(), `data-bplat="${k}"`)).join("")}</div></div>
+      <div class="grow" style="grid-template-columns:70px 1fr"><div class="glabel">${T("규제","Regulator")}</div><div class="gopts">
+        ${allReg.slice(0,8).map(k=>chip(BK.reg.has(k), k, `data-breg="${esc(k)}"`)).join("")}</div></div>
+      <div class="grow" style="grid-template-columns:70px 1fr"><div class="glabel">${T("조건","Filters")}</div><div class="gopts">
+        ${chip(BK.nbp, T("NBP 보호만","NBP only"), 'data-bnbp="1"')}
+        ${[null,0,50,200].map(v=>chip(BK.maxDep===v, v==null?T("입금 전체","any deposit"):`≤ $${v}`, `data-bdep="${v==null?"":v}"`)).join("")}</div></div>
+      <div class="meta" style="margin-top:6px">${ok.length} / ${list.filter(b=>b.status==="verified").length} ${T("개 표시","shown")}</div>
+    </div>
     <div class="card"><div class="scroll"><table>
       <thead><tr>
         <th scope="col">${T("브로커","Broker")}</th><th scope="col">${T("규제","Regulation")}</th>
@@ -2472,6 +2496,13 @@ function renderBrokers(){
     <div class="panel" style="margin-top:14px"><h3>${T("아직 확인하지 못한 브로커","Not yet verifiable")} <span>${list.length-ok.length}</span></h3>
       ${list.filter(b=>b.status!=="verified").map(b=>`<div class="meta">${esc(b.name)} — ${esc(b.note)} <a href="${esc(b.src)}" target="_blank" rel="noopener">↗</a></div>`).join("")||`<div class="dim">${T("없음","none")}</div>`}
       <div class="srcline">${T("데이터 기준일","Data as of")}: ${esc((DB.brokers||{}).as_of||"—")}</div></div>`;
+  el("brokersMain").querySelectorAll("[data-bplat]").forEach(x=>x.onclick=()=>{
+    const k=x.dataset.bplat; BK.plat.has(k)?BK.plat.delete(k):BK.plat.add(k); renderBrokers();});
+  el("brokersMain").querySelectorAll("[data-breg]").forEach(x=>x.onclick=()=>{
+    const k=x.dataset.breg; BK.reg.has(k)?BK.reg.delete(k):BK.reg.add(k); renderBrokers();});
+  const nb=el("brokersMain").querySelector('[data-bnbp]'); if(nb) nb.onclick=()=>{BK.nbp=!BK.nbp; renderBrokers();};
+  el("brokersMain").querySelectorAll("[data-bdep]").forEach(x=>x.onclick=()=>{
+    const v=x.dataset.bdep; BK.maxDep = v===""?null:Number(v); renderBrokers();});
 }
 function costOf(r){
   const to=num(r.to);
