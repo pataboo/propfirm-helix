@@ -750,7 +750,7 @@ const I18N = {
   empty:"조건에 맞는 상품이 없습니다.",
   thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
-  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록",
+  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
   kTarget:"이익 목표", kDaily:"일일 손실", kMax:"최대 손실", kDays:"최소 거래일",
   sectCost:"비용", sectCond:"거래 조건", sectPay:"지급 조건", sectFloor:"낙폭 구조", sectSrc:"데이터 출처",
@@ -802,7 +802,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   empty:"No products match these filters.",
   thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
-  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known",
+  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
   kTarget:"Profit target", kDaily:"Daily loss", kMax:"Max loss", kDays:"Min days",
   sectCost:"Cost", sectCond:"Trading conditions", sectPay:"Payout", sectFloor:"Loss floor", sectSrc:"Data source",
@@ -1689,8 +1689,11 @@ function render(){
   el("resbar").innerHTML =
     `<span class="big">${out.length.toLocaleString('en-US')}<span>${esc(t("resFound"))}</span></span>`+
     `<span class="of">${esc(t("resOf"))} ${rows.length.toLocaleString('en-US')}</span>`+
+    `<button class="fchip" id="covChip" title="${lang==="ko"?"EA·뉴스·오버나이트·주말 규칙이 모두 기록된 상품만 봅니다":"Show only products where all four rule flags are recorded"}">${lang==="ko"?"규칙 기록":"rules known"} ${pctOf("ec")}%</button>`+
     (chips.length?`<div style="display:flex;gap:6px;flex-wrap:wrap">${chips.join("")}</div>`+
       `<button class="fchip" id="clrAll" style="cursor:pointer">${esc(t("clearAll"))}</button>`:"");
+  const covChip=el("covChip");
+  if(covChip) covChip.onclick=()=>{ const b=[...document.querySelectorAll("[data-preset]")].find(x=>x.dataset.preset==="rules"); if(b) b.click(); };
   el("resbar").querySelectorAll("[data-clr]").forEach(b=>b.onclick=()=>{
     const k=b.dataset.clr;
     if(k==="q"){q="";el("gq").value="";}
@@ -2108,6 +2111,7 @@ const PRESETS=[
   {k:"tot",  ko:"총액 확인",     en:"Total known", flags:["tot"]},
   {k:"eqa",  ko:"EA+카피 허용",  en:"EA+copy OK",  flags:["ea","cp"]},
   {k:"A",    ko:"등급 A",        en:"Grade A",     vf:["A"]},
+  {k:"rules",ko:"규칙 확인됨",   en:"Rules recorded", flags:["allrules"]},
   {k:"paf",  ko:"후불",          en:"Pay later",   fee:["later"]},
   {k:"cheap",ko:"총액 낮은 순",  en:"Lowest total",sort:"to"},
   {k:"best", ko:"가성비 순",     en:"Best value",  sort:"pr"},
@@ -2148,6 +2152,7 @@ function flagOk(r,f){
   if(f==="cp")    return ok(r.cc);
   if(f==="wk")    return ok(r.wk);
   if(f==="tot")   return r.to!=null;
+  if(f==="allrules") return r.ec!=null && r.nc!=null && r.oc!=null && r.wk!=null;
   return true;
 }
 function rowHasCond(r,c){
@@ -2450,6 +2455,7 @@ function brokerFiltered(){
     return true;
   });
 }
+function pctOf(k){ return Math.round(rows.filter(r=>r[k]!=null).length/rows.length*100); }
 function renderBrokers(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const list=((DB.brokers||{}).brokers||[]);
