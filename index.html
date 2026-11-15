@@ -158,6 +158,20 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .spreadsT{table-layout:fixed;width:100%;min-width:900px}
+  .spreadsT th,.spreadsT td{white-space:normal;overflow-wrap:anywhere}
+  .spreadsT th:first-child,.spreadsT td:first-child{width:150px}
+  .spreadsT th:last-child,.spreadsT td:last-child{width:90px;text-align:center}
+  .spreadsT td{font-size:12px;vertical-align:top}
+  details.fgroup > .body{display:none}
+  details.fgroup[open] > .body{display:block}
+  .pfmbody{white-space:pre-wrap;font-size:12.5px;line-height:1.75;color:var(--ink2);padding:6px 0 12px}
+  details.fgroup > summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;padding:9px 0}
+  details.fgroup > summary::-webkit-details-marker{display:none}
+  details.fgroup > summary::before{content:"▸";color:var(--accent);font-size:11px}
+  details.fgroup[open] > summary::before{content:"▾"}
+  .scroll thead th{position:sticky;top:0;z-index:2;background:var(--panel2)}
+  .rulesT thead th{position:sticky;top:0;z-index:2;background:var(--panel2)}
   .gone{display:inline-block;margin-left:5px;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;color:var(--amber);border:1px solid rgba(255,171,0,.45)}
   .gcheck{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
   .gcheck .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px;background:var(--muted)}
@@ -297,6 +311,7 @@
   .lang button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer}
   .lang button.on{background:var(--accent);color:var(--on-accent)}
   .shell{max-width:none;margin:0;padding:16px 16px 28px;display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
+  .shell.wide{grid-template-columns:minmax(0,1fr)}
   .filters{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;
     position:sticky;top:70px;max-height:calc(100vh - 92px);overflow-y:auto;overscroll-behavior:contain}
   .filters h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
@@ -617,14 +632,14 @@
         <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
       </div>
     </span>
-    <a href="#firms" data-page="firms">Firms</a>
-    <a href="#offers" data-page="offers">Offers</a>
-    <a href="#rules" data-page="rules">Rules</a>
-    <a href="#brokers" data-page="brokers">Brokers</a>
-    <a href="#plan" data-page="plan">Family plan</a>
-    <a href="#tools" data-page="tools">Tools</a>
-    <a href="#spreads" data-page="spreads">Spreads</a>
-    <a href="#payouts" data-page="payouts">Payouts</a>
+    <a href="#firms" data-page="firms" data-ko="프랍펌" data-en="Firms">프랍펌</a>
+    <a href="#offers" data-page="offers" data-ko="프로모션" data-en="Offers">프로모션</a>
+    <a href="#rules" data-page="rules" data-ko="규칙" data-en="Rules">규칙</a>
+    <a href="#brokers" data-page="brokers" data-ko="브로커" data-en="Brokers">브로커</a>
+    <a href="#plan" data-page="plan" data-ko="가족 플랜" data-en="Family plan">가족 플랜</a>
+    <a href="#tools" data-page="tools" data-ko="도구" data-en="Tools">도구</a>
+    <a href="#spreads" data-page="spreads" data-ko="스프레드" data-en="Spreads">스프레드</a>
+    <a href="#payouts" data-page="payouts" data-ko="지급" data-en="Payouts">지급</a>
   </div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
@@ -686,23 +701,23 @@
   </main>
 </div>
 
-<div class="shell" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
-<div class="shell" id="pageHome" style="display:none"><main id="homeMain"></main></div>
-<div class="shell" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
-<div class="shell" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
-<div class="shell" id="pageMethod" style="display:none"><main id="methodMain"></main></div>
-<div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
-<div class="shell" id="pageGoal" style="display:none"><main id="goalMain"></main></div>
-<div class="shell" id="pageBrokers" style="display:none"><main id="brokersMain"></main></div>
-<div class="shell" id="pagePlan" style="display:none"><main id="planMain"></main></div>
-<div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
-<div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
-<div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
-<div class="shell" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
-<div class="shell" id="pageSpreads" style="display:none"><main id="spreadsMain"></main></div>
-<div class="shell" id="pageTools" style="display:none"><main id="toolsMain"></main></div>
+<div class="shell wide" id="pageFirm" style="display:none"><main id="firmMain"></main></div>
+<div class="shell wide" id="pageHome" style="display:none"><main id="homeMain"></main></div>
+<div class="shell wide" id="pageFirms" style="display:none"><main id="firmsMain"></main></div>
+<div class="shell wide" id="pageDocs" style="display:none"><main id="docsMain"></main></div>
+<div class="shell wide" id="pageMethod" style="display:none"><main id="methodMain"></main></div>
+<div class="shell wide" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
+<div class="shell wide" id="pageGoal" style="display:none"><main id="goalMain"></main></div>
+<div class="shell wide" id="pageBrokers" style="display:none"><main id="brokersMain"></main></div>
+<div class="shell wide" id="pagePlan" style="display:none"><main id="planMain"></main></div>
+<div class="shell wide" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
+<div class="shell wide" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
+<div class="shell wide" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
+<div class="shell wide" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
+<div class="shell wide" id="pageSpreads" style="display:none"><main id="spreadsMain"></main></div>
+<div class="shell wide" id="pageTools" style="display:none"><main id="toolsMain"></main></div>
 
-<div class="shell" id="pageRules" style="display:none">
+<div class="shell wide" id="pageRules" style="display:none">
   <main>
     <h1 id="rulesH1"></h1>
     <p id="rulesSub"></p>
@@ -1907,6 +1922,7 @@ function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx
 const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
 function applyStatics(){
   document.documentElement.lang=lang;
+  document.querySelectorAll("[data-ko][data-en]").forEach(a=>{a.textContent=lang==="ko"?a.dataset.ko:a.dataset.en;});
   Tset("brandSub",t("brandSub"));{const _h=el("h1"),_s=el("sub"); if(_h)_h.textContent=t("h1"); if(_s)_s.textContent=t("sub");}
   Tset("lRows",t("rows"));Tset("lFirms",t("firms"));
   Tset("mRows",rows.length.toLocaleString('en-US'));Tset("mFirms",DB.firms.length);
@@ -3118,27 +3134,47 @@ function renderPayouts(){
 }
 
 /* ---------- Spreads ---------- */
+/* PFM 커미션 원문은 '자산군\n값' 형태의 긴 텍스트다. 그대로 쏟아내지 않고 6개 열로 나눈다.
+   'Additional Information' 이하 설명문은 표에서 제외한다. 값이 없으면 — (추정 금지). */
+const COMM_ASSETS=[["FX","FX"],["Metals","금속"],["Indices","지수"],["Energy","에너지"],["Crypto","크립토"],["Other Commodities","기타 원자재"]];
+function parseComm(txt){
+  const out={};
+  const lines=String(txt||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  let cur=null;
+  for(const ln of lines){
+    if(/^additional information$/i.test(ln)) break;
+    const hit=COMM_ASSETS.find(([en])=>ln.toLowerCase()===en.toLowerCase());
+    if(hit){ cur=hit[0]; if(!(cur in out)) out[cur]=""; continue; }
+    if(cur && !out[cur]) out[cur]=ln;
+  }
+  return out;
+}
 function renderSpreads(){
-  const list=rows.reduce((a,r)=>{ (a[r.f]=a[r.f]||0, a[r.f]++); return a; },{});
-  const names=Object.keys(list).sort();
-  const withCm=names.map(n=>({n, q:pfmOf(n)})).filter(o=>o.q&&o.q.commissions);
+  const names=[...new Set(rows.map(r=>r.f))].sort();
+  const withCm=names.map(n=>({n, q:pfmOf(n)})).filter(o=>o.q&&o.q.commissions)
+    .map(o=>({n:o.n, c:parseComm(o.q.commissions), raw:o.q.commissions}));
+  const known=withCm.filter(o=>Object.values(o.c).some(v=>v));
+  const T=(ko,en)=>lang==="ko"?ko:en;
   el("spreadsMain").innerHTML=`
-    <div class="hero2"><h1>${lang==="ko"?"스프레드 비교":"Prop firm spreads"}</h1>
-      <p>${lang==="ko"?"업체별 EUR/USD · USD/JPY · GBP/USD · XAU/USD · US30 · BTC/USD 스프레드.":"Per-firm spreads across major symbols."}</p></div>
-    <div class="panel"><h3>${lang==="ko"?"랏당 커미션":"Per-lot commissions"} <span>${withCm.length} / ${names.length}</span></h3>
-      ${withCm.length?`<table class="fx"><thead><tr><th scope="col">${esc(t("fFirm"))}</th><th scope="col">${lang==="ko"?"커미션 (자산별)":"Commission by asset"}</th></tr></thead>
-        <tbody>${withCm.map(o=>`<tr><td class="firm"><a href="#firm/${encodeURIComponent(o.n)}" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(o.n)}</a></td>
-        <td style="white-space:pre-wrap;font-size:12px;line-height:1.6">${esc(o.q.commissions)}</td></tr>`).join("")}</tbody></table>`
-        :`<div class="empty-inline">${lang==="ko"?"수집된 커미션 데이터가 없습니다.":"No commission data collected."}</div>`}
-      ${srcNote(lang==="ko"?'커미션 출처: propfirmmatch.com 브랜드 페이지. 스프레드 수치는 PFM도 공개하지 않아 비어 있습니다.':'Commission source: propfirmmatch.com brand pages. Spread figures are not published by PFM either.')}
-    </div>
+    <div class="ghero"><h1>${T("커미션·스프레드","Commissions and spreads")}</h1>
+      <p class="gsub">${T("자산군별 랏당 커미션. 원문에 적힌 값만 표시하고, 없는 칸은 — 로 둡니다.","Per-lot commission by asset class. Only what the source states; missing cells stay —.")}</p></div>
 
-    <div class="panel"><h3>${lang==="ko"?"스프레드":"Spreads"} <span>0 / ${DB.firms.length}</span></h3>
-      <div class="empty-inline">${lang==="ko"
-        ?"스프레드 데이터는 아직 수집하지 않았습니다. 업체별 MT5 스프레드 공개 자료를 확보한 뒤 자산군별로 표시할 예정입니다. 빈칸을 추정값으로 채우지 않습니다."
-        :"Spread data has not been collected. Once per-firm MT5 spread references are gathered, they will be shown by asset class. No estimates are filled in."}</div></div>
+    <div class="card"><div class="scroll"><table class="spreadsT">
+      <thead><tr><th scope="col">${T("프랍펌","Firm")}</th>
+        ${COMM_ASSETS.map(([en,ko])=>`<th scope="col">${T(ko,en)}</th>`).join("")}
+        <th scope="col">${T("원문","Source text")}</th></tr></thead>
+      <tbody>${known.map(o=>`<tr>
+        <td class="firm"><a href="#firm/${encodeURIComponent(o.n)}">${esc(o.n)}</a></td>
+        ${COMM_ASSETS.map(([en])=>`<td class="num">${o.c[en]?esc(o.c[en]):'<span class="dim">—</span>'}</td>`).join("")}
+        <td class="evc"><span class="evwrap" title="${esc(o.raw.slice(0,300))}" tabindex="0">✓</span></td>
+      </tr>`).join("")}</tbody></table></div></div>
+    <div class="meta" style="margin-top:8px">${T(`커미션 기록 ${known.length}곳 / 전체 ${names.length} 브랜드`,"Commission recorded for "+known.length+" of "+names.length+" brands")}</div>
+
+    <div class="panel" style="margin-top:14px"><h3>${T("스프레드(핍)","Spreads in pips")} <span>${T("미수집","not collected")}</span></h3>
+      <div class="meta">${T("프랍펌은 EUR/USD 스프레드를 공개하지 않습니다. 브로커 스프레드는 브로커 페이지에서 공식 페이지 기준으로 확인할 수 있습니다.","Prop firms do not publish EUR/USD spreads. Broker spreads are on the broker page, taken from each broker's own site.")}</div>
+      <div style="margin-top:8px"><a class="btn g" href="#brokers" style="text-decoration:none">${T("브로커 스프레드 보기","See broker spreads")} →</a></div></div>
     ${faqBlock(FAQ.spreads)}
-    ${srcNote(lang==="ko"?"스프레드는 계좌 유형·시간대·유동성에 따라 달라집니다. 표시되더라도 참고값으로만 사용하세요.":"Spreads vary by account type, session and liquidity. Treat any figure as indicative.")}`;
+    ${srcNote(T("커미션 출처: propfirmmatch.com 브랜드 페이지. 스프레드는 계좌 유형·시간대에 따라 달라지므로 참고값으로만 사용하세요.","Commission source: propfirmmatch.com brand pages. Spreads vary by account type and session."))}`;
 }
 
 /* ---------- Tools ---------- */
@@ -3624,8 +3660,9 @@ function pfmRulesBlock(){
       ? "Prop Firm Match가 정리한 회사별 규칙 요약입니다. 본문은 원문(영어) 그대로이며 한국어 번역은 다음 단계입니다."
       : "Per-firm rule summaries published by Prop Firm Match. Body text is the original English."}</div>
     ${names.map(n=>`<details class="fgroup" style="border-bottom:1px solid var(--line)">
-      <summary style="font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink2);font-weight:700">${esc(n)}</summary>
-      <div class="body" style="max-height:none;white-space:pre-wrap;font-size:12.5px;line-height:1.75;color:var(--ink2)">${esc(DB.pfmRules[n])}</div>
+      <summary style="font-size:12.5px;text-transform:none;letter-spacing:0;color:var(--ink2);font-weight:700">${esc(n)}
+        <span class="dim" style="font-weight:400">· ${esc(String(DB.pfmRules[n]).replace(/\s+/g," ").slice(0,90))}…</span></summary>
+      <div class="body pfmbody">${esc(DB.pfmRules[n])}</div>
     </details>`).join("")}</div>
     ${srcNote(lang==="ko"
       ? '회사별 규칙 요약 출처: <a href="https://propfirmmatch.com/prop-firm-rules" target="_blank" rel="noopener">propfirmmatch.com/prop-firm-rules</a> (2026-11). 본문은 원문 그대로 인용했습니다.'
