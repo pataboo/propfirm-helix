@@ -2360,10 +2360,7 @@ function planPicks(){
     seen.add(key);
     out.push(r);
   });
-  return out.sort((a,b)=>{
-    const pa=num(a.pr)??1e9, pb=num(b.pr)??1e9;
-    return pa-pb;
-  });
+  return out.sort((a,b)=>costOf(a)-costOf(b));
 }
 function planCopyVerdict(r){
   const e=(DB.eap||{})[r.f]||{};
@@ -2377,7 +2374,7 @@ function renderPlan(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const picks=planPicks();
   const best=picks[0]||null;
-  const feeEach=best?(num(best.pr)??0):0;
+  const feeEach=best?costOf(best):0;
   const totalFee=feeEach*PLAN.people;
   const totalCap=PLAN.capital*PLAN.people;
   const over=totalFee>PLAN.budget;
@@ -2416,7 +2413,7 @@ function renderPlan(){
 
     <div class="panel"><h3>${T("선택된 챌린지","Selected challenge")} <span>${T("1인 최저가 기준","cheapest per person")}</span></h3>
       <div class="brow" style="border:0"><a href="#challenge/${esc(best.i)}">${esc(best.f)} · ${esc(best.p)}</a>
-        <span class="bmeta">${money(best.s,best.cu)} · ${money(best.pr,best.cu)} · ${best.sp?esc(best.sp)+"%":"—"} · ${payCell(best.pc)}</span></div>
+        <span class="bmeta">${money(best.s,best.cu)} · ${T("총액","total")} ${money(costOf(best),best.cu)} · ${best.sp?esc(best.sp)+"%":"—"} · ${payCell(best.pc)}</span></div>
       ${over?`<div class="gcheck cond" style="margin-top:8px"><span class="dot"></span>${T(`예산 $${PLAN.budget.toLocaleString("en-US")}를 $${(totalFee-PLAN.budget).toLocaleString("en-US")} 초과합니다. 인원을 줄이거나 더 저렴한 규모를 고르세요.`,`Over budget by $${(totalFee-PLAN.budget).toLocaleString("en-US")}. Reduce people or pick a smaller size.`)}</div>`:""}
     </div>
 
@@ -2475,17 +2472,21 @@ function renderBrokers(){
       ${list.filter(b=>b.status!=="verified").map(b=>`<div class="meta">${esc(b.name)} — ${esc(b.note)} <a href="${esc(b.src)}" target="_blank" rel="noopener">↗</a></div>`).join("")||`<div class="dim">${T("없음","none")}</div>`}
       <div class="srcline">${T("데이터 기준일","Data as of")}: ${esc((DB.brokers||{}).as_of||"—")}</div></div>`;
 }
+function costOf(r){
+  const to=num(r.to);
+  if(to!=null) return to;
+  const pr=num(r.pr)||0, ac=num(r.ac)||0;
+  return pr+ac;
+}
 const GOAL={size:100000, mk:"cfd", budget:300, speed:"any", rules:new Set()};
 function goalPrice(p){ const n=Number(r_priceOf(p)); return isNaN(n)?null:n; }
 function r_priceOf(r){ return r.pr; }
 function goalScore(r){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const why=[]; let sc=0;
-  const pr=num(r.pr);
-  if(pr!=null){
-    if(pr<=GOAL.budget){ sc+=25; why.push(T(`예산 $${GOAL.budget} 이내 ($${pr})`,`within $${GOAL.budget} budget ($${pr})`)); }
-    else if(pr<=GOAL.budget*1.5){ sc+=12; why.push(T(`예산 50% 초과지만 근접 ($${pr})`,`up to 50% over budget ($${pr})`)); }
-  }
+  const cost=costOf(r);
+  if(cost<=GOAL.budget){ sc+=25; why.push(T(`총액 $${cost} — 예산 이내`,`total $${cost} — within budget`)); }
+  else if(cost<=GOAL.budget*1.5){ sc+=12; why.push(T(`총액 $${cost} — 예산 근접`,`total $${cost} — near budget`)); }
   const sz=num(r.s);
   if(sz!=null && GOAL.size){
     const ratio=sz/GOAL.size;
