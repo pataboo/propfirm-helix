@@ -158,6 +158,26 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .rulegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:10px}
+  .rulecard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .rulecard .rh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .rulecard .rch{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;
+    background:rgba(167,139,250,.16);color:var(--accent);font-weight:800;font-size:11px}
+  .rulecard b{font-size:13px}
+  .rulecard p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}
+  .srcnote2{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.6}
+  .sitefoot{border-top:1px solid var(--line);background:var(--panel);margin-top:40px}
+  .sitefoot .in{max-width:1500px;margin:0 auto;padding:26px 22px;display:grid;grid-template-columns:1.6fr .7fr .7fr .7fr;gap:24px}
+  .sitefoot .fabout b{font-size:15px;letter-spacing:-.02em}
+  .sitefoot p{color:var(--muted);font-size:12px;line-height:1.7;margin:6px 0 0;max-width:52ch}
+  .sitefoot .fcol h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+  .sitefoot .fcol a{display:block;font-size:12.5px;color:var(--ink2);text-decoration:none;padding:3px 0}
+  .sitefoot .fcol a:hover{color:var(--accent)}
+  .sitefoot .fbot{border-top:1px solid var(--line);padding:12px 22px;color:var(--muted);font-size:11.5px;display:block}
+  .smgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 14px;margin-top:8px}
+  .smgrid a{font-size:12.5px;color:var(--ink2);text-decoration:none;padding:3px 0;border-bottom:1px dotted transparent}
+  .smgrid a:hover{color:var(--accent);border-bottom-color:var(--line2)}
+  @media(max-width:900px){.sitefoot .in{grid-template-columns:1fr 1fr}}
   .pfmgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
   .pfmgrid .glabel{margin-bottom:6px}
   .stars{display:flex;flex-direction:column;gap:3px;margin:8px 0 4px;max-width:320px}
@@ -637,8 +657,8 @@
     <span class="navitem">
       <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
       <div class="dropdown" id="chMenu">
-        <a href="#challenges" data-all="1"><b>전체 챌린지</b><span>693</span></a>
-        <a href="#firms"><b>프랍펌</b><span>29</span></a>
+        <a href="#challenges" data-all="1"><b>전체 챌린지</b><span id="cmAll">—</span></a>
+        <a href="#firms"><b>프랍펌</b><span id="cmFirms">—</span></a>
         <a href="#discover"><b>둘러보기</b><span>→</span></a>
         <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
       </div>
@@ -739,6 +759,7 @@
 <div class="shell wide" id="pageCompare" style="display:none"><main id="compareMain"></main></div>
 <div class="shell wide" id="pageSpreads" style="display:none"><main id="spreadsMain"></main></div>
 <div class="shell wide" id="pageTools" style="display:none"><main id="toolsMain"></main></div>
+<div class="shell wide" id="pageSitemap" style="display:none"><main id="sitemapMain"></main></div>
 
 <div class="shell wide" id="pageRules" style="display:none">
   <main>
@@ -751,6 +772,7 @@
         <th scope="col" id="rOn"></th><th scope="col" id="rCp"></th><th scope="col" id="rWk"></th><th scope="col" id="rKr"></th><th scope="col" id="rM5"></th><th scope="col" id="rGrade"></th>
       </tr></thead><tbody id="rulesBody"></tbody></table>
     </div></div>
+    <div id="rulesDocs" style="margin-top:20px"></div>
     <div id="rPfm"></div>
     <div id="rChanges"></div>
     <footer id="foot2"></footer>
@@ -758,6 +780,8 @@
     <div style="margin-top:16px"><a href="#docs" style="font-size:12px">문서 / Docs</a></div>
   </main>
 </div>
+
+<footer class="sitefoot" id="siteFoot"></footer>
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true" tabindex="-1">
@@ -1406,7 +1430,7 @@ function buildFilters(){
   const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
     <div class="body" style="max-height:none"><div class="chips2">
     ${PRESETS.map(p=>{const n=p.sort?rows.length:presetCount(p);
-      return `<button data-preset="${p.k}" class="${(p.sort? sortPreset===p.k : presetActive(p))?"on":""}" title="${esc(p.sort?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터 "+(presetConds(p).length)+"개":"filter x"+presetConds(p).length))}">${esc(pname(p.k))}${p.sort?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
+      return `<button data-preset="${p.k}" class="${(p.sort? sortPreset===p.k : presetActive(p))?"on":""}" title="${esc(p.sort?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터 "+(presetConds(p).length)+"개":"filter x"+presetConds(p).length))}">${esc(pname(p.k))}${p.sort?" ↕":""}${p.sort?"":` <span class="pcnt">${n.toLocaleString("en-US")}</span>`}</button>`;}).join("")}
     </div></div></details>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
@@ -1944,10 +1968,14 @@ let pageSuffix="";
 function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx):"helix"; }
 const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
 function fillMenuCounts(){
-  const f=document.getElementById("fmFirms"), b=document.getElementById("fmBrokers");
-  if(f) f.textContent=(DB.firms||[]).length.toLocaleString("en-US");
-  if(b){ const n=((DB.brokers||{}).brokers||[]).filter(x=>x.status==="verified").length;
-         b.textContent=n.toLocaleString("en-US"); }
+  const n=(v)=>Number(v||0).toLocaleString("en-US");
+  const firmsN=(DB.firms||[]).length;
+  const rowsN=(DB.rows||[]).length;
+  const brkN=((DB.brokers||{}).brokers||[]).filter(x=>x.status==="verified").length;
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=n(v);};
+  set("cmAll",rowsN); set("cmFirms",firmsN);
+  set("fmFirms",firmsN); set("fmBrokers",brkN);
+  set("tmPlan",""); set("tmSpreads",""); set("tmPayouts",""); set("tmTools","");
 }
 function applyStatics(){
   document.documentElement.lang=lang;
@@ -3246,6 +3274,38 @@ function renderSpreads(){
 }
 
 /* ---------- Tools ---------- */
+function renderSitemap(){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const slug=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"brand";
+  const secs=[["challenges","챌린지","Challenges"],["discover","둘러보기","Discover"],["compare","비교","Compare"],
+    ["goal","목표로 찾기","Goal finder"],["firms","프랍펌","Firms"],["brokers","브로커","Brokers"],
+    ["rules","규칙","Rules"],["offers","프로모션","Offers"],["spreads","스프레드","Spreads"],
+    ["payouts","지급","Payouts"],["plan","가족 플랜","Family plan"],["tools","도구","Tools"],
+    ["method","방법론","Method"],["docs","문서","Docs"]];
+  const firms=[...new Set(rows.map(r=>r.f))].sort((a,b)=>a.localeCompare(b));
+  el("sitemapMain").innerHTML=`
+    <div class="ghero"><h1>${T("사이트맵","Site map")}</h1>
+      <p class="gsub">${T("모든 화면과 브랜드별 정적 페이지 목록입니다. 브랜드 페이지는 검색·공유용 실제 URL입니다.","Every screen, plus the static per-brand pages that carry real URLs for search and sharing.")}</p></div>
+    <div class="panel"><h3>${T("주요 화면","Sections")} <span>${secs.length}</span></h3>
+      <div class="smgrid">${secs.map(([h,ko,en])=>`<a href="#${h}">${esc(T(ko,en))}</a>`).join("")}</div></div>
+    <div class="panel"><h3>${T("브랜드별 페이지","Brand pages")} <span>${firms.length}</span></h3>
+      <div class="smgrid">${firms.map(f=>`<a href="f/${slug(f)}/">${esc(f)}</a>`).join("")}</div></div>
+    ${srcNote(T("브랜드 페이지는 빌드 시 생성되는 정적 HTML이며, 표 데이터는 data.js에서 읽습니다.","Brand pages are static HTML generated at build time; the table data loads from data.js."))}`;
+}
+function renderSiteFoot(){
+  const f=document.getElementById("siteFoot"); if(!f) return;
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const col=(title,items)=>`<div class="fcol"><h4>${esc(title)}</h4>${items.map(([h,l])=>`<a href="#${h}">${esc(l)}</a>`).join("")}</div>`;
+  f.innerHTML=`<div class="in">
+    <div class="fabout"><b>helix</b>
+      <p>${T("프랍펌 챌린지와 브로커를 같은 기준으로 비교합니다. 모든 값에는 출처 URL과 검증 등급이 붙고, 확인하지 못한 값은 비워 둡니다.","Prop-firm challenges and brokers compared on one basis. Every value carries a source URL and a grade; what we could not confirm stays blank.")}</p>
+      <p class="dim">${T("데이터 기준일","Data as of")}: ${esc((DB.generated||"").slice(0,10)||"—")} · ${T("지급 실적 출처","Payout figures")}: propfirmmatch.com</p></div>
+    ${col(T("데이터","Data"),[["challenges",T("챌린지","Challenges")],["firms",T("프랍펌","Firms")],["brokers",T("브로커","Brokers")],["rules",T("규칙","Rules")],["offers",T("프로모션","Offers")]])}
+    ${col(T("도구","Tools"),[["goal",T("목표로 찾기","Goal finder")],["plan",T("가족 플랜","Family plan")],["compare",T("비교","Compare")],["spreads",T("스프레드","Spreads")],["payouts",T("지급","Payouts")]])}
+    ${col(T("정보","About"),[["method",T("방법론·필드","Method")],["docs",T("문서","Docs")],["sitemap",T("사이트맵","Site map")]])}
+  </div>
+  <div class="in fbot"><span>${T("개인 프로젝트입니다. 투자 권유가 아니며, 표시된 값은 각 업체 페이지의 기록입니다.","A personal project. Not investment advice; every figure is a record of what a firm publishes.")}</span></div>`;
+}
 function renderTools(){
   const tools=[
     {n:lang==="ko"?"가족 플랜":"Family plan",d:lang==="ko"?"인원·1인 자본·총예산을 넣으면 총자본, 참가비, 카피 규칙, 첫 지급 시점, 실행 브로커까지 계산합니다.":"Enter people, capital each and a budget; get total capital, fees, copy rules, first-payout timing and the brokers to run it.",s:"live",u:"#plan"},
@@ -3868,6 +3928,34 @@ function renderRules(){
     `<span class="rstate no"><i></i>${esc(t("stNo"))}</span>`+
     `<span class="rstate unk"><i></i>${esc(t("stUnk"))}</span>`+
     `<span style="font-size:11.5px;color:var(--muted)">${esc(lang==="ko"?"등급 A=1차 확인 · B=2차·간접 · C=추정":"Grade A=primary · B=indirect · C=inferred")}</span>`;
+  const ruleDocs=[
+    ["E","EA / 자동매매","EA / algorithms",
+     "Expert Advisor·봇·알고리즘 사용 허용 여부입니다. 금지 업체는 자동 주문 자체가 규칙 위반이고, 조건부는 '자체 제작 EA만 허용' 또는 '사전 승인 필요'를 뜻합니다. 실제로 금지하는 곳: Maven·Apex(자동화 전면), Top One 펀딩, The5ers Futures.",
+     "Whether Expert Advisors, bots or algorithms may trade. A ban means automated orders are a rules breach by themselves; conditional usually means own-built EAs only or prior approval. Real bans: Maven, Apex (all automation), Top One funded, The5ers Futures."],
+    ["C","카피트레이딩","Copy trading",
+     "본인 계좌 간 복사(own)와 타인·외부 신호 복사(ext)를 구분합니다. 대부분 본인 계좌는 허용하지만 제3자 카피는 금지이며, 가족이 각자 계좌로 같은 전략을 돌리는 것은 소유자가 다르면 위반입니다.",
+     "Copying between your own accounts versus copying other people's signals. Most firms allow the former and ban the latter; a family running the same strategy on separate accounts breaches it once ownership differs."],
+    ["N","뉴스 거래","News trading",
+     "고영향 지표(CPI·NFP·FOMC) 전후 거래 제한입니다. 평가는 허용하고 펀딩만 금지하는 곳이 흔합니다(FTMO·WSFunded·Top One). '조건부'는 지정 시간(예: 5분) 전후 금지 또는 추가 비용을 뜻합니다.",
+     "Restrictions around high-impact events (CPI, NFP, FOMC). Many firms allow it on evaluation and forbid it once funded (FTMO, WSFunded, Top One). Conditional means a blackout window (e.g. 5 minutes) or a paid add-on."],
+    ["O","오버나이트","Overnight holding",
+     "포지션을 다음 거래일로 넘길 수 있는지입니다. 금지 업체는 당일 청산이 필수이며, 위반 시 계좌가 무효가 될 수 있습니다.",
+     "Whether a position may be carried into the next session. Firms that forbid it require same-day flat; a breach can void the account."],
+    ["W","주말 보유","Weekend holding",
+     "금요일 종료 후 주말 동안 포지션을 유지할 수 있는지입니다. FTMO Standard 펀딩은 금지하지만 Swing 계좌는 예외이고, Lark는 유료 애드온(수수료의 10%)입니다.",
+     "Whether positions may stay open across the weekend. FTMO forbids it on Standard funded accounts but exempts Swing; Lark sells it as a paid add-on (10% of the fee)."],
+    ["S","최소 거래일","Minimum trading days",
+     "지급 또는 통과에 필요한 최소 거래일입니다. '0일'은 업체가 명시적으로 최소 없음이라고 밝힌 것이고, 비어 있으면 확인하지 못한 것입니다.",
+     "The minimum number of trading days before passing or requesting a payout. A recorded 0 means the firm states there is no minimum; blank means we could not confirm it."]
+  ];
+  if(el("rulesDocs")) el("rulesDocs").innerHTML=`
+    <div class="sect" style="margin-top:22px">${lang==="ko"?"규칙 용어 설명":"What each rule means"}</div>
+    <div class="rulegrid">${ruleDocs.map(([ch,ko,en,koD,enD])=>`
+      <div class="rulecard"><div class="rh"><span class="rch">${ch}</span><b>${esc(lang==="ko"?ko:en)}</b></div>
+      <p>${esc(lang==="ko"?koD:enD)}</p></div>`).join("")}</div>
+    <div class="srcnote2">${lang==="ko"
+      ? "표기: EECCNOW 순서로 EA(평가) · EA(펀딩) · 카피(평가) · 카피(펀딩) · 뉴스 · 오버나이트 · 주말. 각 글자는 초록=허용, 노랑=조건부, 빨강=금지, 회색=미기록입니다."
+      : "Reading the letters: EA(eval) · EA(funded) · copy(eval) · copy(funded) · news · overnight · weekend. Green=allowed, amber=conditional, red=forbidden, grey=unrecorded."}</div>`;
   el("rulesBody").innerHTML=Object.entries(map)
     .sort((a,b)=>b[1].n-a[1].n)
     .map(([f,o])=>`<tr data-firm="${esc(f)}">
@@ -3894,7 +3982,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={plan:"pagePlan",brokers:"pageBrokers",goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={sitemap:"pageSitemap",plan:"pagePlan",brokers:"pageBrokers",goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
@@ -3929,6 +4017,7 @@ function route(){
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
   else if(page==="method") renderMethod();
+  else if(page==="sitemap") renderSitemap();
   else if(page==="plan") renderPlan();
   else if(page==="brokers") renderBrokers();
   else if(page==="goal") renderGoal();
@@ -3973,7 +4062,7 @@ const __step=(n,f)=>{try{f()}catch(e){console.error('[helix] init '+n+' failed',
   const fa=document.querySelector(".filters"); if(!fa) return;
   const on=fa.classList.toggle("on"); fm.setAttribute("aria-expanded",on?"true":"false");};}
 __step('theme',applyTheme);__step('prefs',applyTablePrefs);__step('tsettings',buildTableSettings);
-__step('sort',buildSort);__step('statics',applyStatics);__step('menucounts',fillMenuCounts);__step('filters',buildFilters);
+__step('sort',buildSort);__step('statics',applyStatics);__step('menucounts',fillMenuCounts);__step('sitefoot',renderSiteFoot);__step('filters',buildFilters);
 __step('render',render);__step('route',route);
 </script>
 </body></html>
