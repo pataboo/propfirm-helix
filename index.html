@@ -897,7 +897,9 @@ function payTokens(raw){
   const m4=t.match(/(\d{1,2})\s*(qualifying|winning|trading)\s*days?/g)||[];
   m4.forEach(x=>{ const n=parseInt(x,10); if(n>=1&&n<=45&&![7,14,30].includes(n)) push(n+"일"); });
   if(!out.length){
-    if(/one[- ]?time|single payout|1회/.test(t)) out.push("1회");
+    const mo=t.match(/(\d{1,2})\s*months?/);
+    if(mo) out.push(parseInt(mo[1],10)+"개월");
+    else if(/one[- ]?time|single payout|1회/.test(t)) out.push("1회");
     else if(/next day|다음날/.test(t)) out.push("다음날");
     else if(/after (the )?(trading )?period|기간 후/.test(t)) out.push("기간 후");
     else if(/after (passing|challenge)|통과 후/.test(t)) out.push("통과 후");
