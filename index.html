@@ -813,7 +813,8 @@ const I18N = {
 
 let lang = localStorage.getItem("helix-lang") || "ko";
 let theme = localStorage.getItem("helix-theme") || "dark";
-let favOnly=false, favs=new Set(JSON.parse(localStorage.getItem("helix-favs")||"[]")),
+let urlReady=false,
+    favOnly=false, favs=new Set(JSON.parse(localStorage.getItem("helix-favs")||"[]")),
     shownRows=120,
     unitMode=localStorage.getItem("helix-unit")||"auto",
     q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
@@ -1070,6 +1071,7 @@ function applyURLState(p, force){
   activePreset = p.get("preset") || null;
 }
 function syncURL(){
+  if(!urlReady) return;
   if(!/^#challenges(\?|$)/.test(location.hash||"#challenges")) return;
   const p=new URLSearchParams();
   Object.entries(URLSETS).forEach(([key,setKey])=>{ if(F[setKey].size) p.set(key,[...F[setKey]].join(",")); });
@@ -3048,6 +3050,7 @@ function route(){
     if(h.slice(0,_q)==="challenges") applyURLState(_p, true);
     const _f=_p.get("fee"); if(_f) feeFilter=_f;
     h=h.slice(0,_q); }
+  urlReady=true;
   const isFirm=h.startsWith("firm/");
   const isCh=h.startsWith("challenge/");
   const page=isFirm?"challenges":(isCh?"challenge":(PAGES[h]?h:"challenges"));
