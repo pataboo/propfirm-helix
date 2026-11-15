@@ -877,6 +877,8 @@ function unitCell(numVal, txt){
     if(txt && !/%/.test(txt)) return usd;
     return pct || usd || '<span class="dim">—</span>';
   }
+  /* auto: 기록된 텍스트가 달러표기($1,000)면 달러로, 아니면 %로 보여준다. 단위를 추정하지 않는다. */
+  if(txt && /^\s*\$/.test(txt) && (numVal==null || Math.abs(numVal)>=100)) return usd;
   return pct || usd || '<span class="dim">—</span>';
 }
 function payTokens(raw){
@@ -941,8 +943,16 @@ function targetCell(r){
   return unitCell(num(r.tg)||null, r.tgT);
 }
 function lossCell(val, txt, r){
+  if(txt==="!none") return `<span class="dim">${lang==="ko"?"없음":"None"}</span>` + stageTag(r);
   if(val==null && !txt) return '<span class="dim">—</span>';
   return unitCell(num(val), txt) + stageTag(r);
+}
+/* 표 밖(모바일 카드·상세·비교)에서 쓰는 일일손실 표기: 없음 / $1,000 / 3% / — */
+function dlText(r){
+  if(r.dlT==="!none") return lang==="ko"?"없음":"None";
+  if(r.dl==null) return "—";
+  if(r.dlT && /^\s*\$/.test(String(r.dlT))) return esc(r.dlT);
+  return esc(r.dl)+"%";
 }
 function rulesCell(r){
   const T=(ko,en)=>lang==="ko"?ko:en;
@@ -1617,7 +1627,7 @@ function render(){
         <span>${esc(t("fPrice"))} <b>${r.pr!=null?"$"+Number(r.pr).toLocaleString('en-US'):"—"}</b></span>
         <span>${esc(t("fSplit"))} <b>${r.sp?esc(r.sp)+"%":"—"}</b></span>
         <span>${esc(t("fMax"))} <b>${r.ml!=null?esc(r.ml)+"%":"—"}</b></span>
-        <span>${esc(t("fDaily"))} <b>${r.dl!=null?esc(r.dl)+"%":"—"}</b></span>
+        <span>${esc(t("fDaily"))} <b>${dlText(r)}</b></span>
         <span>${esc(t("fDays"))} <b>${(r.mf??r.md)!=null?esc(r.mf??r.md):"—"}</b></span>
         <span>${esc(t("fCycle"))} <b>${esc(tx(r.pc)||"—")}</b></span>
         <a href="#challenge/${encodeURIComponent(r.i)}" onclick="event.stopPropagation()" style="margin-left:auto;color:var(--accent);font-weight:700;text-decoration:none">${lang==="ko"?"자세히 →":"Details →"}</a>
@@ -1752,7 +1762,7 @@ function openCompare(){
   if(arr.length<2) return;
   const F=[["fFirm",r=>esc(r.f)],["fPlan",r=>esc(r.p)],["fSize",r=>money(r.s,r.cu)],
     ["fPrice",r=>money(r.pr,r.cu)],["fAct",r=>money(r.ac,r.cu)],["fTotal",r=>money(r.to,r.cu)],
-    ["fSplit",r=>r.sp?esc(r.sp)+"%":'<span class="dim">—</span>'],["fDaily",r=>pc(r.dl)],
+    ["fSplit",r=>r.sp?esc(r.sp)+"%":'<span class="dim">—</span>'],["fDaily",r=>r.dlT==="!none"?(lang==="ko"?"없음":"None"):pc(r.dl)],
     ["fMax",r=>pc(r.ml)],["fTarget",r=>r.tg?esc(r.tg)+"%":'<span class="dim">—</span>'],
     ["fDd",r=>esc(r.dd||"—")],["fLev",r=>esc(r.lv||"—")],["fSteps",r=>esc(enumv(r.st)||"—")],
     ["fDays",r=>esc((r.mf??r.md)!=null?String(r.mf??r.md):"—")],["fCycle",r=>esc(r.pc||"—")],
@@ -1840,7 +1850,7 @@ function openDrawer(id){
   el("dBody").innerHTML=`
     <div class="kpis">
       <div class="kpi"><div class="v g">${r.tg?esc(r.tg)+"%":'<span class="dim">—</span>'}</div><div class="k">${esc(t("kTarget"))}</div></div>
-      <div class="kpi"><div class="v r">${r.dl!=null?esc(r.dl)+"%":'<span class="dim">—</span>'}</div><div class="k">${esc(t("kDaily"))}</div></div>
+      <div class="kpi"><div class="v r">${dlText(r)==="—"?'<span class="dim">—</span>':dlText(r)}</div><div class="k">${esc(t("kDaily"))}</div></div>
       <div class="kpi"><div class="v a">${r.ml!=null?esc(r.ml)+"%":'<span class="dim">—</span>'}</div><div class="k">${esc(t("kMax"))}</div></div>
       <div class="kpi"><div class="v c">${kDays!=null?esc(kDays)+" d":'<span class="dim">—</span>'}</div><div class="k">${esc(t("kDays"))}</div></div>
     </div>
