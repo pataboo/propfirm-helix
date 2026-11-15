@@ -1473,7 +1473,7 @@ function vsRowHtml(r,idx){
         (typeof r.ac==="number"||/^[\d.,]+$/.test(String(r.ac)))
           ? (Number(r.ac)===0?'<span class="dim">—</span>':money(r.ac,r.cu))
           : (/no activation|none|없음|n\/a/i.test(String(r.ac))?'<span class="dim">없음</span>':esc(String(r.ac).slice(0,10)))}</td>
-      <td class="num">${r.to!=null?money(r.to,r.cu):'<span class="dim">—</span>'}</td>
+      <td class="num">${r.to!=null?money(r.to,r.cu)+(costPlausible(r)?"":" <span class=\"dim\" title=\""+(lang==="ko"?"규모 대비 비정상적으로 낮은 가격 — 확인 필요":"implausibly low for this size — needs checking")+"\">⚠</span>"):'<span class="dim">—</span>'}</td>
       <td><span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${lossCell(r.ml, r.mlT, r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
@@ -2354,6 +2354,7 @@ function planPicks(){
     if(num(r.s)!==PLAN.capital) return;
     const pr0=num(r.pr);
     if(pr0===0 || pr0==null) return;                 // a free trial cannot fund a family plan
+    if(!costPlausible(r)) return;                     // $3.50 for a 100K account is a scrape artefact
     if(/trial|demo/i.test(String(r.p||""))) return;   // nor can a demo/eval-only product
     const key=r.f+"|"+r.p;
     if(seen.has(key)) return;
@@ -2478,6 +2479,11 @@ function costOf(r){
   const pr=num(r.pr)||0, ac=num(r.ac)||0;
   return pr+ac;
 }
+function costPlausible(r){
+  const c=costOf(r), sz=num(r.s)||0;
+  if(!sz) return true;
+  return c >= Math.max(20, sz*0.0005);   // a $100K account cannot cost $3.50
+}
 const GOAL={size:100000, mk:"cfd", budget:300, speed:"any", rules:new Set()};
 function goalPrice(p){ const n=Number(r_priceOf(p)); return isNaN(n)?null:n; }
 function r_priceOf(r){ return r.pr; }
@@ -2485,7 +2491,9 @@ function goalScore(r){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const why=[]; let sc=0;
   const cost=costOf(r);
-  if(cost<=GOAL.budget){ sc+=25; why.push(T(`총액 $${cost} — 예산 이내`,`total $${cost} — within budget`)); }
+  if(!costPlausible(r)){
+    why.push(T(`가격 확인 필요 ($${cost} 기록)`,`price needs checking ($${cost} recorded)`));
+  } else if(cost<=GOAL.budget){ sc+=25; why.push(T(`총액 $${cost} — 예산 이내`,`total $${cost} — within budget`)); }
   else if(cost<=GOAL.budget*1.5){ sc+=12; why.push(T(`총액 $${cost} — 예산 근접`,`total $${cost} — near budget`)); }
   const sz=num(r.s);
   if(sz!=null && GOAL.size){
