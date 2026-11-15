@@ -143,6 +143,13 @@
     font-size:10px;font-weight:800;line-height:15px}
   .fbadge{display:none;margin-left:6px;background:var(--accent);color:#150b23;border-radius:999px;
     padding:1px 7px;font-size:10.5px;font-weight:800;vertical-align:middle}
+  .emptyTitle{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .emptySub{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .emptyChips{display:flex;flex-wrap:wrap;gap:8px}
+  .emptyChip{background:rgba(167,139,250,.10);border:1px solid var(--line2);color:var(--ink2);border-radius:999px;
+    padding:6px 12px;font-size:12px;cursor:pointer}
+  .emptyChip b{color:var(--accent);margin-left:4px}
+  .emptyChip:hover{border-color:var(--accent);color:var(--accent)}
   .payshort{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;cursor:help}
   .ptk{background:rgba(167,139,250,.10);border-radius:4px;padding:0 5px;font-size:11px;color:var(--ink2);line-height:16px}
   .psep{color:var(--muted);opacity:.5;font-size:10px}
@@ -1049,6 +1056,19 @@ function noteSummary(txt){
   }
   return out;
 }
+let _notesReq=null;
+function ensureNotes(cb){
+  if(window.HELIX_NOTES){ cb&&cb(); return; }
+  if(!_notesReq){
+    _notesReq=new Promise(res=>{
+      const sc=document.createElement("script"); sc.src="notes.js";
+      sc.onload=()=>res(true); sc.onerror=()=>res(false);
+      document.head.appendChild(sc);
+    });
+  }
+  _notesReq.then(()=>cb&&cb());
+}
+function fullNote(r){ return (window.HELIX_NOTES && window.HELIX_NOTES[r.i]) || r.no || ""; }
 function notesBlock(txt){
   if(txt && lang==="en" && hasHangul(txt)) txt="[Korean original] "+txt;
   if(!txt) return `<div class="notewrap"><div class="notelist"><li>${esc(t("noNotes"))}</li></div></div>`;
@@ -1574,6 +1594,7 @@ function render(){
   vsWire();
   vsSetData(out);
   syncURL();
+  {const b=el("fcount"); if(b){const n=activeConditionCount(); b.textContent=n; b.style.display=n?"inline-block":"none";}}
   syncFilterUI(); updateGroupBadges();
   document.querySelectorAll("#tb tr[data-id]").forEach(tr=>{tr.tabIndex=0;});
   document.querySelectorAll("thead th[data-sort]").forEach(th=>{
@@ -1583,7 +1604,16 @@ function render(){
       s.textContent=sortDir>0?"▲":"▼";th.appendChild(s);}
     th.setAttribute("aria-sort", th.dataset.sort===sortKey ? (sortDir>0?"ascending":"descending") : "none");
   });
-  el("empty").style.display=out.length?"none":"block";
+  {const em=el("empty");
+   if(out.length){ em.style.display="none"; em.innerHTML=""; }
+   else{
+     const sug=relaxSuggestions();
+     em.style.display="block";
+     em.innerHTML = `<div class="emptyTitle">${lang==="ko"?"조건에 맞는 상품이 없습니다":"No products match these filters"}</div>`+
+       (sug.length?`<div class="emptySub">${lang==="ko"?"조건을 하나만 풀어도 이만큼 나옵니다":"Loosen one condition:"}</div>
+         <div class="emptyChips">${sug.map((x,i)=>`<button class="emptyChip" data-relax="${i}">${esc(x.label)} <b>${x.n.toLocaleString("en-US")}</b></button>`).join("")}</div>`:"");
+     em.querySelectorAll("[data-relax]").forEach(b=>b.onclick=()=>{ sug[Number(b.dataset.relax)].run(); render(); });
+   }}
   const chips=[];
   const pushChip=(label,clear)=>{chips.push(`<span class="fchip">${esc(label)}<button data-clr="${clear}" aria-label="${esc((lang==="ko"?"필터 해제: ":"Remove filter: ")+label)}">✕</button></span>`);};
   F.firm.forEach(v=>pushChip(v,"firm:"+v));
@@ -1752,7 +1782,7 @@ function openDrawer(id){
       ${drawerRow(t("cPfmRef"),(r.dp!=null||r.mp!=null)?`${esc(r.dp??"—")}% / ${esc(r.mp??"—")}%`:'<span class="dim">—</span>')}
     </div>
     <div class="sect">${esc(t("sectFloor"))}</div>${floorChart(r.dd==="Trailing"?"Trailing":"Static")}
-    <div class="sect">${esc(t("sectNotes"))}</div>${notesBlock(r.no)}
+    <div class="sect">${esc(t("sectNotes"))}</div><div id="notesHost">${notesBlock(fullNote(r))}</div>
     <div class="sect">${esc(t("sectEv"))}</div>${evidenceBlock(r)}
     <div class="sect">${esc(t("sectSrc"))}</div>
     <div class="kv">${drawerRow(t("cVer"),`<span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span>`)}
@@ -1776,6 +1806,7 @@ function openDrawer(id){
   const wasOpen=el("drawer").classList.contains("on");
   if(!wasOpen) drawerReturn=document.activeElement;
   el("drawer").classList.add("on"); el("drawer").setAttribute("aria-hidden","false");
+  ensureNotes(()=>{ const h=document.getElementById("notesHost"); if(h && !h.dataset.full){ h.innerHTML=notesBlock(fullNote(r)); h.dataset.full="1"; } });
   el("scrim").classList.add("on");
   if(!wasOpen){const dc=el("dClose"); if(dc) dc.focus({preventScroll:true});}
   document.querySelectorAll("#tb tr").forEach(tr=>tr.classList.toggle("open",tr.dataset.id===id));
@@ -2078,6 +2109,38 @@ function presetCount(p){
   return rows.filter(r=>c.every(cc=>rowHasCond(r,cc))).length;
 }
 const G2F={firm:"firm",mk:"mk",st:"st",dd:"dd",ver:"vf",cycle:"cycle",paym:"paym",plat:"plat",flags:"flags",fee:"fee"};
+function activeConditionCount(){
+  let n=0;
+  ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>n+=F[k].size);
+  ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>{ if(F[k]!=null) n++; });
+  if(q) n++;
+  if(sortPreset) n++;
+  return n;
+}
+function snapFilters(){
+  const o={}; ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>o[k]=new Set(F[k]));
+  ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>o[k]=F[k]);
+  o.q=q; o.sortPreset=sortPreset; return o;
+}
+function restoreFilters(o){
+  Object.entries(o).forEach(([k,v])=>{ if(v instanceof Set) F[k]=new Set(v); else if(k==="q") q=v; else if(k==="sortPreset") sortPreset=v; else F[k]=v; });
+}
+function countWith(patch){
+  const snap=snapFilters();
+  try{ patch(); return rows.filter(matches).length; } finally { restoreFilters(snap); }
+}
+function relaxSuggestions(){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const out=[];
+  if(q) out.push({label:T("검색어 지우기","clear search"), n:countWith(()=>{q="";}), run:()=>{q=""; const g=el("gq"); if(g) g.value="";}});
+  if(F.vf.size && !F.vf.has("C")) out.push({label:T("등급 B·C 포함","include grade B/C"), n:countWith(()=>{F.vf.add("B");F.vf.add("C");}), run:()=>{F.vf.add("B");F.vf.add("C");}});
+  if(F.priceMax!=null) out.push({label:T("금액 상한 +20%","fee cap +20%"), n:countWith(()=>{F.priceMax=Math.round(F.priceMax*1.2);}), run:()=>{F.priceMax=Math.round(F.priceMax*1.2);}});
+  if(F.sizeMin!=null||F.sizeMax!=null) out.push({label:T("계좌 규모 범위 확대","widen size range"), n:countWith(()=>{F.sizeMin=null;F.sizeMax=null;}), run:()=>{F.sizeMin=null;F.sizeMax=null;}});
+  if(F.splitMin!=null) out.push({label:T("분배 조건 완화","lower split"), n:countWith(()=>{F.splitMin=Math.max(0,F.splitMin-10);}), run:()=>{F.splitMin=Math.max(0,F.splitMin-10);}});
+  if(F.flags.size) out.push({label:T("규칙 조건 해제","clear rule filters"), n:countWith(()=>{F.flags.clear();}), run:()=>{F.flags.clear();}});
+  if(F.firm.size>1) out.push({label:T("브랜드 조건 해제","clear brands"), n:countWith(()=>{F.firm.clear();}), run:()=>{F.firm.clear();}});
+  return out.filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,3);
+}
 function groupActive(g){
   if(G2F[g]) return F[G2F[g]].size;
   const map={size:["sizeMin","sizeMax"],price:["priceMax"],split:["splitMin"],target:["target"],
@@ -2185,12 +2248,13 @@ function renderChallenge(id){
       <div class="kv" style="margin-top:12px">${drawerRow(t("cLev"),esc(r.lv||r.lvp||"—"))}
       ${drawerRow(t("cKorea"),esc(enumv(r.kr)||"—"))}${drawerRow(t("cMt5"),r.m5===true?"✓":"?")}</div></div>
 
-    <div class="panel"><h3>${esc(t("sectNotes"))}</h3>${notesBlock(r.no)}</div>
+    <div class="panel"><h3>${esc(t("sectNotes"))}</h3><div id="notesHost">${notesBlock(fullNote(r))}</div></div>
     <div class="panel"><h3>${esc(t("sectEv"))}</h3>${evidenceBlock(r)}</div>
     ${faqBlock([[lang==="ko"?"이 상품은 어떤 기준으로 표시되나요?":"How is this product shown?",
       lang==="ko"?"값은 기록된 원문이며 unknown은 미조사입니다. 자금 투입 전 공식 사이트에서 확인하세요.":"Values are records; unknown means not researched. Verify on the official site before funding."],
       [lang==="ko"?"비교하려면?":"How do I compare?",
       lang==="ko"?"‘비교에 추가’를 누른 뒤 챌린지의 비교 버튼으로 이동하세요.":"Add to compare, then open the compare button on the challenges page."]])}`;
+  ensureNotes(()=>{ const h=document.getElementById("notesHost"); if(h && !h.dataset.full){ h.innerHTML=notesBlock(fullNote(r)); h.dataset.full="1"; } });
   const add=el("chAdd"); if(add) add.onclick=()=>{if(addPick(r.i)) add.textContent=lang==="ko"?"비교에 추가됨":"Added"; else flashCmpFull(); renderBar();};
 }
 
