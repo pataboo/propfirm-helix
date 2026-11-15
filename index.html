@@ -735,8 +735,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="c0009d5a";</script>
-<script src="data.js?v=c0009d5a"></script>
+<script>window.HELIX_VER="d39cde7a";</script>
+<script src="data.js?v=d39cde7a"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -2362,13 +2362,14 @@ function brokerChallengeCount(b){
   if(!keys.size) return 0;
   return rows.filter(r=>challengePlatforms(r).map(platKey).some(k=>k&&keys.has(k))).length;
 }
-const PLAN={people:3, capital:100000, mk:"cfd", budget:1500};
+const PLAN={people:3, capital:100000, mk:"cfd", budget:1500, verifiedOnly:true};
 function planPicks(){
   const seen=new Set(), out=[];
   rows.forEach(r=>{
     if(r.mk!==PLAN.mk) return;
     if(num(r.s)!==PLAN.capital) return;
     const pr0=num(r.pr);
+    if(PLAN.verifiedOnly && r.vf!=="A") return;       // a family spending money should see an official price
     if(pr0===0 || pr0==null) return;                 // a free trial cannot fund a family plan
     if(!costPlausible(r)) return;                     // $3.50 for a 100K account is a scrape artefact
     if(/trial|demo/i.test(String(r.p||""))) return;   // nor can a demo/eval-only product
@@ -2418,6 +2419,9 @@ function renderPlan(){
         ${["cfd","fut","crypto"].map(k=>`<button class="gopt${PLAN.mk===k?" on":""}" data-pk="mk" data-pv="${k}">${esc(assetLabel(k))}</button>`).join("")}</div></div>
       <div class="grow"><div class="glabel">${T("참가비 총예산","Total fee budget")}</div><div class="gopts">
         ${[300,800,1500,3000,6000].map(n=>`<button class="gopt${PLAN.budget===n?" on":""}" data-pk="budget" data-pv="${n}">≤ $${n.toLocaleString("en-US")}</button>`).join("")}</div></div>
+      <div class="grow"><div class="glabel">${T("가격 출처","Price source")}</div><div class="gopts">
+        <button class="gopt${PLAN.verifiedOnly?" on":""}" data-pv="1" data-pk="vo">${T("공식 확인만","official only")}</button>
+        <button class="gopt${PLAN.verifiedOnly?"":" on"}" data-pv="0" data-pk="vo">${T("전체","all")}</button></div></div>
     </div>
 
     ${best?`
@@ -2446,11 +2450,11 @@ function renderPlan(){
     <div class="panel"><h3>${T("실행 브로커","Brokers to run it")} <span>${esc(challengePlatforms(best).join(" · ")||"—")}</span></h3>
       ${brk.length?brk.map(brokerRow).join(""):`<div class="meta">${T("같은 플랫폼 브로커가 DB에 없습니다.","No broker for this platform yet.")}</div>`}
       <div class="meta" style="margin-top:8px"><a href="#brokers">${T("브로커 전체 보기","All brokers")} →</a></div></div>
-    `:`<div class="panel"><div class="meta">${T("이 규모·자산군 조합에 해당하는 챌린지가 없습니다. 규모나 자산군을 바꿔보세요.","No challenge matches this size and market — try another.")}</div></div>`}
+    `:`<div class="panel"><div class="meta">${T("이 조건에 맞는 챌린지가 없습니다.","No challenge matches this combination.")} ${PLAN.verifiedOnly?`<button class="gopt" data-pk="vo" data-pv="0">${T("전체 보기 (미검증 포함)","Include unverified")}</button>`:T("규모나 자산군을 바꿔보세요.","Try another size or market.")}</div></div>`}
   `;
   el("planMain").querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{
     const k=b.dataset.pk, v=b.dataset.pv;
-    PLAN[k]=(k==="mk")?v:Number(v); renderPlan();});
+    PLAN[k]=(k==="mk")?v:(k==="vo"?v==="1":Number(v)); renderPlan();});
 }
 const BK={plat:new Set(), reg:new Set(), nbp:false, maxDep:null};
 function brokerFiltered(){
