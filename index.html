@@ -2402,6 +2402,23 @@ function planCopyVerdict(r){
   if(r.cc===true||r.cc==="cond") return "yes";
   return "unknown";
 }
+// 첫 지급까지 걸리는 날짜를 '기록된 값'만으로 계산한다: 최소 거래일 + 지급 주기.
+// 둘 중 하나라도 없으면 null — 추정해서 지어내지 않는다.
+function cycleDays(pc){
+  const t=String(pc||"").toLowerCase();
+  if(!t) return null;
+  if(/on demand|anytime|즉시|수시/.test(t)) return 0;
+  if(/daily|매일|every 24h/.test(t)) return 1;
+  if(/weekly|주간|every 7/.test(t)) return 7;
+  const m=t.match(/(\d+)\s*(?:day|일)/);
+  if(m) return Number(m[1]);
+  return null;
+}
+function firstPayout(r){
+  const md=num(r.md), cy=cycleDays(r.pc);
+  if(md==null || cy==null) return null;
+  return {days: md+cy, md, cy};
+}
 function renderPlan(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const picks=planPicks();
@@ -2444,6 +2461,7 @@ function renderPlan(){
       <div class="stat"><div class="n" style="color:${over?"var(--amber)":"var(--ink)"}">${money(totalFee,best.cu||"USD")}</div><div class="l">${T("참가비 합계","Total fees")}</div></div>
       <div class="stat"><div class="n">${PLAN.people}×</div><div class="l">${esc(best.f)}</div></div>
       <div class="stat"><div class="n">${brk.length}</div><div class="l">${T("실행 가능 브로커","Brokers available")}</div></div>
+      ${(()=>{const f=firstPayout(best); return f?`<div class="stat"><div class="n">${f.days}${T("일","d")}</div><div class="l">${T("첫 지급까지(추정)","First payout (est.)")}</div></div>`:"";})()}
     </div>
 
     <div class="panel"><h3>${T("선택된 챌린지","Selected challenge")} <span>${T("1인 최저가 기준","cheapest per person")}</span></h3>
@@ -2458,6 +2476,7 @@ function renderPlan(){
     <div class="panel"><h3>${T("시나리오 계산","Scenario maths")} <span>${T("보장 아님 · 목표 도달 시","not a promise")}</span></h3>
       <div class="meta">${T("1인이 목표 수익률을 달성했을 때 받는 금액 (참가비 차감 전)","Payout per person if they hit the target, before fees")}</div>
       ${[4,6,8,10].map(pct=>`<div class="srow"><span>${T("목표","Target")} ${pct}%</span><b>${money(scen(pct)||0,best.cu||"USD")}</b><span class="dim">${PLAN.people}${T("명 합계","total")} ${money((scen(pct)||0)*PLAN.people,best.cu||"USD")}</span></div>`).join("")}
+      ${(()=>{const f=firstPayout(best); return f?`<div class="meta" style="margin-top:8px">${T(`첫 지급까지 약 ${f.days}일 = 최소 거래일 ${f.md}일 + 지급 주기 ${f.cy}일 (기록된 값으로만 계산)`,`About ${f.days} days to first payout = ${f.md} minimum trading days + ${f.cy}-day payout cycle (from recorded values only)`)}</div>`:`<div class="meta" style="margin-top:8px">${T("최소 거래일 또는 지급 주기가 기록되지 않아 첫 지급 시점을 계산할 수 없습니다.","Minimum trading days or payout cycle is unrecorded, so time to first payout cannot be computed.")}</div>`;})()}
       <div class="meta" style="margin-top:8px">${T("실제 지급은 업체 심사·규정 준수에 따릅니다. 이 표는 산수일 뿐 수익 보장이 아닙니다.","Actual payouts depend on the firm's review and rules. This is arithmetic, not a guarantee.")}</div>
     </div>
 
