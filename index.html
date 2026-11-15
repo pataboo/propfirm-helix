@@ -147,6 +147,8 @@
     background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);color:var(--accent);
     font-size:12px;font-weight:700;text-decoration:none}
   .goalCTA:hover{background:rgba(167,139,250,.22)}
+  .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .srow b{color:var(--accent);font-size:13px}
   .gcheck{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
   .gcheck .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px;background:var(--muted)}
   .gcheck.no{border-color:rgba(239,125,125,.35);background:rgba(239,125,125,.06)} .gcheck.no .dot{background:#ef7d7d}
@@ -609,6 +611,7 @@
     <a href="#offers" data-page="offers">Offers</a>
     <a href="#rules" data-page="rules">Rules</a>
     <a href="#brokers" data-page="brokers">Brokers</a>
+    <a href="#plan" data-page="plan">Family plan</a>
     <a href="#tools" data-page="tools">Tools</a>
     <a href="#spreads" data-page="spreads">Spreads</a>
     <a href="#payouts" data-page="payouts">Payouts</a>
@@ -681,6 +684,7 @@
 <div class="shell" id="pageDiscover" style="display:none"><main id="discoverMain"></main></div>
 <div class="shell" id="pageGoal" style="display:none"><main id="goalMain"></main></div>
 <div class="shell" id="pageBrokers" style="display:none"><main id="brokersMain"></main></div>
+<div class="shell" id="pagePlan" style="display:none"><main id="planMain"></main></div>
 <div class="shell" id="pageChallenge" style="display:none"><main id="challengeMain"></main></div>
 <div class="shell" id="pageOffers" style="display:none"><main id="offersMain"></main></div>
 <div class="shell" id="pagePayouts" style="display:none"><main id="payoutsMain"></main></div>
@@ -2342,6 +2346,98 @@ function brokerChallengeCount(b){
   if(!keys.size) return 0;
   return rows.filter(r=>challengePlatforms(r).map(platKey).some(k=>k&&keys.has(k))).length;
 }
+const PLAN={people:3, capital:100000, mk:"cfd", budget:1500};
+function planPicks(){
+  const seen=new Set(), out=[];
+  rows.forEach(r=>{
+    if(r.mk!==PLAN.mk) return;
+    if(num(r.s)!==PLAN.capital) return;
+    const pr0=num(r.pr);
+    if(pr0===0 || pr0==null) return;                 // a free trial cannot fund a family plan
+    if(/trial|demo/i.test(String(r.p||""))) return;   // nor can a demo/eval-only product
+    const key=r.f+"|"+r.p;
+    if(seen.has(key)) return;
+    seen.add(key);
+    out.push(r);
+  });
+  return out.sort((a,b)=>{
+    const pa=num(a.pr)??1e9, pb=num(b.pr)??1e9;
+    return pa-pb;
+  });
+}
+function planCopyVerdict(r){
+  const e=(DB.eap||{})[r.f]||{};
+  const t=String(e.copy||"")+" "+String(r.cc||"");
+  if(r.cc===false||/not allowed|prohibited|금지|불가/i.test(t)) return "no";
+  if(/personal accounts only|own accounts|same individual|본인/i.test(t)) return "own";
+  if(r.cc===true||r.cc==="cond") return "yes";
+  return "unknown";
+}
+function renderPlan(){
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  const picks=planPicks();
+  const best=picks[0]||null;
+  const feeEach=best?(num(best.pr)??0):0;
+  const totalFee=feeEach*PLAN.people;
+  const totalCap=PLAN.capital*PLAN.people;
+  const over=totalFee>PLAN.budget;
+  const v=best?planCopyVerdict(best):"unknown";
+  const vmap={
+    no:{cls:"no", ko:"이 챌린지는 카피트레이딩이 금지입니다. 가족 구성원은 각자 다른 전략을 써야 하며, 같은 진입을 반복하면 위반 위험이 큽니다.", en:"Copy trading is prohibited here — each member must trade a different strategy, or the accounts risk a breach."},
+    own:{cls:"cond", ko:"본인 명의 계좌끼리만 카피 가능합니다. 배우자·자녀 계좌는 소유자가 달라 카피 대상이 아닙니다.", en:"Only accounts in the same person's name may copy; a spouse or child's account is a different owner."},
+    yes:{cls:"yes", ko:"카피가 허용됩니다. 단 모든 계좌가 같은 사람 소유여야 합니다.", en:"Copying is allowed, provided every account belongs to the same person."},
+    unknown:{cls:"unk", ko:"카피 규칙이 기록되지 않았습니다. 진행 전에 업체 규정을 확인하세요.", en:"Copy rules are not recorded for this brand — verify before funding."}
+  };
+  const m=vmap[v];
+  const brk=best?brokersForPlatforms(challengePlatforms(best)):[];
+  const scen=(pct)=>{ if(!best) return null; const gross=PLAN.capital*pct/100*(num(best.sp)||0)/100; return Math.round(gross); };
+  el("planMain").innerHTML=`
+    <div class="ghero"><h1>${T("가족·그룹 플랜 계산","Family and group plan")}</h1>
+      <p class="gsub">${T("몇 명이, 각자 얼마로, 어떤 챌린지를 살 때 — 총 자본과 참가비, 카피 규칙 위험, 실행 브로커를 한 번에 봅니다.","How many people, how much each, which challenge — total capital, total fees, copy-rule risk and the brokers to run it, in one view.")}</p></div>
+
+    <div class="gpanel">
+      <div class="grow"><div class="glabel">${T("참여 인원","People")}</div><div class="gopts">
+        ${[1,2,3,4,5,6].map(n=>`<button class="gopt${PLAN.people===n?" on":""}" data-pk="people" data-pv="${n}">${n}${T("명","")}</button>`).join("")}</div></div>
+      <div class="grow"><div class="glabel">${T("1인 자본","Capital each")}</div><div class="gopts">
+        ${[10000,25000,50000,100000,200000].map(n=>`<button class="gopt${PLAN.capital===n?" on":""}" data-pk="capital" data-pv="${n}">${n>=1000?Math.round(n/1000)+"K":"$"+n}</button>`).join("")}</div></div>
+      <div class="grow"><div class="glabel">${T("자산군","Market")}</div><div class="gopts">
+        ${["cfd","fut","crypto"].map(k=>`<button class="gopt${PLAN.mk===k?" on":""}" data-pk="mk" data-pv="${k}">${esc(assetLabel(k))}</button>`).join("")}</div></div>
+      <div class="grow"><div class="glabel">${T("참가비 총예산","Total fee budget")}</div><div class="gopts">
+        ${[300,800,1500,3000,6000].map(n=>`<button class="gopt${PLAN.budget===n?" on":""}" data-pk="budget" data-pv="${n}">≤ $${n.toLocaleString("en-US")}</button>`).join("")}</div></div>
+    </div>
+
+    ${best?`
+    <div class="stats" style="margin-bottom:14px">
+      <div class="stat"><div class="n">${money(totalCap,"USD")}</div><div class="l">${T("총 자본","Total capital")}</div></div>
+      <div class="stat"><div class="n" style="color:${over?"var(--amber)":"var(--ink)"}">${money(totalFee,best.cu||"USD")}</div><div class="l">${T("참가비 합계","Total fees")}</div></div>
+      <div class="stat"><div class="n">${PLAN.people}×</div><div class="l">${esc(best.f)}</div></div>
+      <div class="stat"><div class="n">${brk.length}</div><div class="l">${T("실행 가능 브로커","Brokers available")}</div></div>
+    </div>
+
+    <div class="panel"><h3>${T("선택된 챌린지","Selected challenge")} <span>${T("1인 최저가 기준","cheapest per person")}</span></h3>
+      <div class="brow" style="border:0"><a href="#challenge/${esc(best.i)}">${esc(best.f)} · ${esc(best.p)}</a>
+        <span class="bmeta">${money(best.s,best.cu)} · ${money(best.pr,best.cu)} · ${best.sp?esc(best.sp)+"%":"—"} · ${payCell(best.pc)}</span></div>
+      ${over?`<div class="gcheck cond" style="margin-top:8px"><span class="dot"></span>${T(`예산 $${PLAN.budget.toLocaleString("en-US")}를 $${(totalFee-PLAN.budget).toLocaleString("en-US")} 초과합니다. 인원을 줄이거나 더 저렴한 규모를 고르세요.`,`Over budget by $${(totalFee-PLAN.budget).toLocaleString("en-US")}. Reduce people or pick a smaller size.`)}</div>`:""}
+    </div>
+
+    <div class="panel"><h3>${T("가족·그룹 카피 규칙","Copy rules for a group")}</h3>
+      <div class="gcheck ${m.cls}"><span class="dot"></span>${esc(T(m.ko,m.en))}</div></div>
+
+    <div class="panel"><h3>${T("시나리오 계산","Scenario maths")} <span>${T("보장 아님 · 목표 도달 시","not a promise")}</span></h3>
+      <div class="meta">${T("1인이 목표 수익률을 달성했을 때 받는 금액 (참가비 차감 전)","Payout per person if they hit the target, before fees")}</div>
+      ${[4,6,8,10].map(pct=>`<div class="srow"><span>${T("목표","Target")} ${pct}%</span><b>${money(scen(pct)||0,best.cu||"USD")}</b><span class="dim">${PLAN.people}${T("명 합계","total")} ${money((scen(pct)||0)*PLAN.people,best.cu||"USD")}</span></div>`).join("")}
+      <div class="meta" style="margin-top:8px">${T("실제 지급은 업체 심사·규정 준수에 따릅니다. 이 표는 산수일 뿐 수익 보장이 아닙니다.","Actual payouts depend on the firm's review and rules. This is arithmetic, not a guarantee.")}</div>
+    </div>
+
+    <div class="panel"><h3>${T("실행 브로커","Brokers to run it")} <span>${esc(challengePlatforms(best).join(" · ")||"—")}</span></h3>
+      ${brk.length?brk.map(brokerRow).join(""):`<div class="meta">${T("같은 플랫폼 브로커가 DB에 없습니다.","No broker for this platform yet.")}</div>`}
+      <div class="meta" style="margin-top:8px"><a href="#brokers">${T("브로커 전체 보기","All brokers")} →</a></div></div>
+    `:`<div class="panel"><div class="meta">${T("이 규모·자산군 조합에 해당하는 챌린지가 없습니다. 규모나 자산군을 바꿔보세요.","No challenge matches this size and market — try another.")}</div></div>`}
+  `;
+  el("planMain").querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.pk, v=b.dataset.pv;
+    PLAN[k]=(k==="mk")?v:Number(v); renderPlan();});
+}
 function renderBrokers(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const list=((DB.brokers||{}).brokers||[]);
@@ -3549,7 +3645,7 @@ function renderRules(){
     location.hash="#firm/"+encodeURIComponent(tr.dataset.firm); route();
   });
 }
-const PAGES={brokers:"pageBrokers",goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
+const PAGES={plan:"pagePlan",brokers:"pageBrokers",goal:"pageGoal",home:"pageHome",offers:"pageOffers",firms:"pageFirms",docs:"pageDocs",method:"pageMethod",discover:"pageDiscover",challenge:"pageChallenge",challenges:"pageChallenges",compare:"pageCompare",
              tools:"pageTools",rules:"pageRules",spreads:"pageSpreads",payouts:"pagePayouts"};
 function route(){
   let h=(location.hash||"").replace(/^#/,"")||"home";
@@ -3571,7 +3667,7 @@ function route(){
   if(isFirm) el("pageChallenges").style.display="none";
   if(isCh){ const cid=decodeURIComponent(h.slice(10)); const cr=rows.find(x=>x.i===cid); setTitle(cr?cr.f:""); }
   document.querySelectorAll("#subnav a").forEach(a=>a.classList.toggle("on",a.dataset.page===page));
-  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",brokers:"Brokers",
+  const TITLES={home:"",challenges:"Challenges",compare:"Compare Challenges",offers:"Offers",firms:"Prop Firms",docs:"Docs",method:"Method & Fields",goal:"Goal finder",brokers:"Brokers",plan:"Family plan",
     rules:"Prop Firm Rules",spreads:"Spreads",payouts:"Payouts",tools:"Trading Tools"};
   if(isFirm){ const nm=decodeURIComponent(h.slice(5)); setTitle(nm); }
   else if(!isCh) setTitle(TITLES[page]!==undefined?TITLES[page]:"Challenges");
@@ -3581,6 +3677,7 @@ function route(){
   else if(page==="firms") renderFirms();
   else if(page==="docs") renderDocs();
   else if(page==="method") renderMethod();
+  else if(page==="plan") renderPlan();
   else if(page==="brokers") renderBrokers();
   else if(page==="goal") renderGoal();
   else if(page==="discover") renderDiscover();
