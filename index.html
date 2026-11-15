@@ -158,6 +158,16 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .pfmgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
+  .pfmgrid .glabel{margin-bottom:6px}
+  .stars{display:flex;flex-direction:column;gap:3px;margin:8px 0 4px;max-width:320px}
+  .stars .sb{display:grid;grid-template-columns:26px 1fr 42px;gap:8px;align-items:center;font-size:11px;color:var(--muted)}
+  .sbar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+  .sbar i{display:block;height:100%;background:var(--accent)}
+  .miniT{width:100%;border-collapse:collapse;font-size:12px}
+  .miniT th,.miniT td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left}
+  .miniT th{color:var(--muted);font-weight:600}
+  @media(max-width:900px){.pfmgrid{grid-template-columns:1fr}}
   .spreadsT{table-layout:fixed;width:100%;min-width:900px}
   .spreadsT th,.spreadsT td{white-space:normal;overflow-wrap:anywhere}
   .spreadsT th:first-child,.spreadsT td:first-child{width:150px}
@@ -752,8 +762,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="638a12dc";</script>
-<script src="data.js?v=638a12dc"></script>
+<script>window.HELIX_VER="768116d1";</script>
+<script src="data.js?v=768116d1"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -3496,6 +3506,34 @@ function renderFirm(name){
       <td><span class="pill p-${esc(r.vf||"C")}">${esc(r.vf||"—")}</span></td>
     </tr>`).join("");
 
+  const pf=(DB.pfmf||{})[String(name).toLowerCase()]||null;
+  const pfmBlock = (()=>{
+    if(!pf) return "";
+    const T=(ko,en)=>lang==="ko"?ko:en;
+    const dist=Array.isArray(pf.d)?pf.d:null;
+    const stars=dist?[5,4,3,2,1].map((s,i)=>[s,Number(dist[i])||0]):[];   // dist = [5★,4★,3★,2★,1★]
+    const tot=stars.reduce((a,[,n])=>a+n,0)||1;
+    const bars=stars.length?`<div class="stars">${stars.map(([s,n])=>`<div class="sb"><span>${s}★</span>
+        <div class="sbar"><i style="width:${Math.round(n/tot*100)}%"></i></div><span class="dim">${n}</span></div>`).join("")}</div>`:"";
+    const lev=(pf.lv||[]);
+    const levTbl=lev.length?`<table class="miniT"><thead><tr><th>${T("자산","Asset")}</th><th>Instant</th><th>1-Step</th><th>2-Step</th><th>3-Step</th></tr></thead>
+      <tbody>${lev.map(r0=>`<tr><td>${esc(r0[0])}</td>${r0.slice(1,5).map(v=>`<td class="num">${esc(v||"—")}</td>`).join("")}</tr>`).join("")}</tbody></table>`:"";
+    const eapPlats=((DB.eap||{})[name]||{}).platforms||[];
+    const platsShown=(pf.p&&pf.p.length)?pf.p:eapPlats;
+    const chips=(arr)=>arr&&arr.length?arr.map(x=>`<span class="gopt on" style="cursor:default">${esc(x)}</span>`).join(""):'<span class="dim">—</span>';
+    return `<div class="panel" style="margin-top:14px"><h3>${T("PropFirmMatch 프로필","PropFirmMatch profile")}
+        <span>${pf.r?`★ ${esc(pf.r)}`:"—"}${pf.n?` · ${esc(pf.n)} ${T("리뷰","reviews")}`:""}</span></h3>
+      ${bars}
+      <div class="pfmgrid">
+        <div><div class="glabel">${T("플랫폼","Platforms")}</div><div class="gopts">${chips(platsShown)}</div></div>
+        <div><div class="glabel">${T("입금 수단","Payment methods")}</div><div class="gopts">${chips(pf.pm)}</div></div>
+        <div><div class="glabel">${T("출금 수단","Payout methods")}</div><div class="gopts">${chips(pf.po)}</div></div>
+      </div>
+      ${levTbl?`<div style="margin-top:12px"><div class="glabel">${T("레버리지 (PFM 표)","Leverage (PFM table)")}</div>${levTbl}</div>`:""}
+      ${pf.an?`<details class="fgroup"><summary>${T("최근 공지","Recent announcement")}</summary><div class="pfmbody">${esc(pf.an)}</div></details>`:""}
+      <div class="srcline">${T("출처","Source")}: propfirmmatch.com/prop-firms/${esc(pf.s||"")} (2026-11)</div></div>`;
+  })();
+
   el("firmMain").innerHTML=`
     <div class="fhero">
       <div>
@@ -3518,6 +3556,7 @@ function renderFirm(name){
       <button type="button" data-go="fPlat">${lang==="ko"?"EA · 플랫폼":"EA · platforms"} <b>${plats.length}</b></button>
       <button type="button" data-go="fPay">${lang==="ko"?"지급":"Payout"} <b>${plans.length}</b></button>
     </div>
+    ${pfmBlock}
 
     <div class="panel fpanel" id="fRules">
       <h3>${lang==="ko"?"규칙":"Rules"} <span class="ct">${lang==="ko"?"상품 단위 집계":"per-product aggregate"}</span></h3>
