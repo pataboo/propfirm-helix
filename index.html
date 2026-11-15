@@ -3076,8 +3076,13 @@ function renderFirms(){
         <td>${(()=>{
         const gs=["A","B","C"].filter(g=>o.g[g]);
         if(!gs.length) return '<span class="dim">—</span>';
+        // 한 브랜드에 등급을 두 개 이상 보여주면 "등급이 왜 둘이지"가 된다. 대표 등급 하나만 표시하고
+        // 나머지는 툴팁에 남긴다 (행 수가 많은 쪽, 동률이면 더 높은 등급).
+        const best=gs.slice().sort((a,b)=>(o.g[b]-o.g[a])||("ABC".indexOf(a)-"ABC".indexOf(b)))[0];
         const tip=gs.map(g=>`${g} ${o.g[g]}${lang==="ko"?"행":" rows"}`).join(" · ");
-        return `<span title="${esc(tip)}">`+gs.map(g=>`<span class="pill p-${g}" style="margin-right:4px">${g}<span class="dim" style="font-weight:600"> ${o.g[g]}</span></span>`).join("")+`</span>`;
+        const rest=gs.filter(g=>g!==best).reduce((a,g)=>a+o.g[g],0);
+        return `<span title="${esc(tip)}"><span class="pill p-${best}">${best}</span>`+
+          (rest?`<span class="dim" style="font-size:10px;margin-left:4px">+${rest}</span>`:"")+`</span>`;
       })()}</td>
         <td>${o.site?`<a href="${esc(o.site)}" target="_blank" rel="noopener" style="font-size:12px">site ↗</a>`:""}</td>
       </tr>`).join("")}</tbody></table></div></div>
@@ -3873,8 +3878,13 @@ function renderRules(){
       <td>${(()=>{
         const gs=["A","B","C"].filter(g=>o.g[g]);
         if(!gs.length) return '<span class="dim">—</span>';
+        // 한 브랜드에 등급을 두 개 이상 보여주면 "등급이 왜 둘이지"가 된다. 대표 등급 하나만 표시하고
+        // 나머지는 툴팁에 남긴다 (행 수가 많은 쪽, 동률이면 더 높은 등급).
+        const best=gs.slice().sort((a,b)=>(o.g[b]-o.g[a])||("ABC".indexOf(a)-"ABC".indexOf(b)))[0];
         const tip=gs.map(g=>`${g} ${o.g[g]}${lang==="ko"?"행":" rows"}`).join(" · ");
-        return `<span title="${esc(tip)}">`+gs.map(g=>`<span class="pill p-${g}" style="margin-right:4px">${g}<span class="dim" style="font-weight:600"> ${o.g[g]}</span></span>`).join("")+`</span>`;
+        const rest=gs.filter(g=>g!==best).reduce((a,g)=>a+o.g[g],0);
+        return `<span title="${esc(tip)}"><span class="pill p-${best}">${best}</span>`+
+          (rest?`<span class="dim" style="font-size:10px;margin-left:4px">+${rest}</span>`:"")+`</span>`;
       })()}</td>
     </tr>`).join("");
   if(el("foot2")) el("foot2").innerHTML=t("foot");
