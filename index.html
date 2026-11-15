@@ -895,24 +895,24 @@ function lossCell(val, txt, r){
 function rulesCell(r){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const items=[
-    ["E", r.ec, T("EA · 평가 단계","EA · evaluation")],
-    ["E", r.ef, T("EA · 펀딩 단계","EA · funded")],
-    ["C", r.cc, T("카피트레이딩 · 평가","Copy trading · evaluation")],
-    ["C", r.cf, T("카피트레이딩 · 펀딩","Copy trading · funded")],
-    ["N", r.nc, T("뉴스 거래","News trading")],
-    ["O", r.oc, T("오버나이트 보유","Overnight holding")],
-    ["W", (r.wc!=null?r.wc:r.wk), T("주말 보유","Weekend holding")],
+    ["E", r.ec, T("EA · 평가","EA · evaluation")],
+    ["E", r.ef, T("EA · 펀딩","EA · funded")],
+    ["C", r.cc, T("카피트레이딩 · 평가","Copy · evaluation")],
+    ["C", r.cf, T("카피트레이딩 · 펀딩","Copy · funded")],
+    ["N", r.nc, T("뉴스 거래 · 평가","News · evaluation")],
+    ["N", r.nf, T("뉴스 거래 · 펀딩","News · funded")],
+    ["O", r.oc, T("오버나이트 보유 · 평가","Overnight · evaluation")],
+    ["O", r.of, T("오버나이트 보유 · 펀딩","Overnight · funded")],
+    ["W", (r.wc!=null?r.wc:r.wk), T("주말 보유 · 평가","Weekend · evaluation")],
+    ["W", r.wf, T("주말 보유 · 펀딩","Weekend · funded")],
   ];
   const known=items.filter(([,v])=>v!=null);
   if(!known.length) return '<span class="dim">—</span>';
-  const cls=(v)=> v===true?"py":(v==="cond"?"pcond":(v===false?"pno":"puk"));
   const lbl=(v)=> v===true?T("허용","allowed"):v==="cond"?T("조건부·애드온","conditional / add-on"):v===false?T("금지","prohibited"):T("미확인","unknown");
-  return `<span class="pcode">${items.map(([ch,v,tip])=>{
-    let extra="";
-    if(ch==="W" && r.wf!=null && String(r.wf)!==String(r.wc!=null?r.wc:r.wk))
-      extra = T(" · 펀딩 단계: "," · funded: ") + lbl(r.wf);
-    return `<span class="pl ${cls(v)}" title="${esc(tip)}: ${esc(lbl(v))}${esc(extra)}">${ch}</span>`;
-  }).join("")}</span>`;
+  const cls=(v)=> v===true?"py":(v==="cond"?"pcond":(v===false?"pno":"puk"));
+  return `<span class="pcode" title="${esc(T("10글자: E·EA, C·카피, N·뉴스, O·오버나이트, W·주말 — 각 2글자는 평가/펀딩 순서","10 letters: E EA, C copy, N news, O overnight, W weekend — each pair is evaluation then funded"))}">`+
+    items.map(([ch,v,tip])=>`<span class="pl ${cls(v)}" title="${esc(tip)}: ${esc(lbl(v))}">${ch}</span>`).join("")+
+    `</span>`;
 }
 function evCell(r){
   const g=r.vf||"—", sy=r.sy||"";
