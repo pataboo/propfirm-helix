@@ -1043,8 +1043,11 @@ function daysCell(r){
   const n=Number(v);
   return isNaN(n) ? esc(String(v)) : String(n);
 }
+const CURS={USD:"$",EUR:"€",GBP:"£",KRW:"₩"};
 function money(v,cur){if(v==null||v==="")return '<span class="dim">—</span>';const n=num(v);if(n==null)return esc(v);
-  const sym=((cur||"").toUpperCase()==="USD"||!cur)?"$":"";return `<span class="mono">${sym}${n.toLocaleString('en-US')}</span>`;}
+  const c=(cur||"USD").toUpperCase(), sym=CURS[c]||"";
+  const txt=n.toLocaleString('en-US')+(CURS[c]?"":` ${c}`);
+  return `<span class="mono">${sym}${txt}</span>`;}
 
 /* ---------- notes ---------- */
 /* Rule-based KO summary: pull target / loss / split / payout segments out of the
@@ -2512,7 +2515,7 @@ function costOf(r){
 }
 function costPlausible(r){
   const c=costOf(r), sz=num(r.s)||0;
-  if(!sz) return true;
+  if(!sz || c===0) return true;          // a free challenge is free, not implausible
   return c >= Math.max(20, sz*0.0005);   // a $100K account cannot cost $3.50
 }
 const GOAL={size:100000, mk:"cfd", budget:300, speed:"any", rules:new Set()};
