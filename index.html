@@ -147,6 +147,11 @@
     background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);color:var(--accent);
     font-size:12px;font-weight:700;text-decoration:none}
   .goalCTA:hover{background:rgba(167,139,250,.22)}
+  .brow{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}
+  .brow:last-child{border-bottom:0}
+  .brow a{font-size:12.5px;font-weight:700;color:var(--ink)}
+  .brow a:hover{color:var(--accent)}
+  .bmeta{font-size:11px;color:var(--muted)}
   .breg,.bplat{display:flex;flex-wrap:wrap;gap:3px;max-width:220px}
   .btag{background:rgba(167,139,250,.10);border-radius:4px;padding:0 5px;font-size:10px;color:var(--ink2);line-height:16px}
   .ghero{margin:6px 0 14px}
@@ -2279,6 +2284,7 @@ function renderChallenge(id){
     </div>
 
     ${eapBlock(r.f)}
+    ${brokerPanel(r)}
     <div class="panel"><h3>${esc(t("sectCond"))}</h3>
       <div class="rules">${ruleChip(t("fEa"),r.ec)}${ruleChip(t("fNews"),r.nc)}${ruleChip(t("fOn"),r.oc)}
       ${ruleChip(t("fCp"),r.cc)}${ruleChip(t("fWk"),r.wk)}</div>
@@ -2325,6 +2331,11 @@ const cycLabel=d=>d===0?(lang==="ko"?"수시/즉시":"On demand")
   :d===1?(lang==="ko"?"매일":"Daily")
   :(lang==="ko"?d+"일":d+" days");
 
+function brokerChallengeCount(b){
+  const keys=new Set((b.plat||[]).map(platKey).filter(Boolean));
+  if(!keys.size) return 0;
+  return rows.filter(r=>challengePlatforms(r).map(platKey).some(k=>k&&keys.has(k))).length;
+}
 function renderBrokers(){
   const T=(ko,en)=>lang==="ko"?ko:en;
   const list=((DB.brokers||{}).brokers||[]);
@@ -2340,6 +2351,7 @@ function renderBrokers(){
     <td>${b.nbp===true?'<span class="yes">✓</span>':b.nbp===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
     <td>${b.seg===true?'<span class="yes">✓</span>':b.seg===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
     <td class="num">${b.founded||'<span class="dim">—</span>'}</td>
+    <td class="num">${brokerChallengeCount(b).toLocaleString("en-US")}</td>
     <td class="evc"><span class="evwrap" title="${esc((b.q||"")+" — "+b.src)}" tabindex="0">✓</span> <a href="${esc(b.src)}" target="_blank" rel="noopener" style="text-decoration:none">↗</a></td>
   </tr>`;
   el("brokersMain").innerHTML=`
@@ -2351,7 +2363,7 @@ function renderBrokers(){
         <th scope="col" class="num">${T("최소입금","Min deposit")}</th><th scope="col">${T("플랫폼","Platforms")}</th>
         <th scope="col" class="num">EUR/USD</th><th scope="col" class="num">${T("수수료","Commission")}</th>
         <th scope="col">${T("레버리지","Leverage")}</th><th scope="col">${T("NBP","NBP")}</th>
-        <th scope="col">${T("자금분리","Segregated")}</th><th scope="col" class="num">${T("설립","Founded")}</th><th scope="col">${T("근거","Source")}</th>
+        <th scope="col">${T("자금분리","Segregated")}</th><th scope="col" class="num">${T("설립","Founded")}</th><th scope="col" class="num">${T("호환 챌린지","Runnable challenges")}</th><th scope="col">${T("근거","Source")}</th>
       </tr></thead><tbody>${ok.map(row).join("")}</tbody></table></div></div>
     <div class="panel" style="margin-top:14px"><h3>${T("아직 확인하지 못한 브로커","Not yet verifiable")} <span>${list.length-ok.length}</span></h3>
       ${list.filter(b=>b.status!=="verified").map(b=>`<div class="meta">${esc(b.name)} — ${esc(b.note)} <a href="${esc(b.src)}" target="_blank" rel="noopener">↗</a></div>`).join("")||`<div class="dim">${T("없음","none")}</div>`}
@@ -3411,6 +3423,43 @@ function pfmRulesBlock(){
     ${srcNote(lang==="ko"
       ? '회사별 규칙 요약 출처: <a href="https://propfirmmatch.com/prop-firm-rules" target="_blank" rel="noopener">propfirmmatch.com/prop-firm-rules</a> (2026-11). 본문은 원문 그대로 인용했습니다.'
       : 'Rule summaries source: <a href="https://propfirmmatch.com/prop-firm-rules" target="_blank" rel="noopener">propfirmmatch.com/prop-firm-rules</a> (Nov 2026). Quoted verbatim.')}`;
+}
+const PLAT_NORM=[["mt4","mt4"],["metatrader 4","mt4"],["metatrader4","mt4"],
+  ["mt5","mt5"],["metatrader 5","mt5"],["metatrader5","mt5"],
+  ["ctrader","ctrader"],["tradingview","tradingview"],["matchtrader","matchtrader"],
+  ["tradelocker","tradelocker"],["dxtrade","dxtrade"],["proreal","proreal"],
+  ["xstation","xstation"],["saxtrader","saxtrader"],["saxoinvestor","saxtrader"],
+  ["proptrader","saxtrader"],["tradovate","tradovate"],["thinktrader","thinktrader"]];
+function platKey(name){
+  const t=String(name||"").toLowerCase();
+  for(const [needle,key] of PLAT_NORM){ if(t.includes(needle)) return key; }
+  return null;
+}
+function challengePlatforms(r){
+  const e=(DB.eap||{})[r.f];
+  if(e && e.platforms && e.platforms.length) return e.platforms;
+  if(r.m5===true) return ["MT5"];
+  return [];
+}
+function brokersForPlatforms(plats){
+  const mine=new Set(plats.map(platKey).filter(Boolean));
+  if(!mine.size) return [];
+  return ((DB.brokers||{}).brokers||[]).filter(b=>b.status==="verified" &&
+    (b.plat||[]).map(platKey).some(k=>k && mine.has(k)));
+}
+function brokerRow(b){
+  return `<div class="brow"><a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.name)}</a>
+    <span class="bmeta">${b.min!=null?money(b.min,b.cur||"USD"):"—"} · ${b.spread!=null?b.spread+"핍":"—"} · ${esc((b.reg||[])[0]||"—")}</span></div>`;
+}
+function brokerPanel(r){
+  const plats=challengePlatforms(r);
+  const list=brokersForPlatforms(plats);
+  const T=(ko,en)=>lang==="ko"?ko:en;
+  if(!plats.length) return "";
+  const head=`<div class="panel"><h3>${T("이 챌린지를 실행할 브로커","Brokers that can run this challenge")} <span>${esc(plats.join(" · "))}</span></h3>`;
+  if(!list.length) return head+`<div class="meta">${T("같은 플랫폼을 지원하는 브로커가 아직 DB에 없습니다.","No broker in the database supports this platform yet.")} <a href="#brokers">${T("브로커 보기","See brokers")}</a></div></div>`;
+  return head+list.slice(0,4).map(brokerRow).join("")+
+    `<div class="meta" style="margin-top:8px">${T("거주 국가 제한은 브로커 페이지에서 직접 확인하세요.","Check each broker's country restrictions before funding.")} <a href="#brokers">${T("전체 브로커","All brokers")} →</a></div></div>`;
 }
 function eapBlock(firm){
   const e=(DB.eap||{})[firm];
