@@ -752,8 +752,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="bbc29fbc";</script>
-<script src="data.js?v=bbc29fbc"></script>
+<script>window.HELIX_VER="638a12dc";</script>
+<script src="data.js?v=638a12dc"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -1853,7 +1853,7 @@ function openDrawer(id){
       ${drawerRow(t("cTotal"),money(r.to,r.cu))}${r.po?drawerRow(t("cPromo"),esc(r.po)):""}
       ${r.co?drawerRow(t("cCode"),`<b>${esc(r.co)}</b>`):""}</div>
     <div class="sect">${esc(t("sectCond"))}</div>
-    <div class="kv">${drawerRow(t("cLev"),r.lv?esc(r.lv):'<span class="dim">—</span>')}
+    <div class="kv">${drawerRow(t("cLev"),r.lv?esc(r.lv)+(r.lx?` <span class="dim">(${esc(r.lx)})</span>`:""):(r.lx?`<span class="dim">${esc(r.lx)}</span>`:'<span class="dim">—</span>'))}
       ${drawerRow(t("cType"),esc(enumv(r.ty)||"—"))}${drawerRow(t("cStages"),r.sg!=null?esc(r.sg):'<span class="dim">—</span>')}
       ${drawerRow(t("cDays"),r.md!=null?esc(r.md):'<span class="dim">—</span>')}
       ${drawerRow(t("cKorea"),r.kr?esc(enumv(r.kr)):'<span class="dim">—</span>')}
@@ -2349,7 +2349,7 @@ function renderChallenge(id){
     <div class="panel"><h3>${esc(t("sectCond"))}</h3>
       <div class="rules">${ruleChip(t("fEa"),r.ec)}${ruleChip(t("fNews"),r.nc)}${ruleChip(t("fOn"),r.oc)}
       ${ruleChip(t("fCp"),r.cc)}${ruleChip(t("fWk"),r.wk)}</div>
-      <div class="kv" style="margin-top:12px">${drawerRow(t("cLev"),esc(r.lv||r.lvp||"—"))}
+      <div class="kv" style="margin-top:12px">${drawerRow(t("cLev"),r.lv?esc(r.lv)+(r.lx?` <span class="dim">(${esc(r.lx)})</span>`:""):(r.lx?esc(r.lx):esc(r.lvp||"—")))}
       ${drawerRow(t("cKorea"),esc(enumv(r.kr)||"—"))}${drawerRow(t("cMt5"),r.m5===true?"✓":"?")}</div></div>
 
     <div class="panel"><h3>${esc(t("sectNotes"))}</h3><div id="notesHost">${notesBlock(fullNote(r))}</div></div>
