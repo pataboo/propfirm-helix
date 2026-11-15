@@ -139,6 +139,9 @@
   .rangeRow{display:flex;align-items:center;gap:6px;margin-top:8px}
   .chg{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
   .chg:last-child{border-bottom:0}
+  .pcnt{opacity:.55;font-size:10px;margin-left:2px}
+  .rulesIcons{display:inline-flex;gap:3px;font-size:11px}
+  .rulesIcons .cond{color:var(--amber)}
   .evwrap{cursor:help;outline-offset:2px}
   .evwrap:focus-visible{outline:2px solid var(--accent);border-radius:4px}
   .qi{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid var(--line2);
@@ -629,11 +632,15 @@
     </div>
     <div class="mlist" id="listView" style="display:none"></div>
     <div class="card" id="tableView"><div class="scroll"><table><caption class="sr" id="tbCaption">상품 목록 — 정렬 가능한 표</caption><thead><tr>
-      <th scope="col" data-sort="f" id="thFirm"></th><th scope="col" data-sort="p" id="thPlan"></th><th scope="col" data-sort="mk" id="thMkt"></th>
-      <th scope="col" data-sort="s" class="num" id="thSize"></th><th scope="col" data-sort="pr" class="num" id="thPrice"></th>
-      <th scope="col" data-sort="ac" class="num" id="thAct"></th><th scope="col" data-sort="sp" class="num" id="thSplit"></th>
-      <th scope="col" data-sort="ml" class="num" id="thMax"></th><th scope="col" data-sort="tg" id="thTarget"></th>
-      <th scope="col" data-sort="md" class="num" id="thDays"></th><th scope="col" data-sort="vf" id="thVer"></th>
+      <th scope="col" data-sort="f" id="thFirm"></th><th scope="col" data-sort="p" id="thPlan"></th>
+      <th scope="col" data-sort="s" class="num" id="thSize"></th><th scope="col" data-sort="tg" class="num" id="thTarget"></th>
+      <th scope="col" data-sort="dl" class="num" id="thDaily"></th><th scope="col" data-sort="md" class="num" id="thDays"></th>
+      <th scope="col" data-sort="pc" id="thCycle"></th><th scope="col" data-sort="pf" id="thFirstPay"></th>
+      <th scope="col" data-sort="sp" class="num" id="thSplit"></th><th scope="col" data-sort="rt" class="num" id="thRating"></th>
+      <th scope="col" data-sort="m5" id="thMt5"></th><th scope="col" id="thRules"></th>
+      <th scope="col" data-sort="pr" class="num" id="thPrice"></th><th scope="col" data-sort="ac" class="num" id="thAct"></th>
+      <th scope="col" data-sort="to" class="num" id="thTotal"></th><th scope="col" data-sort="mk" id="thMkt"></th>
+      <th scope="col" data-sort="ml" class="num" id="thMax"></th><th scope="col" data-sort="vf" id="thVer"></th>
       <th scope="col" id="thEv"></th><th scope="col" data-sort="ao" id="thUpd"></th>
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
@@ -822,8 +829,8 @@ let urlReady=false,
     favOnly=false, favs=new Set(JSON.parse(localStorage.getItem("helix-favs")||"[]")),
     shownRows=120,
     unitMode=localStorage.getItem("helix-unit")||"auto",
-    q="", sortKey="f", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
-     colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols")||"null"); const n=13; if(!v) return Array(n).fill(1); const o=v.slice(0,n); while(o.length<n) o.push(1); return o;})(),
+    q="", sortKey="to", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
+     colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols-v2")||"null"); const n=20; if(!v) return [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0]; const o=v.slice(0,n); while(o.length<n) o.push(0); return o;})(),
      dense=localStorage.getItem("helix-dense")==="1";
 const ALL_GROUPS=["st","dd","cycle","paym","plat","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
@@ -855,6 +862,13 @@ function unitCell(numVal, txt){
     return pct || usd || '<span class="dim">—</span>';
   }
   return pct || usd || '<span class="dim">—</span>';
+}
+function rulesCell(r){
+  const f=(v)=>v===true?'<span class="yes">✓</span>':(v==="cond"?'<span class="cond">◐</span>':'<span class="no">✕</span>');
+  const items=[[r.nc,lang==="ko"?"뉴스":"N"],[r.oc,lang==="ko"?"보유":"H"],[r.cc,lang==="ko"?"카피":"C"],[r.wk,lang==="ko"?"주말":"W"]];
+  const has=items.some(([v])=>v!=null);
+  if(!has) return '<span class="dim">—</span>';
+  return `<span class="rulesIcons">${items.map(([v,lab])=>v==null?'':`<span title="${esc(lab)}">${f(v)}</span>`).join("")}</span>`;
 }
 function evCell(r){
   const g=r.vf||"—", sy=r.sy||"";
@@ -1130,7 +1144,7 @@ function matches(r){
   if(F.paym && F.paym.size){ const pm=payMethods(r); if(![...F.paym].some(k=>pm.includes(k))) return false; }
   if(F.plat && F.plat.size){ const e=(DB.eap||{})[r.f]; const ps=(e&&e.platforms)||[];
     if(![...F.plat].some(k=>ps.includes(k))) return false; }
-  if(activePreset && !presetOk(r,activePreset)) return false;
+  if(activePreset){ const ap=PRESETS.find(x=>x.k===activePreset); if(ap&&ap.kind==="filter"&&!presetOk(r,activePreset)) return false; }
   if(F.target==="yes" && !(num(r.tg)>0))return false;
   if(F.target==="no"  && (num(r.tg)>0))return false;
   if(F.target && /^\d+$/.test(F.target) && !(num(r.tg)>=Number(F.target)))return false;
@@ -1210,7 +1224,8 @@ function buildFilters(){
   const host=el("filterPanel"); if(!host) return;
   const presetHtml=`<details class="fgroup" data-g="preset" open><summary>${lang==="ko"?"프리셋":"Presets"}</summary>
     <div class="body" style="max-height:none"><div class="chips2">
-    ${Object.keys(PRESETS[lang]||PRESETS.en).map(k=>`<button data-preset="${k}" class="${activePreset===k?"on":""}">${esc(pname(k))}</button>`).join("")}
+    ${PRESETS.map(p=>{const n=p.kind==="sort"?rows.length:rows.filter(r=>presetOk(r,p.k)).length;
+      return `<button data-preset="${p.k}" class="${activePreset===p.k?"on":""}" title="${esc(p.kind==="sort"?(lang==="ko"?"정렬":"sort"):(lang==="ko"?"필터":"filter"))}">${esc(pname(p.k))}${p.kind==="sort"?" ↕":""} <span class="pcnt">${n.toLocaleString("en-US")}</span></button>`;}).join("")}
     </div></div></details>`;
   const gf=DB.firms.filter(f=>!firmSearch||f.toLowerCase().includes(firmSearch.toLowerCase()));
   const cyc=[...new Set(rows.map(r=>r.pc).filter(Boolean))].sort();
@@ -1296,8 +1311,7 @@ function buildFilters(){
   const favChip=document.getElementById("favChip");
   if(favChip) favChip.onclick=()=>{ favOnly=!favOnly; favChip.classList.toggle("on",favOnly);
     favChip.textContent=`★ ${lang==="ko"?"관심":"Saved"} ${favs.size}`; render(); };
-  host.querySelectorAll("button[data-preset]").forEach(b=>b.onclick=()=>{
-    const k=b.dataset.preset; activePreset = activePreset===k?null:k; render();});
+  host.querySelectorAll("button[data-preset]").forEach(b=>b.onclick=()=>applyPreset(b.dataset.preset));
   host.querySelectorAll("button[data-fee]").forEach(b=>b.onclick=()=>{
     const v=Number(b.dataset.fee); F.priceMax = F.priceMax===v?null:v; render();
   });
@@ -1368,19 +1382,26 @@ function render(){
     return `<tr data-id="${esc(r.i)}" tabindex="0" aria-label="${esc((lang==="ko"?"상세 열기: ":"Open details: ")+r.f+" — "+r.p)}" class="${activeId===r.i?"open":""}">
       <td class="firm"><button class="fav${favs.has(r.i)?" on":""}" data-fav="${esc(r.i)}" title="${lang==="ko"?"관심":""}">★</button><a href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)">${esc(r.f)}</a></td>
       <td class="plan" title="${esc(r.p)}">${esc(r.p)}${(r.co||r.pt)?`<span class="tagpromo">PROMO</span>`:""}</td>
-      <td><span class="tag t-${esc((r.mk||"").toLowerCase())}" title="${esc(ASSET_TIP[lang])}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${money(r.s,r.cu)}</td>
+      <td class="mono">${r.tg==="0" ? '<span class="dim">—</span>' : unitCell(num(r.tg)||null, r.tgT)}</td>
+      <td class="num">${pc(r.dl)}</td>
+      <td class="num">${daysCell(r)}</td>
+      <td>${r.pc?`<span class="mono" style="font-size:11.5px">${esc(r.pc)}</span>`:'<span class="dim">—</span>'}</td>
+      <td class="mono">${r.pf?esc(r.pf):'<span class="dim">—</span>'}</td>
+      <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
+      <td class="num">${r.rt?esc(r.rt):'<span class="dim">—</span>'}</td>
+      <td>${r.m5===true?'<span class="yes">✓</span>':r.m5===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
+      <td class="rulesCell">${rulesCell(r)}</td>
       <td class="num">${money(r.pr,r.cu)}</td>
       <td class="num">${(r.ac==null||r.ac===""||r.ac===0)?'<span class="dim">—</span>':money(r.ac,r.cu)}</td>
-      <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
+      <td class="num">${r.to!=null?money(r.to,r.cu):'<span class="dim">—</span>'}</td>
+      <td><span class="tag t-${esc((r.mk||"").toLowerCase())}">${esc(assetLabel(r.mk))}</span></td>
       <td class="num">${unitCell(num(r.ml), r.mlT)}</td>
-      <td class="mono">${r.tg==="0" ? '<span class="dim">—</span>' : unitCell(num(r.tg)||null, r.tgT)}</td>
-      <td class="num">${daysCell(r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
       <td class="evc">${evCell(r)}</td>
       <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td></tr>`;
   }).join("") + (out.length>PAGE
-    ? `<tr class="moreRow"><td colspan="13"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
+    ? `<tr class="moreRow"><td colspan="19"><button id="moreBtn" class="btn" style="width:100%">${lang==="ko"?`더 보기 (${out.length-PAGE}개 남음)`:`Show more (${out.length-PAGE} left)`}</button></td></tr>`
     : "");
   window.__lastOut=out;
   {const mb=el("moreBtn"); if(mb) mb.onclick=()=>{shownRows+=120; render();};}
@@ -1706,6 +1727,9 @@ function applyStatics(){
   Tset("thAct",t("thAct")); Tset("thMax",t("thMax"));
   Tset("thTarget",t("thTarget")); Tset("thDays",t("thDays"));
   Tset("thVer",t("thVer")); Tset("thEv",lang==="ko"?"근거":"Evidence"); Tset("thUpd",lang==="ko"?"갱신일":"Updated");
+  Tset("thDaily",lang==="ko"?"일일손실":"Daily loss"); Tset("thCycle",lang==="ko"?"지급주기":"Payout");
+  Tset("thFirstPay",lang==="ko"?"첫지급":"First payout"); Tset("thRating",lang==="ko"?"평점":"Rating");
+  Tset("thMt5","MT5"); Tset("thRules",lang==="ko"?"규칙":"Rules"); Tset("thTotal",lang==="ko"?"총액":"Total");
   if(el("rFirm")){
     Tset("rFirm",t("rFirm")); Tset("rN",t("rN"));
     Tset("rEa",t("fEa")); Tset("rNews",t("fNews"));
@@ -1900,27 +1924,44 @@ const FCLASS={ko:{free:"무료",normal:"일반",later:"후불"},en:{free:"Free",
 const fclassLabel=k=>(FCLASS[lang]||FCLASS.en)[k]||k;
 const fclassBadge=r=>{const k=feeClass(r);return `<span class="fclass ${k}">${esc(fclassLabel(k))}</span>`;};
 let feeFilter=null, activePreset=null;
-const PRESETS={ko:{ea:"EA+카피 허용",cheap:"총액 낮은 순",kr:"한국 가능",tot:"총액 확인됨",
-  buy:"★ 실구매 후보",sale:"할인 40%↑",best:"가성비 순",paf:"Pay Later $5",gap:"미확인 있음",src:"1차 출처만"},
-  en:{ea:"EA+copy allowed",cheap:"Lowest total",kr:"Korea OK",tot:"Total known",buy:"★ Shortlist",
-  sale:"40%+ off",best:"Best value",paf:"Pay Later $5",gap:"Has gaps",src:"Primary only"}};
-const pname=k=>(PRESETS[lang]||PRESETS.en)[k]||k;
+const PRESETS=[
+  {k:"buy",  ko:"★ 실구매 후보", en:"★ Shortlist", kind:"filter"},
+  {k:"kr",   ko:"한국 가능",     en:"Korea OK",    kind:"filter"},
+  {k:"tot",  ko:"총액 확인",     en:"Total known", kind:"filter"},
+  {k:"eqa",  ko:"EA+카피 허용",  en:"EA+copy OK",  kind:"filter"},
+  {k:"A",    ko:"등급 A",        en:"Grade A",     kind:"filter"},
+  {k:"paf",  ko:"후불",          en:"Pay later",   kind:"filter"},
+  {k:"cheap",ko:"총액 낮은 순",  en:"Lowest total",kind:"sort", key:"to"},
+  {k:"best", ko:"가성비 순",     en:"Best value",  kind:"sort", key:"value"},
+];
+const pname=k=>{const p=PRESETS.find(x=>x.k===k); return p?(lang==="ko"?p.ko:p.en):k;};
 function presetOk(r,k){
   const ok=v=>v===true||v==="cond";
   switch(k){
-    case "ea":   return ok(r.ec)&&ok(r.cc);
-    case "kr":   return r.kr==="yes";
-    case "tot":  return r.to!=null;
-    case "buy":  return r.vf==="A" && r.to!=null;
-    case "src":  return r.vf==="A";
-    case "paf":  return feeClass(r)==="later" && Number(r.pr||0)<=5;
-    case "gap":  return r.ml==null || r.dl==null || r.tg==null || r.sp==null;
-    case "sale": { const m=String(r.pt||r.po||"").match(/(\d{2})\s*%/); return m && Number(m[1])>=40; }
-    default:     return true;
+    case "buy": return r.vf==="A" && r.to!=null && r.kr==="yes";
+    case "kr":  return r.kr==="yes";
+    case "tot": return r.to!=null;
+    case "eqa": return ok(r.ec)&&ok(r.cc);
+    case "A":   return r.vf==="A";
+    case "paf": return feeClass(r)==="later";
+    default: return true;
   }
 }
+function clearAllFilters(){
+  ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>F[k].clear());
+  ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>F[k]=null);
+  q=""; const g=el("gq"); if(g) g.value="";
+}
+function applyPreset(k){
+  const p=PRESETS.find(x=>x.k===k); if(!p) return;
+  if(activePreset===k){ activePreset=null; render(); return; }
+  clearAllFilters();
+  activePreset=k;
+  if(p.kind==="sort"){ sortKey=(p.k==="best"?"pr":(p.key||"to")); sortDir=1; const sel=el("sortSel"); if(sel) sel.value=sortKey; }
+  render();
+}
 
-const SORTS=[["f","회사","Firm"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
+const SORTS=[["f","회사","Firm"],["to","총액","Total"],["pr","최저 참가비","Cheapest"],["sp","최고 분배","Highest split"],
   ["ml","최대 손실","Max loss"],["s","계좌 규모","Size"],["rt","평점","Rating"],["mf","최소일수","Min days"]];
 function buildSort(){
   const sel=el("sortSel"); if(!sel) return;
@@ -2127,14 +2168,14 @@ function renderDiscover(){
 }
 
 /* ---------- table preferences ---------- */
-const COLKEYS=["thFirm","thPlan","thMkt","thSize","thPrice","thAct","thSplit","thMax","thTarget","thDays","thVer","thEv","thUpd"];
+const COLKEYS=["thFirm","thPlan","thSize","thTarget","thDaily","thDays","thCycle","thFirstPay","thSplit","thRating","thMt5","thRules","thPrice","thAct","thTotal","thMkt","thMax","thVer","thEv","thUpd"];
 function applyTablePrefs(){
   let st=document.getElementById("colStyle");
   if(!st){ st=document.createElement("style"); st.id="colStyle"; document.head.appendChild(st); }
   st.textContent=colVis.map((on,i)=>on?"":`#tableView th:nth-child(${i+1}),#tableView td:nth-child(${i+1}){display:none}`).join("");
   const tb=document.querySelector("#tableView table");
   if(tb) tb.classList.toggle("dense",dense);
-  localStorage.setItem("helix-cols",JSON.stringify(colVis));
+  localStorage.setItem("helix-cols-v2",JSON.stringify(colVis));
   localStorage.setItem("helix-dense",dense?"1":"0");
 }
 function buildTableSettings(){
@@ -2154,7 +2195,7 @@ function buildTableSettings(){
     unitMode=rb.value; localStorage.setItem("helix-unit",unitMode); render();});
   const d=el("denseChk"); if(d) d.onchange=()=>{dense=d.checked;applyTablePrefs();};
   const r=el("tsReset"); if(r) r.onclick=e=>{e.preventDefault();
-    colVis=[1,1,1,1,1,1,1,1,1,1,1]; dense=false; applyTablePrefs(); buildTableSettings();};
+    colVis=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0]; dense=false; applyTablePrefs(); buildTableSettings();};
 }
 
 /* ---------- Docs ---------- */
