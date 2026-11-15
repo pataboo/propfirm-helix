@@ -752,8 +752,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="cf42c4e8";</script>
-<script src="data.js?v=cf42c4e8"></script>
+<script>window.HELIX_VER="bbc29fbc";</script>
+<script src="data.js?v=bbc29fbc"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -3112,9 +3112,30 @@ function renderPayouts(){
   const mode=o=>{const e=Object.entries(o).sort((a,b)=>b[1]-a[1])[0];return e?e[0]:null;};
   const list=Object.entries(agg).map(([f,o])=>({f,n:o.n,sp:mode(o.sp),pc:mode(o.pc),pf:o.pf,ym:o.ym,yk:o.yk}))
     .sort((a,b)=>(Number(b.sp)||0)-(Number(a.sp)||0));
+  const pfmp=(DB.pfmpay&&DB.pfmpay.cfd)||[];
+  const payBlock = pfmp.length?`<div class="card"><div class="scroll"><table class="spreadsT">
+      <thead><tr><th scope="col" class="num">#</th><th scope="col">${lang==="ko"?"회사":"Firm"}</th>
+        <th scope="col" class="num">${lang==="ko"?"누적 지급액":"Total paid"}</th>
+        <th scope="col" class="num">${lang==="ko"?"지급 건수":"Payouts"}</th>
+        <th scope="col" class="num">${lang==="ko"?"평균":"Average"}</th>
+        <th scope="col" class="num">${lang==="ko"?"최근 1건":"Latest"}</th>
+        <th scope="col">${lang==="ko"?"속도":"Speed"}</th>
+        <th scope="col" class="num">${lang==="ko"?"평점":"Rating"}</th></tr></thead>
+      <tbody>${pfmp.map((o,i)=>`<tr>
+        <td class="num dim">${o.rank!=null?Math.round(o.rank):i+1}</td>
+        <td class="firm"><a href="#firm/${encodeURIComponent(o.brand)}">${esc(o.brand)}</a></td>
+        <td class="num"><b>${o.total!=null?money(o.total,"USD"):"—"}</b></td>
+        <td class="num">${o.count!=null?o.count.toLocaleString("en-US"):"—"}</td>
+        <td class="num">${o.avg!=null?money(o.avg,"USD"):"—"}</td>
+        <td class="num">${o.last!=null?money(o.last,"USD"):"—"}</td>
+        <td>${o.speed?esc(o.speed):'<span class="dim">—</span>'}</td>
+        <td class="num">${o.rating!=null?esc(o.rating)+(o.reviews?` <span class="dim">(${o.reviews})</span>`:""):'<span class="dim">—</span>'}</td>
+      </tr>`).join("")}</tbody></table></div>
+      <div class="srcline">${lang==="ko"?"출처: propfirmmatch.com/payouts (2026-11-15 수집). 업체가 PFM에 신고한 지급 실적입니다.":"Source: propfirmmatch.com/payouts, collected 2026-11-15; payout figures as reported to PFM by each firm."}</div></div>`:"";
   el("payoutsMain").innerHTML=`
     <div class="hero2"><h1>${lang==="ko"?"지급 조건 비교":"Payout comparison"}</h1>
       <p>${lang==="ko"?"회사별 수익 분배·지급 주기·첫 지급·최소 지급액·상한을 상품 기록에서 집계했습니다.":"Profit split, cycle, first payout, minimum and cap aggregated from product records."}</p></div>
+    ${payBlock}
     <div class="card"><div class="scroll" style="max-height:calc(100vh - 300px)">
       <table class="fx" style="min-width:860px"><thead><tr>
         <th scope="col">${lang==="ko"?"회사":"Firm"}</th><th scope="col" class="num">${lang==="ko"?"상품":"Products"}</th>
