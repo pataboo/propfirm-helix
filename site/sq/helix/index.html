@@ -389,12 +389,13 @@
     .pillbar .cta{display:none}
   }
   /* fail steps */
-  .steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:12px; margin-top:24px}
-  .step{padding:20px 20px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
-  .step .n{display:block; font-size:11px; letter-spacing:.18em; color:var(--accent); font-weight:700; margin-bottom:10px}
-  .step b{display:block; color:var(--fg); font-size:16px; font-weight:650; margin-bottom:8px; letter-spacing:-.01em}
+  .steps{display:grid; gap:0; margin-top:22px}
+  .step{display:grid; grid-template-columns:3.4rem 1fr; gap:16px; padding:20px 0; border-top:1px solid var(--line2)}
+  .step:first-child{border-top:0}
+  .step .n{font-size:11.5px; letter-spacing:.16em; color:var(--accent); font-weight:700; padding-top:4px}
+  .step b{display:block; color:var(--fg); font-size:16.5px; font-weight:650; margin-bottom:7px; letter-spacing:-.01em}
   .step p{margin:0 0 10px; color:var(--muted); font-size:14.2px; line-height:1.62}
-  .step .tagline{display:block; font-size:11.5px; letter-spacing:.04em; color:var(--dim)}
+  .step .tagline{display:block; font-size:11.8px; letter-spacing:.04em; color:var(--dim); margin-top:2px}
   /* odds + objections */
   .odds{margin-top:24px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
   .dots{display:grid; grid-template-columns:repeat(20,1fr); gap:5px; max-width:32rem}
@@ -426,6 +427,7 @@
   .fin .r{margin-left:auto}
   @media (max-width:700px){
     .dots{grid-template-columns:repeat(10,1fr)}
+    .step{grid-template-columns:2.4rem 1fr; gap:10px}
     .flinks{margin-left:0; gap:12px; font-size:12.5px}
     .fin .r{margin-left:0}
     .twocol,.results{grid-template-columns:1fr}
@@ -503,7 +505,7 @@
       </div>
     </div>
 
-    <p class="note">Helix records the rule that would trigger step one for every firm it covers — drawdown type, daily loss, news and EA limits, and the payout terms behind step two. Check those before you pay, not after.</p>
+    <p class="note">Helix records what each step costs: the drawdown and rule limits behind step one, the payout and restart terms behind step two, and the fee you paid behind step three. Check them before you pay, not after.</p>
   </section>
 
   <section>
