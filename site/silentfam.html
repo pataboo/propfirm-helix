@@ -170,7 +170,8 @@
   .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
   .rules span{color:var(--muted); font-size:14.5px}
 
-  .rules .why{display:block; margin-top:7px; font-style:normal; font-size:13.8px; color:var(--accent); opacity:.9}
+  .rules .why{display:block; margin-top:9px; padding-left:11px; border-left:2px solid rgba(167,139,250,.45);
+    font-style:normal; font-size:13.8px; color:var(--accent); opacity:.92}
   .journey{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
   .journey li{display:grid; grid-template-columns:7.4rem 1fr; gap:18px; padding:20px 0; border-top:1px solid var(--line)}
   .journey li:first-child{border-top:0}
@@ -180,7 +181,7 @@
   .journey code{display:inline-block; padding:5px 9px; border:1px solid var(--line); border-radius:7px;
     background:var(--panel); color:var(--fg2); font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   html[data-theme="light"] .journey code{background:#fff}
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px}
+  .stats{display:grid; margin-top:40px; padding-top:26px; border-top:1px solid var(--line); grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px}
   .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-0.03em; line-height:1}
   .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
 
@@ -297,7 +298,7 @@
   <section id="how">
     <p class="label"><b>03</b> How we work</p>
     <h2>Four rules we don't bend.</h2>
-    <div class="rules"><div><b>Local first.</b><span>Our records live with us. Cloud services hold copies, inside defined boundaries.</span><em class="why">Because a record you cannot open offline is rented, not owned.</em></div><div><b>Evidence over opinion.</b><span>A result counts only when someone else can check it. When we don't know, we say so instead of guessing.</span><em class="why">Because an unchecked number feels exactly like a checked one.</em></div><div><b>AI-assisted, human-approved.</b><span>Agents research, build and review. People decide — and the decision is written down.</span><em class="why">Because a machine can move very fast in the wrong direction.</em></div><div><b>Small, reviewed steps.</b><span>Every change is versioned and traceable back to why it was made. No silent rewrites.</span><em class="why">Because a large change hides the one mistake that caused it.</em></div></div>
+    <div class="rules"><div><b>Local first.</b><span>Our records live with us. Cloud services hold copies, inside defined boundaries.</span><em class="why">Because a record you cannot open offline is rented, not owned.</em></div><div><b>Evidence over opinion.</b><span>A result counts only when someone else can check it. When we don't know, we say so.</span><em class="why">Because an unchecked number feels exactly like a checked one.</em></div><div><b>AI-assisted, human-approved.</b><span>Agents research, build and review. People decide — and the decision is written down.</span><em class="why">Because a machine can move very fast in the wrong direction.</em></div><div><b>Small, reviewed steps.</b><span>Every change is versioned and traceable back to why it was made. No silent rewrites.</span><em class="why">Because a large change hides the one mistake that caused it.</em></div></div>
     <div class="stats"><div class="stat"><span class="v">2,166</span><span class="k">challenges catalogued</span></div><div class="stat"><span class="v">71</span><span class="k">prop firms</span></div><div class="stat"><span class="v">85%</span><span class="k">grade A evidence</span></div><div class="stat"><span class="v">99%</span><span class="k">rule coverage</span></div></div>
     <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">Figures from Helix, the database inside SilentQuants — build of 16 November 2026. Sources and grades are published per row.</p>
   </section>
