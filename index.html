@@ -160,6 +160,12 @@
   .stale{color:var(--amber);font-weight:700}
   .tpwarn.sq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;
     border-radius:50%;font-size:12px;font-weight:900;line-height:1}
+  .rtags{display:inline-flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .rtag{display:inline-block;padding:1px 5px;border-radius:4px;font-size:10.5px;font-weight:800;border:1px solid var(--line2)}
+  .rtag.pfm{color:var(--ink2)}
+  .rtag.tp{color:#00b67a;border-color:rgba(0,182,122,.4)}
+  .rtag.sj{color:#00a0d2;border-color:rgba(0,160,210,.4)}
+  .rtag.feefo{color:#ff7a00;border-color:rgba(255,122,0,.4)}
   .tpwarn{display:inline-block;padding:1px 7px;border-radius:9999px;font-size:11px;font-weight:800;color:var(--red);
     border:1px solid rgba(255,45,85,.5);background:rgba(255,45,85,.10);text-decoration:none}
   .tpwarn:hover{background:rgba(255,45,85,.18)}
@@ -813,8 +819,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="ffc81075";</script>
-<script src="data.js?v=ffc81075"></script>
+<script>window.HELIX_VER="a3d6cdf0";</script>
+<script src="data.js?v=a3d6cdf0"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -944,7 +950,7 @@ let urlReady=false,
 const ALL_GROUPS=["st","dd","cycle","paym","plat","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
 const picked = new Set();
-const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),paym:new Set(),plat:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,
+const F = {firm:new Set(),mk:new Set(),st:new Set(),dd:new Set(),vf:new Set(),flags:new Set(),cycle:new Set(),fee:new Set(),paym:new Set(),plat:new Set(),target:null,daysBand:null,levBand:null,ratingMin:null,rtsrc:new Set(),
            sizeMin:null,sizeMax:null,priceMax:null,dailyMax:null,maxlossMax:null,splitMin:null,daysMax:null,levMin:null};
 const el=id=>document.getElementById(id);
 const t=k=>(I18N[lang][k] ?? k);
@@ -1368,7 +1374,18 @@ function matches(r){
     if(F.levBand==="low" && l3>30) return false;
     if(F.levBand==="mid" && !(l3>30&&l3<=100)) return false;
     if(F.levBand==="high"&& l3<=100) return false; }
-  if(F.ratingMin!=null){ const rt=num(r.rt); if(rt==null||rt<F.ratingMin) return false; }
+  if(F.rtsrc.size){
+    const x=ratingsOf(r.f);
+    const has=[...F.rtsrc].some(k=>x[k]&&(x[k].r!=null||x[k].warn));
+    if(!has) return false;
+  }
+  if(F.ratingMin!=null){
+    const x=ratingsOf(r.f);
+    const srcs=F.rtsrc.size?[...F.rtsrc]:["pfm","tp","sj","feefo"];
+    const vals=srcs.map(k=>(x[k]&&x[k].r!=null)?Number(x[k].r):null).filter(v=>v!=null);
+    const best=vals.length?Math.max(...vals):(num(r.rt));
+    if(best==null||best<F.ratingMin) return false;
+  }
   return true;
 }
 let firmSearch="";
@@ -1500,9 +1517,19 @@ function buildFilters(){
     <button data-lev="low" class="${F.levBand==="low"?"on":""}">≤ 30</button>
     <button data-lev="mid" class="${F.levBand==="mid"?"on":""}">31–100</button>
     <button data-lev="high" class="${F.levBand==="high"?"on":""}">100+</button></div></div></details>`);
-  add("rating", `<details class="fgroup" data-g="rating" ${OPEN.rating?"open":""}><summary>${esc(t("fRating"))}</summary><div class="body"><div class="chips2">
-    <button data-rating="4" class="${F.ratingMin===4?"on":""}">≥ 4.0</button>
-    <button data-rating="4.5" class="${F.ratingMin===4.5?"on":""}">≥ 4.5</button></div></div></details>`);
+  add("rating", `<details class="fgroup" data-g="rating" ${OPEN.rating?"open":""}><summary>${esc(t("fRating"))}</summary><div class="body">
+    <div class="glabel" style="margin-bottom:6px">${lang==="ko"?"평점 출처":"Rating source"}</div>
+    <div class="chips2" style="margin-bottom:8px">
+      <button data-rtsrc="pfm" class="${F.rtsrc.has("pfm")?"on":""}">PFM</button>
+      <button data-rtsrc="tp" class="${F.rtsrc.has("tp")?"on":""}">Trustpilot</button>
+      <button data-rtsrc="sj" class="${F.rtsrc.has("sj")?"on":""}">Sitejabber</button>
+      <button disabled title="${lang==="ko"?"Feefo는 Cloudflare 차단으로 수집 불가":"Feefo is behind Cloudflare; not collected"}">Feefo</button>
+      <button disabled title="${lang==="ko"?"Reviews.io에 이 업체들의 프로필이 없습니다":"Reviews.io has no profiles for these firms"}">Reviews.io</button>
+    </div>
+    <div class="chips2">
+      <button data-rating="4" class="${F.ratingMin===4?"on":""}">≥ 4.0</button>
+      <button data-rating="4.5" class="${F.ratingMin===4.5?"on":""}">≥ 4.5</button>
+    </div></div></details>`);
   parts.push(`<div class="fgroup" style="border:0;padding:2px 0"><button id="favChip" class="chip2 ${favOnly?"on":""}" style="width:100%;justify-content:center">★ ${lang==="ko"?"관심":"Saved"} ${favs.size}</button></div>`);
   parts.push(presetHtml);
   visGroups.forEach(id=>{ if(H[id]) parts.push(H[id]); });
@@ -1550,6 +1577,8 @@ function buildFilters(){
     F.levBand = F.levBand===b.dataset.lev?null:b.dataset.lev; fapply();});
   host.querySelectorAll("button[data-rating]").forEach(b=>b.onclick=()=>{
     const v=Number(b.dataset.rating); F.ratingMin = F.ratingMin===v?null:v; fapply();});
+  host.querySelectorAll("[data-rtsrc]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.rtsrc; F.rtsrc.has(k)?F.rtsrc.delete(k):F.rtsrc.add(k); fapply();});
   if(typeof syncFilterUI==="function"){ syncFilterUI(); updateGroupBadges(); }
 }
 /* ---------- PERF/A11Y: virtual scrolling for the challenges table ---------- */
@@ -1570,9 +1599,7 @@ function vsRowHtml(r,idx){
       <td>${payCell(r.pc)}</td>
       <td>${payCell(r.pf)}</td>
       <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
-      <td class="num">${(DB.tpwarn||{})[r.f]
-        ? `<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${esc(lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page for the rating")}">!</a>`
-        : (r.rt?esc(r.rt):'<span class="dim">—</span>')}</td>
+      <td class="num">${ratingCell(r)}</td>
       <td>${r.m5===true?'<span class="yes">✓</span>':r.m5===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
       <td class="rulesCell">${rulesCell(r)}</td>
       <td class="num">${money(r.pr,r.cu)}</td>
@@ -1843,6 +1870,21 @@ function renderBar(){
 }
 
 /* ---------- drawer ---------- */
+const RSRC=[["pfm",{ko:"PFM",en:"PFM"}],["tp",{ko:"Trustpilot",en:"Trustpilot"}],["feefo",{ko:"Feefo",en:"Feefo"}]];
+function ratingsOf(firm){ return (DB.ratings||{})[firm]||{}; }
+function ratingCell(r){
+  const x=ratingsOf(r.f); const out=[];
+  const pfm=(x.pfm&&x.pfm.r!=null)?`<span class="rtag pfm" title="PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""}">P ${x.pfm.r}</span>`:(r.rt?`<span class="rtag pfm" title="PFM ${esc(r.rt)}">P ${esc(r.rt)}</span>`:"");
+  if(pfm) out.push(pfm);
+  if(x.tp){
+    if(x.tp.warn) out.push(`<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page"}">!</a>`);
+    else if(x.tp.r!=null) out.push(`<span class="rtag tp" title="Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""}">T ${x.tp.r}</span>`);
+  }
+  if(x.sj&&x.sj.r!=null) out.push(`<span class="rtag sj" title="Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""}">SJ ${x.sj.r}</span>`);
+  if(x.feefo&&x.feefo.r!=null) out.push(`<span class="rtag feefo" title="Feefo ${x.feefo.r}">F ${x.feefo.r}</span>`);
+  if(!out.length) return '<span class="dim">—</span>';
+  return `<span class="rtags">${out.join("")}</span>`;
+}
 function tpWarnBadge(firm){
   const w=(DB.tpwarn||{})[firm];
   if(!w) return "";
@@ -1946,7 +1988,18 @@ function openDrawer(id){
       ${drawerRow(t("cCycle"),r.pc?esc(tx(r.pc)):'<span class="dim">—</span>')}
       ${drawerRow(t("cFirst"),r.pf?esc(r.pf):'<span class="dim">—</span>')}
       ${r.pn?drawerRow(t("cMin"),esc(r.pn)):""}
-      ${drawerRow(t("cRating"),(r.rt?`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`:'<span class="dim">—</span>')+((DB.tpwarn||{})[r.f]?` <a class="tpwarn" href="https://www.trustpilot.com/review/${esc(((DB.tpwarn||{})[r.f]||{}).d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(lang==="ko"?"Trustpilot이 이 회사 평점을 산정하지 않습니다 — 가이드라인 위반":"Trustpilot withholds this firm's rating")}">Trustpilot ⚠</a>`:""))}
+      ${drawerRow(t("cRating"),(()=>{
+        const x=ratingsOf(r.f), bits=[];
+        if(x.pfm&&x.pfm.r!=null) bits.push(`<span class="rtag pfm">PFM ${x.pfm.r}</span>${x.pfm.n?` <span class="dim">(${x.pfm.n})</span>`:""}`);
+        if(x.tp){
+          if(x.tp.warn) bits.push(`<a class="tpwarn" href="https://www.trustpilot.com/review/${esc(x.tp.d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Trustpilot ⚠</a>`);
+          else if(x.tp.r!=null) bits.push(`<span class="rtag tp">Trustpilot ${x.tp.r}</span>${x.tp.n?` <span class="dim">(${x.tp.n})</span>`:""}`);
+        }
+        if(x.sj&&x.sj.r!=null) bits.push(`<span class="rtag sj">Sitejabber ${x.sj.r}</span>${x.sj.n!=null?` <span class="dim">(${x.sj.n})</span>`:""}`);
+        if(x.feefo&&x.feefo.r!=null) bits.push(`<span class="rtag feefo">Feefo ${x.feefo.r}</span>`);
+        if(!bits.length && r.rt) bits.push(`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`);
+        return bits.length?bits.join(" · "):'<span class="dim">—</span>';
+      })())}
       ${r.yk!=null?drawerRow(t("cCap"),r.yk===0?esc("무제한"):money(r.yk,r.cu)+(r.ykn?` <span class="dim">${esc(r.ykn)}</span>`:"")):""}
       ${r.ym!=null?drawerRow(t("cMinPay"),money(r.ym,r.cu)):""}</div>
     <div class="sect">${esc(t("sectMore"))}</div>
@@ -2113,7 +2166,7 @@ el("cGo").onclick=()=>{location.hash="#compare";route();};
 };}
 ["st1","st3"].forEach(id=>{const a=document.getElementById(id); if(a) a.onclick=e=>{e.preventDefault();
   ["firm","mk","st","dd","vf","flags","cycle","fee"].forEach(k=>F[k].clear());
-  F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null;
+  F.sizeMin=F.sizeMax=F.priceMax=F.splitMin=null; F.target=F.daysBand=F.levBand=F.ratingMin=null; F.rtsrc.clear();
   sortPreset=null; q=""; const g=el("gq"); if(g) g.value="";
   location.hash="#challenges"; route(); render();};});
 {const a=document.getElementById("st4"); if(a) a.onclick=e=>{e.preventDefault();
@@ -2315,6 +2368,7 @@ function activeConditionCount(){
   let n=0;
   ["firm","mk","st","dd","vf","flags","cycle","fee","paym","plat"].forEach(k=>n+=F[k].size);
   ["sizeMin","sizeMax","priceMax","splitMin","ratingMin","daysBand","levBand","target"].forEach(k=>{ if(F[k]!=null) n++; });
+  n+=F.rtsrc.size;
   if(q) n++;
   if(sortPreset) n++;
   return n;
