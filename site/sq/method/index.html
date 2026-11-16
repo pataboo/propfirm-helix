@@ -217,6 +217,13 @@
     .st{display:inline-block; justify-self:start}
   }
 
+
+  /* SilentQuants: pastel teal — cool analogue of the family violet, away from profit-green */
+  :root{--accent:#5fe0c8; --accent-soft:#9af3e4; --glow:rgba(95,224,200,.13)}
+  html[data-theme="light"]{--accent:#0e8b79; --accent-soft:#12a892; --glow:rgba(14,139,121,.08)}
+  .btn.primary{background:linear-gradient(180deg,var(--accent-soft),var(--accent)); color:#04201c}
+  html[data-theme="light"] .btn.primary{color:#fff}
+  .st.live{border-color:rgba(95,224,200,.5); color:var(--accent-soft); background:rgba(95,224,200,.14)}
   h1{max-width:22ch; text-wrap:balance}
   .herobtns{display:flex; gap:12px; flex-wrap:wrap; margin-top:26px}
   .btn{display:inline-block; padding:12px 20px; border-radius:11px; font-weight:600; font-size:15px; border:1px solid transparent}
