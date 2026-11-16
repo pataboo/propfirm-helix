@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SilentFam — 유명해지고 싶지 않습니다. 자유로워지고 싶습니다.</title>
+<meta name="description" content="가족이 운영하는 이니셔티브. 자유를 위한 조용한 시스템을 만듭니다 — 증거, 곁에 두는 기억, 관객 없이도 작동하는 도구.">
+<meta name="theme-color" content="#03080a">
+<meta property="og:title" content="SilentFam">
+<meta property="og:description" content="유명해지고 싶지 않습니다. 자유로워지고 싶습니다.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://silentfam.com/">
+<link rel="alternate" hreflang="en" href="https://silentfam.com/">
+<link rel="alternate" hreflang="ko" href="https://silentfam.com/ko/">
+<link rel="alternate" hreflang="x-default" href="https://silentfam.com/">
+<script>
+  // dark is the default; only an explicit choice changes it
+  (function(){try{var t=localStorage.getItem("sf-theme");if(t==="light"){document.documentElement.setAttribute("data-theme","light");}}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
+    --line:#1d2529; --line2:#2b3539;
+    --fg:#fcfcfe; --fg2:#d2d4d6; --muted:#9ba0a5; --dim:#828a90;
+    --accent:#a78bfa; --accent-soft:#c4b1ff; --btn-ink:#0a0710;
+    --glow:rgba(167,139,250,.13);
+    --measure:44rem;
+    color-scheme: dark;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f5fb; --panel:#ffffff; --panel2:#f1edfa;
+    --line:#e4ddf1; --line2:#d3cae8;
+    --fg:#16111f; --fg2:#3b3348; --muted:#615a70; --dim:#7a7388;
+    --accent:#6d4aff; --accent-soft:#7f5cff; --btn-ink:#ffffff;
+    --glow:rgba(109,74,255,.10);
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg2);
+    font-family:"Plus Jakarta Sans","Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",
+      "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    font-size:17px; line-height:1.72; letter-spacing:-0.005em;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(70rem 34rem at 50% -14rem, var(--glow), transparent 70%);
+    background-repeat:no-repeat;
+    transition:background-color .18s ease, color .18s ease;
+  }
+  html[lang="ko"] body{font-size:16.5px; line-height:1.78; letter-spacing:-0.01em}
+  a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent; transition:color .15s,border-color .15s}
+  a:hover{color:var(--accent-soft); border-bottom-color:rgba(167,139,250,.45)}
+  .wrap{max-width:var(--measure); margin:0 auto; padding:0 26px}
+
+  header.site{position:sticky; top:0; z-index:20; backdrop-filter:blur(14px);
+    background:color-mix(in srgb, var(--bg) 82%, transparent); border-bottom:1px solid var(--line)}
+  .bar{max-width:var(--measure); margin:0 auto; padding:15px 26px; display:flex; align-items:center; gap:10px}
+  .mark{font-weight:800; font-size:16px; letter-spacing:-0.03em; color:var(--fg); border:0;
+    display:inline-flex; align-items:center; gap:8px}
+  .mark:hover{color:var(--accent); border:0}
+  .mark .dot{width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px rgba(167,139,250,.9)}
+  nav.top{margin-left:auto; display:flex; gap:22px; font-size:14px; align-items:center}
+  nav.top a{color:var(--muted); border:0}
+  nav.top a:hover{color:var(--accent)}
+  .tools{display:flex; align-items:center; gap:8px; margin-left:20px; padding-left:20px; border-left:1px solid var(--line)}
+  .lang{font-size:12.5px; letter-spacing:.04em; color:var(--muted); border:0; padding:5px 8px; border-radius:8px}
+  .lang:hover{color:var(--accent); background:var(--panel2)}
+  .iconbtn{display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:0;
+    font-size:15px; line-height:1; cursor:pointer; color:var(--muted); background:transparent;
+    border:1px solid var(--line); border-radius:9px; transition:color .15s, border-color .15s, background .15s}
+  .iconbtn:hover{color:var(--accent); border-color:rgba(167,139,250,.55); background:var(--panel2)}
+
+  .hero{padding:clamp(44px,8vh,84px) 0 clamp(34px,5vh,52px)}
+  .kicker{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
+    margin:0 0 26px; display:flex; align-items:center; gap:10px}
+  .kicker::before{content:""; width:26px; height:1px; background:var(--line2)}
+  h1{margin:0; font-size:clamp(2.15rem,5.4vw,3.85rem); line-height:1.08; letter-spacing:-0.035em;
+    font-weight:700; color:var(--fg); max-width:19ch}
+  html[lang="ko"] h1{letter-spacing:-0.045em; line-height:1.16; word-break:keep-all}
+  h1 em{font-style:normal; color:var(--accent)}
+  .lede{margin:26px 0 0; font-size:clamp(1.02rem,1.5vw,1.16rem); color:var(--fg2); max-width:40ch; line-height:1.68}
+  .lede .q{color:var(--muted)}
+
+  .sub{margin-top:36px; max-width:30rem}
+  .sub form{display:flex; gap:8px; flex-wrap:wrap}
+  .sub input{flex:1 1 15rem; min-width:0; padding:13px 15px; font:inherit; font-size:15px; color:var(--fg);
+    background:var(--panel); border:1px solid var(--line2); border-radius:11px; outline:none}
+  .sub input::placeholder{color:var(--dim)}
+  .sub input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(167,139,250,.14)}
+  .sub button{padding:13px 20px; font:inherit; font-size:15px; font-weight:600; cursor:pointer;
+    color:var(--btn-ink); border:0; border-radius:11px; background:linear-gradient(180deg,#bda8ff,#a78bfa)}
+  html[data-theme="light"] .sub button,html[data-theme="light"] .letterbox button{background:linear-gradient(180deg,#8a6bff,#6d4aff); color:#fff}
+  .sub button:hover{filter:brightness(1.06)}
+  .sub .fine{font-size:12.5px; color:var(--dim); margin:10px 0 0}
+
+  section{padding:clamp(44px,7vh,72px) 0; border-top:1px solid var(--line)}
+  .label{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
+    margin:0 0 22px; display:flex; align-items:baseline; gap:10px}
+  .label b{color:var(--accent); font-weight:700; letter-spacing:0}
+  h2{margin:0 0 18px; font-size:clamp(1.35rem,2.6vw,1.72rem); line-height:1.25; letter-spacing:-0.022em;
+    color:var(--fg); font-weight:700; word-break:keep-all}
+  p{margin:0 0 16px}
+  p:last-child{margin-bottom:0}
+  .hl{color:var(--accent); font-weight:600}
+
+  .ladder{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .ladder li{display:grid; grid-template-columns:3.1rem 1fr; gap:16px; padding:16px 0; border-top:1px solid var(--line)}
+  .ladder li:first-child{border-top:0}
+  .ladder .n{font-size:12px; color:var(--accent); font-weight:700; letter-spacing:.08em; padding-top:3px}
+  .ladder b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:2px}
+  .ladder span{color:var(--muted); font-size:14.5px; line-height:1.6}
+
+  .stacknote{margin:0 0 18px; font-size:13.5px; color:var(--dim)}
+  .cards{display:grid; gap:12px; margin-top:24px}
+  .card{display:block; padding:20px 22px; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:inherit}
+  .card.plain{cursor:default}
+  .card h3{margin:0 0 6px; font-size:16.5px; color:var(--fg); font-weight:650; letter-spacing:-0.015em;
+    display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .card p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.65; max-width:54ch}
+  .card .meta{margin-top:12px; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#8f9499}
+  html[data-theme="light"] .card .meta{color:#7a7388}
+  .pill{display:inline-block; margin-left:3px; padding:2px 8px; border-radius:999px;
+    border:1px solid rgba(167,139,250,.42); background:rgba(167,139,250,.12);
+    font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--accent-soft); vertical-align:2px}
+  html[lang="ko"] .pill{letter-spacing:.02em; font-size:11px}
+
+  .child{margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
+    border-left:2px solid rgba(167,139,250,.55); border-radius:4px 11px 11px 4px; background:rgba(167,139,250,.075)}
+  html[data-theme="light"] .child{background:rgba(109,74,255,.055); border-color:rgba(109,74,255,.22)}
+  .child .lab{display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
+  html[lang="ko"] .child .lab{letter-spacing:.04em; font-size:10.5px}
+  .child b{display:block; color:var(--fg); font-size:15px; font-weight:650; margin-bottom:4px}
+  .child .cp{display:block; color:var(--muted); font-size:13.5px; line-height:1.6}
+  .childlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px}
+  .childlinks a{font-size:13.5px; font-weight:600; border:0}
+
+  .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
+  .buildlist li{display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:baseline;
+    font-size:13.8px; color:var(--muted); line-height:1.55}
+  .buildlist b{color:var(--fg2); font-weight:600}
+  .st{display:block; white-space:nowrap; text-align:center; font-size:10px; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 8px; border-radius:999px; border:1px solid var(--line2); color:#a9aeb3}
+  html[lang="ko"] .st{letter-spacing:.02em; font-size:10.5px}
+  .st.live{border-color:rgba(167,139,250,.5); color:var(--accent-soft); background:rgba(167,139,250,.14)}
+  .st.wip{border-color:#454b51; color:#d2d4d6}
+  html[data-theme="light"] .st.wip{border-color:#c9c1de; color:#3b3348}
+  .st.plan{border-style:dashed; border-color:#3a4045; color:#9ba0a5}
+  html[data-theme="light"] .st.plan{border-color:#d3cae8; color:#6b6479}
+  .order-note{margin:14px 0 0; font-size:12.8px; color:var(--dim); line-height:1.55; max-width:56ch}
+
+  .rules{display:grid; gap:0; margin-top:24px}
+  .rules div{padding:17px 0; border-top:1px solid var(--line)}
+  .rules div:first-child{border-top:0}
+  .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
+  .rules span{color:var(--muted); font-size:14.5px}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px}
+  .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-0.03em; line-height:1}
+  .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
+
+  .letterbox{display:flex; flex-wrap:wrap; gap:18px; align-items:center; justify-content:space-between;
+    margin-top:26px; padding:20px 22px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .letterbox b{display:block; color:var(--fg); font-size:15px; font-weight:650; margin-bottom:3px}
+  .letterbox span{color:var(--muted); font-size:13.5px}
+  .letterbox form{display:flex; gap:8px; flex-wrap:wrap}
+  .letterbox input{flex:1 1 13rem; padding:11px 14px; font:inherit; font-size:14.5px; color:var(--fg);
+    background:var(--bg); border:1px solid var(--line2); border-radius:10px; outline:none}
+  .letterbox input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(167,139,250,.14)}
+  .letterbox button{padding:11px 18px; font:inherit; font-size:14.5px; font-weight:600; cursor:pointer;
+    color:var(--btn-ink); border:0; border-radius:10px; background:linear-gradient(180deg,#bda8ff,#a78bfa)}
+
+  footer{border-top:1px solid var(--line); padding:40px 0 64px; margin-top:8px}
+  .fgrid{display:flex; flex-wrap:wrap; gap:34px; justify-content:space-between}
+  .fcol{font-size:13.5px; line-height:2}
+  .fcol .h{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:10px}
+  .fcol a{color:var(--muted); border:0}
+  .fcol a:hover{color:var(--accent)}
+  .fin{margin-top:34px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--dim);
+    display:flex; flex-wrap:wrap; gap:14px}
+  .fin .r{margin-left:auto}
+
+  @media (max-width:700px){
+    body{font-size:16px}
+    .bar{padding:13px 18px; gap:8px; flex-wrap:wrap}
+    nav.top{gap:14px; font-size:13px; margin-left:auto}
+    nav.top a:nth-child(3){display:none}
+    .tools{margin-left:auto; padding-left:12px; border-left:0}
+    .wrap{padding:0 18px}
+    .ladder li{grid-template-columns:2.4rem 1fr; gap:12px}
+    .buildlist li{grid-template-columns:1fr; gap:5px}
+    .st{display:inline-block; justify-self:start}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="silentfam.ko.html"><span class="dot"></span>SilentFam</a>
+    <nav class="top">
+      <a href="#why">이유</a>
+      <a href="#build">만드는 것</a>
+      <a href="#letters">서한</a>
+      <a href="#contact">연락</a>
+    </nav>
+    <div class="tools">
+      <a class="lang" href="silentfam.html" hreflang="en" lang="en">English</a>
+      <button class="iconbtn" id="themeBtn" type="button" aria-label="라이트·다크 전환" title="라이트·다크 전환"><span id="themeIcon">☾</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <p class="kicker">가족이 운영하는 이니셔티브 · 2025년 시작</p>
+    <h1>유명해지고 싶지 않습니다.<br><em>자유로워지고 싶습니다.</em></h1>
+    <p class="lede">우리는 조용한 시스템을 만듭니다 — 직접 확인할 수 있는 증거, 우리 곁에 두는 기억, 관객 없이도 작동하는 도구. <span class="q">얼굴도, 이름도, 소음도 없이. 검증할 수 있는 것만.</span></p>
+    <div class="sub">
+      <form action="mailto:hello@silentfam.com" method="post" enctype="text/plain">
+        <input type="email" name="email" placeholder="이메일 주소" aria-label="이메일 주소" required>
+        <button type="submit">서한 받기</button>
+      </form>
+      <p class="fine">의미 있는 소식이 있을 때 한 통. 추적도, 전달도 없습니다.</p>
+    </div>
+  </div>
+
+  <section id="why">
+    <p class="label"><b>01</b> 이유</p>
+    <h2>변화는 안에서 시작해 밖으로 향합니다.</h2>
+    <p>SilentFam은 우리 가족 안에서 던진 질문 하나로 시작했습니다. 유명해지지 않고도 풍요로워질 수 있다면 어떨까? 성공을 전시하거나 누군가에게 증명하지 않고도, 여행하고 배우고 만들고 함께 시간을 보내는 가족을 상상했습니다.</p>
+    <p>우리가 만드는 시스템은 그 삶을 위해 존재해야 합니다. 그 반대가 아니라.</p>
+    <ol class="ladder"><li><span class="n">01</span><div><b>왜를 안다</b><span>목적, 정체성, 가치가 먼저입니다. 이유 없는 목표는 마감일이 붙은 산만함일 뿐입니다.</span></div></li><li><span class="n">02</span><div><b>무엇을 고른다</b><span>명확한 비전, 그리고 그 비전에 실제로 봉사하는 목표.</span></div></li><li><span class="n">03</span><div><b>어떻게를 배운다</b><span>지식, 시스템, 의도된 행동 — 도약이 아니라 반복되는 작은 걸음.</span></div></li><li><span class="n">04</span><div><b>살아보고 돌아본다</b><span>실제 결과, 정직한 검토, 더 나은 다음 걸음. 그리고 다시 순환합니다.</span></div></li></ol>
+  </section>
+
+  <section id="build">
+    <p class="label"><b>02</b> 만드는 것</p>
+    <h2>세 개의 층, 하나의 방향.</h2>
+    <p class="stacknote">하나의 시스템, 세 개의 층: 혼자 쓰는 것, 함께 쓰는 것, 그리고 우리가 거래하는 방식.</p>
+    <div class="cards">
+      <div class="card plain">
+        <h3>Flow <span class="pill">개인</span></h3>
+        <p>개인 운영체제. <span class="hl">목적·비전·목표</span>를 한 번 정하면, 나머지 모든 것이 그로부터 <span class="hl">바깥으로 흐릅니다</span> — 하루, 프로젝트, 결정, 회고. 변화는 안에서 시작하고, 시스템은 바깥 부분을 보이게 할 뿐입니다.</p>
+        <span class="meta">가칭 · 내부에서 운영 중</span>
+      </div>
+      <div class="card plain">
+        <h3>Tribe <span class="pill">공유</span></h3>
+        <p>함께 쓰는 Flow. 가족이거나 서로를 선택한 몇 사람이 앉아서 <span class="hl">목적·비전·목표를 함께</span> 정합니다 — 모두가 이미 동의했다고 가정하지 않고. 그 결정은 곧 현실이 됩니다. 과제로 쪼개고, <span class="hl">작은 실험</span>으로 돌려보고, 정직하게 재고, 되는 것은 남기고 안 되는 것은 버립니다. 가운데 비전 캔버스, 둘레에 조감 보드. 이렇게 SilentFam을 운영합니다.</p>
+        <span class="meta">비전 캔버스 · 조감 보드 · 실험 순환</span>
+      </div>
+      <div class="card plain">
+        <h3>SilentQuants <span class="pill">트레이딩</span></h3>
+        <p>프랍펌 자본과 일부 브로커 위에서 정량 트레이더로 가는 방향입니다. 리서치, 검증, 규칙, 비용, 그리고 그것을 운용하는 규율. <span class="hl">아직 펀딩받지 않았습니다.</span> 이 순서로 만드는 중이고, Helix는 그중 처음으로 혼자 서는 조각입니다.</p>
+        <div class="child">
+          <span class="lab">SilentQuants 안에</span>
+          <b>Helix — 챌린지·브로커 데이터베이스</b>
+          <span class="cp">71개 프랍펌의 2,166개 챌린지. 각각의 비용, 실제 규칙, 그리고 그 답의 출처.</span>
+          <span class="childlinks">
+            <a href="https://silentquants.com/tools/helix">Helix 열기 ↗</a>
+            <a href="https://silentquants.com/">silentquants.com ↗</a>
+          </span>
+        </div>
+        <ol class="buildlist"><li><span class="st live">운영 중</span><span><b>01 어디서 거래할 것인가</b> — 챌린지·브로커 데이터베이스, 업체별 비용과 손익분기</span></li><li><span class="st wip">제작 중</span><span><b>02 무엇을 어겨서는 안 되는가</b> — 업체별 규칙을 체크리스트로</span></li><li><span class="st wip">제작 중</span><span><b>03 실제로 무엇을 거래하는가</b> — 전략 랩: 백테스트, 워크포워드, 살아남는 것</span></li><li><span class="st plan">예정</span><span><b>04 어떻게 실행하는가</b> — 도구, 체크리스트, 결정 일지</span></li><li><span class="st plan">예정</span><span><b>05 무엇을 남겼는가</b> — 응시, 수수료, 페이아웃, 자본 사다리</span></li></ol>
+        <p class="order-note">순서는 열정의 순서가 아니라 결정의 순서입니다. 규칙을 모르면 포지션 크기를 정할 수 없고, 일지가 없으면 결과를 판정할 수 없습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <p class="label"><b>03</b> 일하는 방식</p>
+    <h2>굽히지 않는 네 가지 원칙.</h2>
+    <div class="rules"><div><b>기록은 우리 곁에.</b><span>기록은 우리와 함께 있습니다. 클라우드는 정해진 경계 안에서 사본을 보관합니다.</span></div><div><b>의견보다 증거.</b><span>다른 사람이 확인할 수 있어야 결과입니다. 모르면 추측하지 않고 모른다고 말합니다.</span></div><div><b>AI 보조, 사람 승인.</b><span>에이전트가 조사하고 만들고 검토합니다. 결정은 사람이 하고, 그 결정은 기록됩니다.</span></div><div><b>작고 검토된 걸음.</b><span>모든 변경은 버전으로 남고 왜 그렇게 했는지 추적할 수 있습니다. 조용한 덮어쓰기는 없습니다.</span></div></div>
+    <div class="stats"><div class="stat"><span class="v">2,166</span><span class="k">수록된 챌린지</span></div><div class="stat"><span class="v">71</span><span class="k">프랍펌</span></div><div class="stat"><span class="v">85%</span><span class="k">A등급 증거</span></div><div class="stat"><span class="v">99%</span><span class="k">규칙 커버리지</span></div></div>
+    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">수치는 SilentQuants 안의 데이터베이스 Helix, 2026년 11월 16일 빌드 기준입니다. 출처와 등급은 행마다 공개됩니다.</p>
+  </section>
+
+  <section id="letters">
+    <p class="label"><b>04</b> 서한</p>
+    <h2>배운 것이 생기면 씁니다.</h2>
+    <p>일정에 맞춰 나가는 뉴스레터가 아닙니다. 하나의 교훈이 끝났을 때 서한이 나갑니다 — 무엇을 시도했고, 무엇을 치렀고, 무엇을 남겼는지. <span class="hl">첫 서한이 무엇에 관한 것이 될지는 아직 모릅니다.</span> 주제를 약속하고 어기는 것보다 솔직한 편이 낫다고 생각합니다.</p>
+    <div class="letterbox">
+      <div>
+        <b>말할 만한 것이 생겼을 때, 한 통.</b>
+        <span>추적 없음, 전달 없음, 정해진 주기 없음.</span>
+      </div>
+      <form action="mailto:hello@silentfam.com" method="post" enctype="text/plain">
+        <input type="email" name="email" placeholder="이메일 주소" aria-label="이메일 주소" required>
+        <button type="submit">구독</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="contact">
+    <p class="label"><b>05</b> 연락</p>
+    <h2>중요한 일이면 메일 주세요.</h2>
+    <p>답할 가치가 있는 것에는 모두 답합니다. 통화, 과장, 우리 이름을 걸어야 하는 제휴는 하지 않습니다.</p>
+    <p><a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol">
+        <div class="h">SilentFam</div>
+        <a href="#why">이유</a><br>
+        <a href="#build">만드는 것</a><br>
+        <a href="#how">일하는 방식</a><br>
+        <a href="#letters">서한</a>
+      </div>
+      <div class="fcol">
+        <div class="h">만드는 것</div>
+        <a href="#build">Flow</a><br>
+        <a href="#build">Tribe</a><br>
+        <a href="https://silentquants.com/">SilentQuants ↗</a><br>
+        <a href="https://silentquants.com/tools/helix">└ Helix ↗</a>
+      </div>
+      <div class="fcol">
+        <div class="h">더 보기</div>
+        <a href="/privacy">개인정보</a><br>
+        <a href="mailto:hello@silentfam.com">이메일</a>
+      </div>
+    </div>
+    <div class="fin">
+      <span>© 2026 SilentFam</span>
+      <span>조용히 짓고, 꼼꼼히 확인합니다.</span>
+      <span class="r">쿠키 없음. 분석 없음. 얼굴 없음.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var root=document.documentElement, btn=document.getElementById("themeBtn"), icon=document.getElementById("themeIcon");
+    function paint(){ icon.textContent = root.getAttribute("data-theme")==="light" ? "☀" : "☾"; }
+    paint();
+    btn.addEventListener("click", function(){
+      var next = root.getAttribute("data-theme")==="light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      try{ localStorage.setItem("sf-theme", next); }catch(e){}
+      paint();
+    });
+  })();
+</script>
+
+</body>
+</html>
