@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SilentFam — 유명해지고 싶지 않습니다. 자유로워지고 싶습니다.</title>
-<meta name="description" content="가족이 운영하는 이니셔티브. 자유를 위한 조용한 시스템을 만듭니다 — 증거, 곁에 두는 기억, 관객 없이도 작동하는 도구.">
+<title>SilentFam — 유명해지고 싶은 게 아닙니다. 자유롭고 싶은 겁니다.</title>
+<meta name="description" content="가족이 운영하는 작은 팀입니다. 자유를 위해 조용한 시스템을 만듭니다. 증거, 곁에 두는 기록, 관객 없이도 돌아가는 도구.">
 <meta name="theme-color" content="#03080a">
 <meta property="og:title" content="SilentFam">
-<meta property="og:description" content="유명해지고 싶지 않습니다. 자유로워지고 싶습니다.">
+<meta property="og:description" content="유명해지고 싶은 게 아닙니다. 자유롭고 싶은 겁니다.">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://silentfam.com/">
 <link rel="alternate" hreflang="en" href="https://silentfam.com/">
@@ -25,7 +25,7 @@
     --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
     --line:#1d2529; --line2:#2b3539;
     --fg:#fcfcfe; --fg2:#d2d4d6; --muted:#9ba0a5; --dim:#828a90;
-    --accent:#a78bfa; --accent-soft:#c4b1ff; --btn-ink:#0a0710;
+    --accent:#a78bfa; --accent-soft:#c4b1ff; --accent-rgb:167,139,250; --btn-ink:#0a0710;
     --glow:rgba(167,139,250,.13);
     --measure:44rem;
     color-scheme: dark;
@@ -34,7 +34,7 @@
     --bg:#f7f5fb; --panel:#ffffff; --panel2:#f0ecf9;
     --line:#e2dbef; --line2:#cfc6e4;
     --fg:#111114; --fg2:#3a3a42; --muted:#63636e; --dim:#8a8a95;
-    --accent:#6d4aff; --accent-soft:#7f5cff; --btn-ink:#ffffff;
+    --accent:#6d4aff; --accent-soft:#7f5cff; --accent-rgb:109,74,255; --btn-ink:#ffffff;
     --glow:rgba(109,74,255,.06);
     color-scheme: light;
   }
@@ -74,6 +74,49 @@
     font-size:15px; line-height:1; cursor:pointer; color:var(--muted); background:transparent;
     border:1px solid var(--line); border-radius:9px; transition:color .15s, border-color .15s, background .15s}
   .iconbtn:hover{color:var(--accent); border-color:rgba(167,139,250,.55); background:var(--panel2)}
+
+
+  /* ── floating pill header ─────────────────────────── */
+  header.site{position:sticky; top:0; z-index:40; background:transparent; border:0; backdrop-filter:none; padding:14px 16px 0}
+  .pillbar{
+    max-width:52rem; margin:0 auto; display:flex; align-items:center; gap:8px;
+    padding:8px 10px 8px 18px; border-radius:999px;
+    background:rgba(12,20,23,.86); border:1px solid #303c42;
+    box-shadow:0 14px 40px -26px rgba(0,0,0,.95), 0 0 0 1px rgba(255,255,255,.02) inset;
+    backdrop-filter:blur(18px) saturate(150%);
+  }
+  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
+  .pillbar .bar{max-width:none; padding:0; margin:0; display:contents}
+  .pillbar .mark{font-size:15.5px; font-weight:800; letter-spacing:-0.03em; padding:4px 6px 4px 2px; gap:6px}
+  .pillbar .mark .wm{display:inline-block; white-space:nowrap; transition:transform .22s cubic-bezier(.2,.7,.3,1)}
+  .pillbar .mark .w1,.pillbar .mark .w2{display:inline; transition:color .16s ease, letter-spacing .22s ease}
+  .pillbar .mark .w2{color:var(--accent)}
+  .pillbar .mark:hover .w1{color:var(--accent)}
+  .pillbar .mark:hover .w2{color:var(--fg)}
+  .pillbar .mark:hover .wm,.pillbar .mark:focus-visible .wm{transform:scale(1.07); letter-spacing:-0.045em}
+  .pillbar .mark:focus-visible .w1{color:var(--accent)}
+  .pillbar .mark:focus-visible .w2{color:var(--fg)}
+  .pillbar .mark:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:8px}
+  .pillbar .mark:hover{border:0}
+  nav.top{margin-left:auto; gap:4px; font-size:14px; display:flex; align-items:center}
+  nav.top a{color:var(--muted); border:0; padding:7px 11px; border-radius:999px; transition:color .15s, background .15s}
+  nav.top a:hover{color:var(--accent); background:rgba(var(--accent-rgb),.12)}
+  .pillbar .tools{margin-left:8px; padding-left:14px; border-left:1px solid var(--line); gap:8px}
+  .pillbar .lang{padding:6px 9px; border-radius:999px; font-size:12.5px; border:0}
+  .pillbar .iconbtn{border:0; width:32px; height:32px; border-radius:999px; color:var(--fg2)}
+  .pillbar .iconbtn:hover{background:rgba(167,139,250,.16)}
+  .pillbar .cta{margin-left:4px; padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:650; border:0;
+    color:#140b22; background:linear-gradient(180deg,#c4b1ff,#a78bfa); white-space:nowrap}
+  .pillbar .cta:hover{filter:brightness(1.06); border:0}
+  main.wrap{padding-top:clamp(32px,6vh,64px)}
+  @media (max-width:760px){
+    .pillbar{flex-wrap:wrap; gap:4px; padding:8px 12px; border-radius:24px}
+    nav.top{order:3; width:100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin:6px 0 2px; gap:2px; font-size:13px; scrollbar-width:none}
+    nav.top::-webkit-scrollbar{display:none}
+    nav.top a{white-space:nowrap; padding:6px 10px}
+    .pillbar .cta{display:none}
+  }
 
   .hero{padding:clamp(44px,8vh,84px) 0 clamp(34px,5vh,52px)}
   .kicker{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
@@ -227,17 +270,18 @@
 <body>
 
 <header class="site">
-  <div class="bar">
-    <a class="mark" href="silentfam.ko.html"><span class="dot"></span>SilentFam</a>
+  <div class="pillbar">
+    <a class="mark" href="/ko/" aria-label="SilentFam home"><span class="dot"></span><span class="wm"><span class="w1">Silent</span><span class="w2">Fam</span></span></a>
     <nav class="top">
-      <a href="#why">이유</a>
-      <a href="#build">만드는 것</a>
-      <a href="#journey">여정</a>
-      <a href="#contact">연락</a>
+      <a href="#why">왜</a>
+      <a href="#build">무엇을</a>
+      <a href="#journey">어떻게</a>
+      <a href="#contact">Contact</a>
     </nav>
     <div class="tools">
-      <a class="lang" href="silentfam.html" hreflang="en" lang="en">English</a>
+      <a class="lang" href="/" hreflang="en" lang="en">English</a>
       <button class="iconbtn" id="themeBtn" type="button" aria-label="라이트·다크 전환" title="라이트·다크 전환"><span id="themeIcon">☾</span></button>
+      <a class="cta" href="https://silentquants.com/">SilentQuants ↗</a>
     </div>
   </div>
 </header>
@@ -245,83 +289,83 @@
 <main class="wrap">
 
   <div class="hero">
-    <p class="kicker">가족이 운영하는 이니셔티브 · 2025년 시작</p>
-    <h1>유명해지고 싶지 않습니다.<br><em>자유로워지고 싶습니다.</em></h1>
-    <p class="lede">우리는 조용한 시스템을 만듭니다 — 직접 확인할 수 있는 증거, 우리 곁에 두는 기억, 관객 없이도 작동하는 도구. <span class="q">얼굴도, 이름도, 소음도 없이. 검증할 수 있는 것만.</span></p>
+    <p class="kicker">가족이 운영합니다 · 2025년에 시작</p>
+    <h1>유명해지고 싶은 게 아닙니다.<br><em>자유롭고 싶은 겁니다.</em></h1>
+    <p class="lede">우리는 조용한 시스템을 만듭니다. 직접 확인할 수 있는 증거, 곁에 두는 기록, 관객 없이도 돌아가는 도구. <span class="q">얼굴도 이름도 소음도 없이. 확인할 수 있는 것만 남깁니다.</span></p>
     <div class="sub">
       <form action="mailto:hello@silentfam.com" method="post" enctype="text/plain">
         <input type="email" name="email" placeholder="이메일 주소" aria-label="이메일 주소" required>
         <button type="submit">서한 받기</button>
       </form>
-      <p class="fine">의미 있는 소식이 있을 때 한 통. 추적도, 전달도 없습니다.</p>
+      <p class="fine">말할 게 생겼을 때 한 통만 보냅니다. 추적도, 넘겨주기도 없습니다.</p>
     </div>
   </div>
 
   <section id="why">
-    <p class="label"><b>01</b> 이유</p>
-    <h2>변화는 안에서 시작해 밖으로 향합니다.</h2>
-    <p>SilentFam은 우리 가족 안에서 던진 질문 하나로 시작했습니다. 유명해지지 않고도 풍요로워질 수 있다면 어떨까? 성공을 전시하거나 누군가에게 증명하지 않고도, 여행하고 배우고 만들고 함께 시간을 보내는 가족을 상상했습니다.</p>
-    <p>우리가 만드는 시스템은 그 삶을 위해 존재해야 합니다. 그 반대가 아니라.</p>
-    <ol class="ladder"><li><span class="n">01</span><div><b>왜를 안다</b><span>목적, 정체성, 가치가 먼저입니다. 이유 없는 목표는 마감일이 붙은 산만함일 뿐입니다.</span></div></li><li><span class="n">02</span><div><b>무엇을 고른다</b><span>명확한 비전, 그리고 그 비전에 실제로 봉사하는 목표.</span></div></li><li><span class="n">03</span><div><b>어떻게를 배운다</b><span>지식, 시스템, 의도된 행동 — 도약이 아니라 반복되는 작은 걸음.</span></div></li><li><span class="n">04</span><div><b>살아보고 돌아본다</b><span>실제 결과, 정직한 검토, 더 나은 다음 걸음. 그리고 다시 순환합니다.</span></div></li></ol>
+    <p class="label"><b>01</b> 왜</p>
+    <h2>변화는 안에서 시작해서 밖으로 나갑니다.</h2>
+    <p>SilentFam은 우리 가족이 던진 질문 하나에서 시작했습니다. 유명해지지 않고도 풍요로워질 수는 없을까. 성공을 자랑하거나 누군가에게 증명하지 않고도, 여행하고 배우고 만들고 같이 시간을 보낼 수는 없을까.</p>
+    <p>우리가 만드는 시스템은 그 삶을 위해 있어야 합니다. 그 반대가 아니라.</p>
+    <ol class="ladder"><li><span class="n">01</span><div><b>왜를 안다</b><span>목적과 정체성, 가치가 먼저입니다. 이유 없는 목표는 마감일만 붙은 산만함입니다.</span></div></li><li><span class="n">02</span><div><b>무엇을 고른다</b><span>어떤 삶을 살고 싶은지 정하고, 거기에 맞는 목표를 세웁니다.</span></div></li><li><span class="n">03</span><div><b>어떻게를 배운다</b><span>지식과 시스템을 만들고, 도약 대신 작은 걸음을 반복합니다.</span></div></li><li><span class="n">04</span><div><b>살아보고 돌아본다</b><span>겪어보고 정직하게 되돌아본 다음, 다음 걸음을 고칩니다. 그리고 다시 처음으로.</span></div></li></ol>
   </section>
 
   <section id="build">
-    <p class="label"><b>02</b> 만드는 것</p>
+    <p class="label"><b>02</b> 무엇을 만들고 있나</p>
     <h2>세 개의 층, 하나의 방향.</h2>
-    <p class="stacknote">하나의 시스템, 세 개의 층: 혼자 쓰는 것, 함께 쓰는 것, 그리고 우리가 거래하는 방식.</p>
+    <p class="stacknote">하나의 시스템, 세 개의 층. 혼자 쓰는 것, 함께 쓰는 것, 그리고 우리가 거래하는 방식.</p>
     <div class="cards">
       <div class="card plain">
         <h3>Flow <span class="pill">개인</span></h3>
-        <p>개인 운영체제. <span class="hl">목적·비전·목표</span>를 한 번 정하면, 나머지 모든 것이 그로부터 <span class="hl">바깥으로 흐릅니다</span> — 하루, 프로젝트, 결정, 회고. 변화는 안에서 시작하고, 시스템은 바깥 부분을 보이게 할 뿐입니다.</p>
-        <span class="meta">가칭 · 내부에서 운영 중</span>
+        <p>혼자 쓰는 운영체제입니다. <span class="hl">목적과 비전, 목표</span>를 한 번 정해두면 하루 일정부터 프로젝트, 결정, 회고까지 <span class="hl">거기서부터 흘러나갑니다</span>. 변화는 안에서 시작하고, 시스템은 그게 밖으로 드러나게 도와줄 뿐입니다.</p>
+        <span class="meta">가칭 · 안에서 굴리는 중</span>
       </div>
       <div class="card plain">
-        <h3>Tribe <span class="pill">공유</span></h3>
-        <p>함께 쓰는 Flow. 가족이거나 서로를 선택한 몇 사람이 앉아서 <span class="hl">목적·비전·목표를 함께</span> 정합니다 — 모두가 이미 동의했다고 가정하지 않고. 그 결정은 곧 현실이 됩니다. 과제로 쪼개고, <span class="hl">작은 실험</span>으로 돌려보고, 정직하게 재고, 되는 것은 남기고 안 되는 것은 버립니다. 가운데 비전 캔버스, 둘레에 조감 보드. 이렇게 SilentFam을 운영합니다.</p>
+        <h3>Tribe <span class="pill">함께</span></h3>
+        <p>함께 쓰는 Flow입니다. 가족이든, 서로 선택한 몇 사람이든, 앉아서 <span class="hl">목적과 비전, 목표를 같이</span> 정합니다. 다들 이미 같은 생각일 거라고 가정하지 않고요. 정하고 나면 일을 쪼개고, <span class="hl">작은 실험</span>으로 돌려보고, 정직하게 재보고, 되는 것만 남깁니다. 가운데에 비전 캔버스, 둘레에 한눈에 보는 보드. SilentFam은 이렇게 굴러갑니다.</p>
         <span class="meta">비전 캔버스 · 조감 보드 · 실험 순환</span>
       </div>
       <div class="card plain">
         <h3>SilentQuants <span class="pill">트레이딩</span></h3>
-        <p>프랍펌 자본과 일부 브로커 위에서 정량 트레이더로 가는 방향입니다. 리서치, 검증, 규칙, 비용, 그리고 그것을 운용하는 규율. <span class="hl">아직 펀딩받지 않았습니다.</span> 이 순서로 만드는 중이고, Helix는 그중 처음으로 스스로 서는 조각입니다.</p>
+        <p>프랍펌 자본과 몇몇 브로커 위에서 정량 트레이더로 가려는 쪽입니다. 리서치, 검증, 규칙, 비용, 그리고 그걸 운용하는 규율까지. <span class="hl">아직 펀딩은 받지 못했습니다.</span> 이 순서대로 만들고 있고, Helix는 그중 처음으로 혼자 서는 조각입니다.</p>
         <div class="child">
           <span class="lab">SilentQuants 안에</span>
           <b>Helix — 프랍펌·브로커 데이터베이스</b>
-          <span class="cp">71개 프랍펌의 2,166개 챌린지. 각각의 비용, 실제 규칙, 그리고 그 답의 출처.</span>
+          <span class="cp">71개 프랍펌의 2,166개 챌린지. 각각 비용이 얼마인지, 규칙이 실제로 어떤지, 그 답을 어디서 가져왔는지.</span>
           <span class="childlinks">
             <a href="https://silentquants.com/tools/helix">Helix 열기 ↗</a>
             <a href="https://silentquants.com/">silentquants.com ↗</a>
           </span>
         </div>
         <p class="listhead">만드는 순서</p>
-        <ol class="buildlist"><li><span class="st live">운영 중</span><span><b>01 어디서 거래할 것인가</b> — Helix: 업체별 비용·규칙·손익분기</span></li><li><span class="st wip">제작 중</span><span><b>02 무엇을 어겨서는 안 되는가</b> — 업체별 규칙을 체크리스트로</span></li><li><span class="st wip">제작 중</span><span><b>03 실제로 무엇을 거래하는가</b> — 전략 랩: 백테스트, 워크포워드, 살아남는 것</span></li><li><span class="st plan">예정</span><span><b>04 어떻게 실행하는가</b> — 도구, 체크리스트, 결정 일지</span></li><li><span class="st plan">예정</span><span><b>05 무엇을 남겼는가</b> — 응시, 수수료, 페이아웃, 자본 사다리</span></li></ol>
+        <ol class="buildlist"><li><span class="st live">운영 중</span><span><b>01 어디서 거래할 것인가</b> — Helix: 업체별 비용·규칙·손익분기</span></li><li><span class="st wip">만드는 중</span><span><b>02 무엇을 어기면 안 되는가</b> — 업체별 규칙을 체크리스트로</span></li><li><span class="st wip">만드는 중</span><span><b>03 실제로 무엇을 거래하는가</b> — 전략 랩: 백테스트, 워크포워드, 살아남는 것</span></li><li><span class="st plan">예정</span><span><b>04 어떻게 실행하는가</b> — 도구, 체크리스트, 결정 일지</span></li><li><span class="st plan">예정</span><span><b>05 무엇이 남았는가</b> — 응시, 수수료, 페이아웃, 자본 사다리</span></li></ol>
         <p class="order-note">순서는 열정의 순서가 아니라 결정의 순서입니다. 규칙을 모르면 포지션 크기를 정할 수 없고, 일지가 없으면 결과를 판정할 수 없습니다.</p>
       </div>
     </div>
   </section>
 
   <section id="how">
-    <p class="label"><b>03</b> 일하는 방식</p>
-    <h2>굽히지 않는 네 가지 원칙.</h2>
-    <div class="rules"><div><b>기록은 우리 곁에.</b><span>기록은 우리와 함께 있습니다. 클라우드는 정해진 경계 안에서 사본을 보관합니다.</span><em class="why">오프라인에서 열 수 없는 기록은 소유가 아니라 임대이기 때문입니다.</em></div><div><b>의견보다 증거.</b><span>다른 사람이 확인할 수 있어야 결과입니다. 모르면 모른다고 말합니다.</span><em class="why">확인하지 않은 숫자는 확인한 숫자와 똑같이 그럴듯해 보이기 때문입니다.</em></div><div><b>AI 보조, 사람 승인.</b><span>에이전트가 조사하고 만들고 검토합니다. 결정은 사람이 하고, 그 결정은 기록됩니다.</span><em class="why">기계는 아주 빠르게, 아주 확신 있게 틀린 방향으로 갈 수 있기 때문입니다.</em></div><div><b>작고 검토된 걸음.</b><span>모든 변경은 버전으로 남고 왜 그렇게 했는지 추적할 수 있습니다. 조용한 덮어쓰기는 없습니다.</span><em class="why">큰 변경은 원인이 된 그 하나의 실수를 숨기기 때문입니다.</em></div></div>
+    <p class="label"><b>03</b> 어떻게 하고 있나</p>
+    <h2>굽히지 않는 네 가지.</h2>
+    <div class="rules"><div><b>기록은 우리 곁에.</b><span>기록은 우리와 함께 있습니다. 클라우드는 정해둔 경계 안에서 사본만 보관합니다.</span><em class="why">오프라인에서 열 수 없는 기록은 소유가 아니라 임대이기 때문입니다.</em></div><div><b>의견보다 증거.</b><span>다른 사람이 확인할 수 있어야 결과라고 부릅니다. 모르면 모른다고 말합니다.</span><em class="why">확인하지 않은 숫자는 확인한 숫자만큼이나 그럴듯해 보이기 때문입니다.</em></div><div><b>AI 보조, 사람 승인.</b><span>에이전트가 조사하고 만들고 검토합니다. 결정은 사람이 하고, 그 결정은 기록됩니다.</span><em class="why">기계는 아주 빠르게, 아주 확신 있게 틀린 방향으로 갈 수 있기 때문입니다.</em></div><div><b>작고 검토된 걸음.</b><span>모든 변경은 버전으로 남고, 왜 그렇게 했는지 추적할 수 있습니다. 조용한 덮어쓰기는 없습니다.</span><em class="why">큰 변경은 원인이 된 그 하나의 실수를 숨기기 때문입니다.</em></div></div>
     <div class="stats"><div class="stat"><span class="v">2,166</span><span class="k">수록된 챌린지</span></div><div class="stat"><span class="v">71</span><span class="k">프랍펌</span></div><div class="stat"><span class="v">85%</span><span class="k">A등급 증거</span></div><div class="stat"><span class="v">99%</span><span class="k">규칙 커버리지</span></div></div>
-    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">수치는 SilentQuants 안의 데이터베이스 Helix, 2026년 11월 16일 빌드 기준입니다. 출처와 등급은 행마다 공개됩니다.</p>
+    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">수치는 SilentQuants 안의 데이터베이스 Helix, 2026년 11월 16일 빌드 기준입니다. 출처와 등급은 행마다 공개합니다.</p>
   </section>
 
   <section id="journey">
     <p class="label"><b>04</b> 여정</p>
-    <h2>아직 짧습니다. 모든 걸음은 확인할 수 있습니다.</h2>
-    <p>사진도, 창업 신화도 없습니다. 아래는 가리킬 수 있는 것들입니다.</p>
-    <ol class="journey"><li><span class="ch">01</span><time>2026년 10월 25일</time><div><b>도구보다 먼저 정한 규칙 하나</b><p>무엇을 설치하기 전에, 진실이 어디에 사는지를 먼저 적었습니다. 우리 곁, 우리 디스크. 그 뒤로 클라우드는 기록이 아니라 표시 계층입니다. 아래의 모든 결정이 이 한 줄에서 나왔습니다.</p><code><span>결정 2026-10-25</span> · <span>로컬이 정본</span></code></div></li><li><span class="ch">02</span><time>2026년 11월 3일</time><div><b>두 개의 시스템, 하나의 목적</b><p>일이 둘로 갈렸습니다. 한 사람의 목적과 방향을 다루는 개인 시스템, 그리고 가족과 회사를 위한 공유 시스템. 같은 생각을 두 규모로 쓴 것이라 이름도 Flow와 Tribe입니다.</p><code><span>Flow</span> · <span>Platform — 분리 후 11월 4일 활성화</span></code></div></li><li><span class="ch">03</span><time>2026년 11월 5일</time><div><b>가족 데이터에 대한 규칙</b><p>움직이지 않을 경계를 정했습니다. 가족이 서로에게 하는 말은 클라우드 모델로 가지 않습니다. 규칙을 파일로 두는 건 쉽고, 실행 전에 확인하게 만드는 게 실제로 어렵습니다.</p><code><span>가족 레인 규칙</span> · <span>로컬 전용</span></code></div></li><li><span class="ch">04</span><time>2026년 11월 9–10일</time><div><b>단단해지고, 그제야 쓸 만해짐</b><p>두 도메인에 HSTS와 DNSSEC를 적용했고, 가정용 첫 도구가 또 하나의 앱이 아니라 대화창 안에서 작동하기 시작했습니다. 보안은 자랑할 기능이 아니라, 무언가를 공개할 수 있는 이유입니다.</p><code><span>HSTS</span> · <span>DNSSEC</span> · <span>두 도메인</span></code></div></li><li><span class="ch">05</span><time>2026년 11월 14–15일</time><div><b>데이터베이스가 꾸미기를 그만둠</b><p>스프레드시트가, 모르는 것을 인정하는 데이터베이스가 되었습니다. 업체가 공개하지 않은 숫자는 비워두고 비었다고 말합니다. 그 정직함이 제품입니다.</p><code><span>2,166개 챌린지</span> · <span>71개 브랜드</span> · <span>규칙 99%</span> · <span>A등급 85%</span></code></div></li><li><span class="ch">06</span><time>2026년 11월 16일</time><div><b>이 페이지, 두 개의 언어</b><p>영어가 원본입니다. 한국어는 기계 번역이 아니라 우리가 직접 읽고 확인할 수 있는 번역입니다. 하나의 템플릿, 두 개의 사전 — 그래서 두 판이 어긋날 수 없습니다.</p><code><span>EN</span> · <span>KO — 하나의 템플릿, 두 개의 사전</span></code></div></li></ol>
+    <h2>우리가 지나온 굵직한 것들.</h2>
+    <p>얼굴과 이름은 감추지만, 어떻게 사는지는 숨기지 않습니다.</p>
+    <ol class="journey"><li><span class="ch">01</span><time>2026년 10월 25일</time><div><b>도구보다 먼저 정한 규칙 하나</b><p>무엇을 설치하기도 전에, 진실이 어디에 있는지를 먼저 적었습니다. 우리 곁, 우리 디스크, 로그인 없이도 열 수 있는 파일. 그 뒤로 쓰는 클라우드는 전부 보여주는 층이고 사본일 뿐, 기록 자체는 아닙니다. 웹사이트보다 먼저, 데이터베이스보다 먼저 내린 결정이었고, 여기 보이는 것들은 거의 다 그 결정의 결과입니다.</p><code><span>결정 2026-10-25</span> · <span>로컬이 정본</span></code></div></li><li><span class="ch">02</span><time>2026년 11월 3일</time><div><b>두 개의 시스템, 하나의 목적</b><p>일이 둘로 갈렸습니다. 한쪽은 한 사람의 목적과 목표, 하루를 담고, 다른 쪽은 여기 사는 모두의 같은 것들을 담습니다. 그래야 결정을 혼자 정하지 않고 같이 할 수 있습니다. 이름을 Flow와 Tribe로 붙인 건 같은 생각을 두 규모로 쓴 것이라서지, 서로 다른 제품이라서가 아닙니다. 나누는 데는 저녁 한 번이면 됐고, 둘이 어긋나지 않게 붙잡아두는 게 내년의 일입니다.</p><code><span>Flow</span> · <span>Tribe — 분리 후 11월 4일 활성화</span></code></div></li><li><span class="ch">03</span><time>2026년 11월 5일</time><div><b>가족 데이터에 대한 규칙</b><p>움직이지 않을 경계를 정했습니다. 가족이 서로에게 하는 말은, 아무리 편해도 클라우드 모델로 가지 않습니다. 규칙을 파일에 적는 건 쉬웠습니다. 쓸모 있는 부분은 그걸 실행 전에 확인하는 절차로 만든 것이었습니다. 나중에 누가 십이 분짜리 지름길을 쓰더라도 이 선이 조용히 무너지지 않게요.</p><code><span>가족 레인 규칙</span> · <span>로컬 전용</span></code></div></li><li><span class="ch">04</span><time>2026년 11월 9–10일</time><div><b>단단해지고, 그제야 쓸 만해짐</b><p>두 도메인에 HSTS와 DNSSEC를 붙였고, 첫 가정용 도구가 또 하나의 앱을 배우라고 하지 않고 대화창 안에서 작동하기 시작했습니다. 보안은 자랑할 기능이 아니라, 여기에 무언가를 공개할 수 있는 이유입니다. 같은 주에 처음으로 진짜 쓸모 있는 게 돌아갔다는 건 생각보다 기분이 좋은 일이었습니다.</p><code><span>HSTS</span> · <span>DNSSEC</span> · <span>두 도메인</span></code></div></li><li><span class="ch">05</span><time>2026년 11월 14–15일</time><div><b>데이터베이스가 꾸미기를 그만둠</b><p>스프레드시트가, 모르는 걸 인정하는 데이터베이스가 되었습니다. 업체가 공개하지 않은 숫자는 비워두고 비었다고 말하며, 행마다 우리가 얼마나 꼼꼼히 확인했는지를 등급으로 남깁니다. 오늘 기준 71개 브랜드의 챌린지 2,166개를 읽을 수 있고, 그중 99%에 규칙이 붙어 있습니다. 정직함이 제품이고, 규모는 그 부산물입니다.</p><code><span>2,166개 챌린지</span> · <span>71개 브랜드</span> · <span>규칙 99%</span> · <span>A등급 85%</span></code></div></li><li><span class="ch">06</span><time>2026년 11월 16일</time><div><b>이 페이지, 두 개의 언어</b><p>영어가 원본입니다. 한국어는 우리가 직접 쓰고 읽는 번역이지, 맞겠거니 하는 기계 출력이 아닙니다. 두 판은 하나의 서식에서 만들어지니 시간이 지나도 서로 어긋날 수 없습니다. 같은 주에 이 사이트가 무엇이 아닌지도 정했습니다. 남의 회사 프로모 코드와 평점을 그대로 옮겨놓고 리서치라고 부르는 곳은 되지 않기로요.</p><code><span>EN</span> · <span>KO — 하나의 템플릿, 두 개의 사전</span></code></div></li></ol>
   </section>
 
   <section id="letters">
     <p class="label"><b>05</b> 서한</p>
-    <h2>배운 것이 생기면 씁니다.</h2>
-    <p>일정에 맞춰 나가는 뉴스레터가 아닙니다. 하나의 교훈이 끝났을 때 서한이 나갑니다 — 무엇을 시도했고, 무엇을 치렀고, 무엇을 남겼는지. <span class="hl">첫 서한이 무엇에 관한 것이 될지는 아직 모릅니다.</span> 주제를 약속하고 어기는 것보다 솔직한 편이 낫다고 생각합니다.</p>
+    <h2>배운 게 생기면 씁니다.</h2>
+    <p>일정에 맞춰 나가는 뉴스레터가 아닙니다. 하나의 교훈이 끝났을 때 한 통 나갑니다. 무엇을 해봤고, 무엇을 치렀고, 무엇이 남았는지. <span class="hl">첫 서한이 무슨 얘기가 될지는 아직 모릅니다.</span> 주제를 약속하고 못 지키는 것보다 솔직한 편이 낫다고 생각합니다.</p>
     <div class="letterbox">
       <div>
-        <b>말할 만한 것이 생겼을 때, 한 통.</b>
-        <span>추적 없음, 전달 없음, 정해진 주기 없음.</span>
+        <b>말할 만한 게 생겼을 때, 한 통.</b>
+        <span>추적 없음, 넘겨주기 없음, 정해진 주기 없음.</span>
       </div>
       <form action="mailto:hello@silentfam.com" method="post" enctype="text/plain">
         <input type="email" name="email" placeholder="이메일 주소" aria-label="이메일 주소" required>
@@ -331,9 +375,9 @@
   </section>
 
   <section id="contact">
-    <p class="label"><b>06</b> 연락</p>
+    <p class="label"><b>06</b> Contact</p>
     <h2>중요한 일이면 메일 주세요.</h2>
-    <p>답할 가치가 있는 것에는 모두 답합니다. 통화, 과장, 우리 이름을 걸어야 하는 제휴는 하지 않습니다.</p>
+    <p>답할 만한 것에는 다 답합니다. 통화, 과장, 우리 이름을 걸어야 하는 제휴는 하지 않습니다.</p>
     <p><a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p>
   </section>
 
@@ -344,9 +388,9 @@
     <div class="fgrid">
       <div class="fcol">
         <div class="h">SilentFam</div>
-        <a href="#why">이유</a><br>
-        <a href="#build">만드는 것</a><br>
-        <a href="#how">일하는 방식</a><br>
+        <a href="#why">왜</a><br>
+        <a href="#build">무엇을</a><br>
+        <a href="#how">어떻게</a><br>
         <a href="#letters">여정</a>
       </div>
       <div class="fcol">
@@ -371,6 +415,44 @@
 </footer>
 
 <script>
+  /* 숫자가 화면에 들어올 때 0에서 목표값까지 올라간다. 동작 줄이기를 켠 사람에게는 바로 최종값. */
+  (function(){
+    var els = Array.prototype.slice.call(document.querySelectorAll(".stat .v"));
+    if(!els.length || !("IntersectionObserver" in window)) return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    els.forEach(function(el){ el.dataset.final = el.textContent.trim(); });
+    function paint(el, v){
+      var final = el.dataset.final;
+      var suffix = final.indexOf("%") > -1 ? "%" : "";
+      var n = Math.round(v);
+      el.textContent = n.toLocaleString("en-US") + suffix;
+    }
+    function run(el){
+      var final = el.dataset.final;
+      var target = parseFloat(final.replace(/[^0-9.]/g, "")) || 0;
+      if(reduce || !target){ el.textContent = final; return; }
+      var t0 = null, dur = 1100;
+      function step(){
+        var ts = (window.performance && performance.now) ? performance.now() : Date.now();
+        if(t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / dur);
+        var eased = 1 - Math.pow(1 - k, 3);
+        paint(el, target * eased);
+        if(k >= 1){ clearInterval(timer); el.textContent = final; }
+      }
+      /* requestAnimationFrame은 백그라운드 탭에서 멈춘다. 인터벌 + 안전 타이머로 항상 최종값에 도달시킨다. */
+      var timer = setInterval(step, 16);
+      step();
+      setTimeout(function(){ clearInterval(timer); el.textContent = final; }, dur + 400);
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ io.unobserve(e.target); run(e.target); }
+      });
+    }, {threshold: .5});
+    els.forEach(function(el){ io.observe(el); });
+  })();
+
   (function(){
     var root=document.documentElement, btn=document.getElementById("themeBtn"), icon=document.getElementById("themeIcon");
     function paint(){ icon.textContent = root.getAttribute("data-theme")==="light" ? "☀" : "☾"; }

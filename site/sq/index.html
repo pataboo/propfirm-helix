@@ -19,7 +19,7 @@
     --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
     --line:#1d2529; --line2:#2b3539;
     --fg:#fcfcfe; --fg2:#d2d4d6; --muted:#9ba0a5; --dim:#828a90;
-    --accent:#a78bfa; --accent-soft:#c4b1ff; --btn-ink:#0a0710;
+    --accent:#a78bfa; --accent-soft:#c4b1ff; --accent-rgb:167,139,250; --btn-ink:#0a0710;
     --glow:rgba(var(--accent-rgb),.13);
     --measure:44rem;
     color-scheme: dark;
@@ -28,7 +28,7 @@
     --bg:#f7f5fb; --panel:#ffffff; --panel2:#f0ecf9;
     --line:#e2dbef; --line2:#cfc6e4;
     --fg:#111114; --fg2:#3a3a42; --muted:#63636e; --dim:#8a8a95;
-    --accent:#6d4aff; --accent-soft:#7f5cff; --btn-ink:#ffffff;
+    --accent:#6d4aff; --accent-soft:#7f5cff; --accent-rgb:109,74,255; --btn-ink:#ffffff;
     --glow:rgba(109,74,255,.06);
     color-scheme: light;
   }
@@ -68,6 +68,49 @@
     font-size:15px; line-height:1; cursor:pointer; color:var(--muted); background:transparent;
     border:1px solid var(--line); border-radius:9px; transition:color .15s, border-color .15s, background .15s}
   .iconbtn:hover{color:var(--accent); border-color:rgba(var(--accent-rgb),.55); background:var(--panel2)}
+
+
+  /* ── floating pill header ─────────────────────────── */
+  header.site{position:sticky; top:0; z-index:40; background:transparent; border:0; backdrop-filter:none; padding:14px 16px 0}
+  .pillbar{
+    max-width:52rem; margin:0 auto; display:flex; align-items:center; gap:8px;
+    padding:8px 10px 8px 18px; border-radius:999px;
+    background:rgba(12,20,23,.86); border:1px solid #303c42;
+    box-shadow:0 14px 40px -26px rgba(0,0,0,.95), 0 0 0 1px rgba(255,255,255,.02) inset;
+    backdrop-filter:blur(18px) saturate(150%);
+  }
+  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
+  .pillbar .bar{max-width:none; padding:0; margin:0; display:contents}
+  .pillbar .mark{font-size:15.5px; font-weight:800; letter-spacing:-0.03em; padding:4px 6px 4px 2px; gap:6px}
+  .pillbar .mark .wm{display:inline-block; white-space:nowrap; transition:transform .22s cubic-bezier(.2,.7,.3,1)}
+  .pillbar .mark .w1,.pillbar .mark .w2{display:inline; transition:color .16s ease, letter-spacing .22s ease}
+  .pillbar .mark .w2{color:var(--accent)}
+  .pillbar .mark:hover .w1{color:var(--accent)}
+  .pillbar .mark:hover .w2{color:var(--fg)}
+  .pillbar .mark:hover .wm,.pillbar .mark:focus-visible .wm{transform:scale(1.07); letter-spacing:-0.045em}
+  .pillbar .mark:focus-visible .w1{color:var(--accent)}
+  .pillbar .mark:focus-visible .w2{color:var(--fg)}
+  .pillbar .mark:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:8px}
+  .pillbar .mark:hover{border:0}
+  nav.top{margin-left:auto; gap:4px; font-size:14px; display:flex; align-items:center}
+  nav.top a{color:var(--muted); border:0; padding:7px 11px; border-radius:999px; transition:color .15s, background .15s}
+  nav.top a:hover{color:var(--accent); background:rgba(var(--accent-rgb),.12)}
+  .pillbar .tools{margin-left:8px; padding-left:14px; border-left:1px solid var(--line); gap:8px}
+  .pillbar .lang{padding:6px 9px; border-radius:999px; font-size:12.5px; border:0}
+  .pillbar .iconbtn{border:0; width:32px; height:32px; border-radius:999px; color:var(--fg2)}
+  .pillbar .iconbtn:hover{background:rgba(var(--accent-rgb),.16)}
+  .pillbar .cta{margin-left:4px; padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:650; border:0;
+    color:#140b22; background:linear-gradient(180deg,#c4b1ff,#a78bfa); white-space:nowrap}
+  .pillbar .cta:hover{filter:brightness(1.06); border:0}
+  main.wrap{padding-top:clamp(32px,6vh,64px)}
+  @media (max-width:760px){
+    .pillbar{flex-wrap:wrap; gap:4px; padding:8px 12px; border-radius:24px}
+    nav.top{order:3; width:100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin:6px 0 2px; gap:2px; font-size:13px; scrollbar-width:none}
+    nav.top::-webkit-scrollbar{display:none}
+    nav.top a{white-space:nowrap; padding:6px 10px}
+    .pillbar .cta{display:none}
+  }
 
   .hero{padding:clamp(44px,8vh,84px) 0 clamp(34px,5vh,52px)}
   .kicker{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
@@ -501,8 +544,58 @@
   })();
   </script>
 
+  <section id="odds">
+    <p class="label"><b>05</b> The odds</p>
+    <h2>One hundred people pay for a challenge.</h2>
+    <p>This is the least flattering number in prop trading, and the one nobody puts on a pricing page. The figures below come from a published aggregate of about 300,000 accounts across ten firms — not from us, and not from a firm's marketing.</p>
+
+    <div class="odds">
+      <div class="dots" aria-hidden="true"><i class="paid"></i><i class="paid"></i><i class="paid"></i><i class="paid"></i><i class="paid"></i><i class="paid"></i><i class="paid"></i><i class="passed"></i><i class="passed"></i><i class="passed"></i><i class="passed"></i><i class="passed"></i><i class="passed"></i><i class="passed"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="legend">
+        <span><i class="sw paid"></i><b>7</b> get paid</span>
+        <span><i class="sw passed"></i><b>7</b> pass, no payout yet</span>
+        <span><i class="sw none"></i><b>86</b> neither</span>
+      </div>
+    </div>
+
+    <div class="rules" style="margin-top:26px">
+      <div><b>14 pass.</b><span>Roughly one in seven clears the evaluation. Most of them are not the ones posting screenshots.</span></div>
+      <div><b>7 get paid.</b><span>Half of the people who pass reach a payout. The other half trip on a rule after funding.</span></div>
+      <div><b>86 do neither.</b><span>That is the group the pitch is aimed at, and the group the maths is usually hidden from.</span></div>
+    </div>
+    <p class="src">Source: published aggregate of ~300,000 accounts at ten firms (thepropfirmguide.com, 2026). Firm-level rates differ widely; this is an illustration of scale, not a prediction about you.</p>
+  </section>
+
+  <section id="objections">
+    <p class="label"><b>06</b> Objections</p>
+    <h2>The things you should be asking.</h2>
+    <p>We would rather answer these here than have you find out later.</p>
+    <div class="objections">
+      <div class="obj">
+        <b>"This is just another comparison site."</b>
+        <p>Comparison sites are usually paid per signup, which is why the ranking so often matches the commission. We take no payment from firms today, we publish no ranking, and we show where a number is missing instead of filling it.</p>
+      </div>
+      <div class="obj">
+        <b>"You are not even funded. Why should I listen?"</b>
+        <p>You should not listen to us about trading. You should check the database. We are not selling a track record — we do not have one — we are publishing what firms require, with a grade and a source on every row.</p>
+      </div>
+      <div class="obj">
+        <b>"If it is free, what is the catch?"</b>
+        <p>There is no revenue yet, and we will say so the day there is. If we ever earn an affiliate commission, it will be disclosed on the page where it applies, and it will not change a row's grade. A firm cannot buy an A.</p>
+      </div>
+      <div class="obj">
+        <b>"What if the data is wrong?"</b>
+        <p>Then it is wrong with a date on it. Every row carries when it was checked and how it was checked. Tell us what is wrong and we fix it, and the fix is visible rather than silent.</p>
+      </div>
+      <div class="obj">
+        <b>"Why anonymous?"</b>
+        <p>Because a name changes what you are willing to say, and we would rather be checkable than likeable. The record is public; the people behind it are not.</p>
+      </div>
+    </div>
+  </section>
+
   <section>
-    <p class="label"><b>05</b> Where we stand</p>
+    <p class="label"><b>07</b> Where we stand</p>
     <h2>Nothing here is a result yet.</h2>
     <div class="stats">
       <div class="stat"><span class="v">2,166</span><span class="k">challenges catalogued</span></div>

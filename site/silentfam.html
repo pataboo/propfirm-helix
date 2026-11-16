@@ -25,7 +25,7 @@
     --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
     --line:#1d2529; --line2:#2b3539;
     --fg:#fcfcfe; --fg2:#d2d4d6; --muted:#9ba0a5; --dim:#828a90;
-    --accent:#a78bfa; --accent-soft:#c4b1ff; --btn-ink:#0a0710;
+    --accent:#a78bfa; --accent-soft:#c4b1ff; --accent-rgb:167,139,250; --btn-ink:#0a0710;
     --glow:rgba(167,139,250,.13);
     --measure:44rem;
     color-scheme: dark;
@@ -34,7 +34,7 @@
     --bg:#f7f5fb; --panel:#ffffff; --panel2:#f0ecf9;
     --line:#e2dbef; --line2:#cfc6e4;
     --fg:#111114; --fg2:#3a3a42; --muted:#63636e; --dim:#8a8a95;
-    --accent:#6d4aff; --accent-soft:#7f5cff; --btn-ink:#ffffff;
+    --accent:#6d4aff; --accent-soft:#7f5cff; --accent-rgb:109,74,255; --btn-ink:#ffffff;
     --glow:rgba(109,74,255,.06);
     color-scheme: light;
   }
@@ -74,6 +74,49 @@
     font-size:15px; line-height:1; cursor:pointer; color:var(--muted); background:transparent;
     border:1px solid var(--line); border-radius:9px; transition:color .15s, border-color .15s, background .15s}
   .iconbtn:hover{color:var(--accent); border-color:rgba(167,139,250,.55); background:var(--panel2)}
+
+
+  /* ── floating pill header ─────────────────────────── */
+  header.site{position:sticky; top:0; z-index:40; background:transparent; border:0; backdrop-filter:none; padding:14px 16px 0}
+  .pillbar{
+    max-width:52rem; margin:0 auto; display:flex; align-items:center; gap:8px;
+    padding:8px 10px 8px 18px; border-radius:999px;
+    background:rgba(12,20,23,.86); border:1px solid #303c42;
+    box-shadow:0 14px 40px -26px rgba(0,0,0,.95), 0 0 0 1px rgba(255,255,255,.02) inset;
+    backdrop-filter:blur(18px) saturate(150%);
+  }
+  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
+  .pillbar .bar{max-width:none; padding:0; margin:0; display:contents}
+  .pillbar .mark{font-size:15.5px; font-weight:800; letter-spacing:-0.03em; padding:4px 6px 4px 2px; gap:6px}
+  .pillbar .mark .wm{display:inline-block; white-space:nowrap; transition:transform .22s cubic-bezier(.2,.7,.3,1)}
+  .pillbar .mark .w1,.pillbar .mark .w2{display:inline; transition:color .16s ease, letter-spacing .22s ease}
+  .pillbar .mark .w2{color:var(--accent)}
+  .pillbar .mark:hover .w1{color:var(--accent)}
+  .pillbar .mark:hover .w2{color:var(--fg)}
+  .pillbar .mark:hover .wm,.pillbar .mark:focus-visible .wm{transform:scale(1.07); letter-spacing:-0.045em}
+  .pillbar .mark:focus-visible .w1{color:var(--accent)}
+  .pillbar .mark:focus-visible .w2{color:var(--fg)}
+  .pillbar .mark:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:8px}
+  .pillbar .mark:hover{border:0}
+  nav.top{margin-left:auto; gap:4px; font-size:14px; display:flex; align-items:center}
+  nav.top a{color:var(--muted); border:0; padding:7px 11px; border-radius:999px; transition:color .15s, background .15s}
+  nav.top a:hover{color:var(--accent); background:rgba(var(--accent-rgb),.12)}
+  .pillbar .tools{margin-left:8px; padding-left:14px; border-left:1px solid var(--line); gap:8px}
+  .pillbar .lang{padding:6px 9px; border-radius:999px; font-size:12.5px; border:0}
+  .pillbar .iconbtn{border:0; width:32px; height:32px; border-radius:999px; color:var(--fg2)}
+  .pillbar .iconbtn:hover{background:rgba(167,139,250,.16)}
+  .pillbar .cta{margin-left:4px; padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:650; border:0;
+    color:#140b22; background:linear-gradient(180deg,#c4b1ff,#a78bfa); white-space:nowrap}
+  .pillbar .cta:hover{filter:brightness(1.06); border:0}
+  main.wrap{padding-top:clamp(32px,6vh,64px)}
+  @media (max-width:760px){
+    .pillbar{flex-wrap:wrap; gap:4px; padding:8px 12px; border-radius:24px}
+    nav.top{order:3; width:100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin:6px 0 2px; gap:2px; font-size:13px; scrollbar-width:none}
+    nav.top::-webkit-scrollbar{display:none}
+    nav.top a{white-space:nowrap; padding:6px 10px}
+    .pillbar .cta{display:none}
+  }
 
   .hero{padding:clamp(44px,8vh,84px) 0 clamp(34px,5vh,52px)}
   .kicker{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
@@ -227,8 +270,8 @@
 <body>
 
 <header class="site">
-  <div class="bar">
-    <a class="mark" href="silentfam.html"><span class="dot"></span>SilentFam</a>
+  <div class="pillbar">
+    <a class="mark" href="silentfam.html" aria-label="SilentFam home"><span class="dot"></span><span class="wm"><span class="w1">Silent</span><span class="w2">Fam</span></span></a>
     <nav class="top">
       <a href="#why">Why</a>
       <a href="#build">What we build</a>
@@ -238,6 +281,7 @@
     <div class="tools">
       <a class="lang" href="silentfam.ko.html" hreflang="ko" lang="ko">한국어</a>
       <button class="iconbtn" id="themeBtn" type="button" aria-label="Toggle light and dark" title="Toggle light and dark"><span id="themeIcon">☾</span></button>
+      <a class="cta" href="https://silentquants.com/">SilentQuants ↗</a>
     </div>
   </div>
 </header>
@@ -311,7 +355,7 @@
     <p class="label"><b>04</b> Journey</p>
     <h2>Short so far. Every step is checkable.</h2>
     <p>No photographs, no founding myth. What follows is what can be pointed at.</p>
-    <ol class="journey"><li><span class="ch">01</span><time>25 Oct 2026</time><div><b>One rule before any tool</b><p>Before we installed anything, we wrote down where the truth lives: with us, on our own disk. Every cloud service since then is a display layer, not the record. This one decision shaped everything below it.</p><code><span>decision 2026-10-25</span> · <span>local is canonical</span></code></div></li><li><span class="ch">02</span><time>3 Nov 2026</time><div><b>Two systems, one purpose</b><p>The work split in two: a personal system for one person's purpose and direction, and a shared one for the family and the company. Same idea at two scales — which is why they are named Flow and Tribe, not two unrelated products.</p><code><span>Flow</span> · <span>Platform — separated, then activated 4 Nov</span></code></div></li><li><span class="ch">03</span><time>5 Nov 2026</time><div><b>A rule about family data</b><p>We fixed a boundary that will not move: what the family says to each other does not travel to a cloud model. The dull version of this rule is a file; the useful version is that it is checked before anything runs.</p><code><span>family lane rule</span> · <span>local only</span></code></div></li><li><span class="ch">04</span><time>9–10 Nov 2026</time><div><b>Hardened, and finally useful</b><p>Both domains got HSTS and DNSSEC, and the first household tool started working inside a chat instead of another app. Security is not a feature we announce; it is the reason we can publish anything at all.</p><code><span>HSTS</span> · <span>DNSSEC</span> · <span>both domains</span></code></div></li><li><span class="ch">05</span><time>14–15 Nov 2026</time><div><b>The database stopped pretending</b><p>A spreadsheet became a database that admits what it does not know. Where a firm publishes no number, the cell stays empty and says so. That honesty is the product.</p><code><span>2,166 challenges</span> · <span>71 firms</span> · <span>99% rules</span> · <span>85% grade A</span></code></div></li><li><span class="ch">06</span><time>16 Nov 2026</time><div><b>This page, in two languages</b><p>English is the source. Korean is a translation we can read ourselves, not a machine output we hope is right. One template, two dictionaries, so the two versions cannot drift apart.</p><code><span>EN</span> · <span>KO — one template, two dictionaries</span></code></div></li></ol>
+    <ol class="journey"><li><span class="ch">01</span><time>25 Oct 2026</time><div><b>One rule before any tool</b><p>Before installing anything, we wrote down where the truth lives: with us, on our own disk, in files we can open without a login. Every cloud service we use after that is a display layer and a copy — never the record itself. That decision came before the websites, before the database, before any of the work you can see here, and almost everything below is a consequence of it.</p><code><span>decision 2026-10-25</span> · <span>local is canonical</span></code></div></li><li><span class="ch">02</span><time>3 Nov 2026</time><div><b>Two systems, one purpose</b><p>The work split in two. One system holds a single person's purpose, goals and days; the other holds the same things for everyone who lives here, so decisions can be made together instead of assumed. They are named Flow and Tribe because they are the same idea at two scales, not two products. Splitting them took an evening; keeping them from drifting apart is the work of the next year.</p><code><span>Flow</span> · <span>Tribe — separated, then activated 4 Nov</span></code></div></li><li><span class="ch">03</span><time>5 Nov 2026</time><div><b>A rule about family data</b><p>We fixed a boundary that will not move: what the family says to each other does not travel to a cloud model, however convenient that would be. Writing the rule into a file was easy. The useful part was making it a check that runs before anything else does, so a later twelve-minute shortcut cannot quietly undo it.</p><code><span>family lane rule</span> · <span>local only</span></code></div></li><li><span class="ch">04</span><time>9–10 Nov 2026</time><div><b>Hardened, and finally useful</b><p>Both domains got HSTS and DNSSEC, and the first household tool started working inside a chat instead of asking anyone to learn another app. Security is not something we announce; it is the reason we can publish anything here at all. In the same week the first genuinely useful thing worked, which is a better feeling than it sounds.</p><code><span>HSTS</span> · <span>DNSSEC</span> · <span>both domains</span></code></div></li><li><span class="ch">05</span><time>14–15 Nov 2026</time><div><b>The database stopped pretending</b><p>A spreadsheet became a database that admits what it does not know: where a firm publishes no number, the cell stays empty and says so, and every row carries a grade for how thoroughly we checked it. Two thousand one hundred and sixty-six challenges across seventy-one firms are readable today, and ninety-nine percent of them carry rule sets. The honesty is the product; the size is a side effect.</p><code><span>2,166 challenges</span> · <span>71 firms</span> · <span>99% rules</span> · <span>85% grade A</span></code></div></li><li><span class="ch">06</span><time>16 Nov 2026</time><div><b>This page, in two languages</b><p>English is the source. Korean is a translation we write and read ourselves, not machine output we hope is right, and both versions are generated from one template so they cannot slowly drift apart. It was also the week we decided what this site is not: a place that republishes another company's promo codes and ratings and calls it research.</p><code><span>EN</span> · <span>KO — one template, two dictionaries</span></code></div></li></ol>
   </section>
 
   <section id="letters">
@@ -371,6 +415,44 @@
 </footer>
 
 <script>
+  /* 숫자가 화면에 들어올 때 0에서 목표값까지 올라간다. 동작 줄이기를 켠 사람에게는 바로 최종값. */
+  (function(){
+    var els = Array.prototype.slice.call(document.querySelectorAll(".stat .v"));
+    if(!els.length || !("IntersectionObserver" in window)) return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    els.forEach(function(el){ el.dataset.final = el.textContent.trim(); });
+    function paint(el, v){
+      var final = el.dataset.final;
+      var suffix = final.indexOf("%") > -1 ? "%" : "";
+      var n = Math.round(v);
+      el.textContent = n.toLocaleString("en-US") + suffix;
+    }
+    function run(el){
+      var final = el.dataset.final;
+      var target = parseFloat(final.replace(/[^0-9.]/g, "")) || 0;
+      if(reduce || !target){ el.textContent = final; return; }
+      var t0 = null, dur = 1100;
+      function step(){
+        var ts = (window.performance && performance.now) ? performance.now() : Date.now();
+        if(t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / dur);
+        var eased = 1 - Math.pow(1 - k, 3);
+        paint(el, target * eased);
+        if(k >= 1){ clearInterval(timer); el.textContent = final; }
+      }
+      /* requestAnimationFrame은 백그라운드 탭에서 멈춘다. 인터벌 + 안전 타이머로 항상 최종값에 도달시킨다. */
+      var timer = setInterval(step, 16);
+      step();
+      setTimeout(function(){ clearInterval(timer); el.textContent = final; }, dur + 400);
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ io.unobserve(e.target); run(e.target); }
+      });
+    }, {threshold: .5});
+    els.forEach(function(el){ io.observe(el); });
+  })();
+
   (function(){
     var root=document.documentElement, btn=document.getElementById("themeBtn"), icon=document.getElementById("themeIcon");
     function paint(){ icon.textContent = root.getAttribute("data-theme")==="light" ? "☀" : "☾"; }
