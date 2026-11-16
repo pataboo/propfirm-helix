@@ -1,45 +1,319 @@
-<!DOCTYPE html><html lang="en" style="color-scheme:dark"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SilentFam — We don&#39;t want to be famous. We want to be free.</title><meta name="color-scheme" content="dark only"><meta name="theme-color" content="#03080a"><meta name="description" content="SilentFam is a family-owned initiative building intelligent systems that support freedom, privacy, prosperity and meaningful living."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SilentFam — We don't want to be famous. We want to be free.</title>
+<meta name="description" content="A family-owned initiative building quiet systems for freedom: evidence, local memory, and tools that work without an audience.">
+<meta name="theme-color" content="#03080a">
+<meta property="og:title" content="SilentFam">
+<meta property="og:description" content="We don't want to be famous. We want to be free.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://silentfam.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..700&display=swap" rel="stylesheet">
+<style>
   :root{
-    --bg:#03080a;--panel:#050b0d;--panel2:#0b1215;--line:#1d2529;--line2:#2b3539;
-    --fg:#fcfcfe;--fg2:#d2d4d6;--muted:#9ba0a5;--accent:#a78bfa;--amber:#ffab00;
-    color-scheme:dark only;
+    --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
+    --line:#1d2529; --line2:#2b3539;
+    --fg:#fcfcfe; --fg2:#d2d4d6; --muted:#9ba0a5; --dim:#828a90;
+    --accent:#a78bfa; --accent-soft:#c4b1ff;
+    --measure:44rem;
+    color-scheme: dark only;
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%;color-scheme:dark only;background:#03080a}
-  body{margin:0;background:var(--bg);color:var(--fg);
-    font-family:"Plus Jakarta Sans",Pretendard Variable,Pretendard,system-ui,sans-serif;
-    font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
-  header.site{max-width:44rem;margin:0 auto;padding:1.4rem 1.25rem .1rem;display:flex;
-    justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
-    border-bottom:1px solid var(--line)}
-  header.site>a{color:var(--fg);text-decoration:none;font-weight:800;letter-spacing:-.02em;font-size:15px}
-  header.site>a:hover{color:var(--accent)}
-  header.site nav{display:flex;gap:14px;flex-wrap:wrap}
-  header.site nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:12.5px}
-  header.site nav a:hover{color:var(--accent)}
-  main{max-width:44rem;margin:0 auto;padding:2.6rem 1.25rem 4rem}
-  .kicker{color:var(--accent);font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 14px}
-  h1{font-size:clamp(2rem,5.5vw,2.85rem);line-height:1.08;letter-spacing:-.03em;margin:.2rem 0 1rem;font-weight:800}
-  h2{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--accent);margin:2.6rem 0 .8rem}
-  h3{font-size:15px;font-weight:800;margin:1.4rem 0 .4rem}
-  p{margin:0 0 1rem;color:var(--fg2)}
-  p.lead{font-size:1.06em;color:var(--muted);max-width:60ch}
-  strong{color:var(--fg);font-weight:700}
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  ul.grid{list-style:none;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin:0}
-  ul.grid li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-  ul.grid li b,ul.grid li strong{display:block;color:var(--fg);margin-bottom:3px}
-  ul.grid li span{display:block;color:var(--muted);font-size:13.5px;line-height:1.55}
-  ul:not(.grid){padding-left:18px;color:var(--fg2)}
-  li{margin:6px 0}
-  .note{background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--accent);
-    border-radius:12px;padding:13px 16px;color:var(--muted);margin:1.4rem 0}
-  .flow{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0 0;padding:0;list-style:none}
-  .flow li{border:1px solid var(--line2);border-radius:9999px;padding:4px 11px;font-size:11.5px;
-    color:var(--muted);font-weight:700;letter-spacing:.02em}
-  footer,body>footer{max-width:44rem;margin:0 auto;padding:1.4rem 1.25rem 3rem;border-top:1px solid var(--line);
-    color:var(--muted);font-size:12px}
-  hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
-  @media (max-width:600px){ main{padding:2rem 1.1rem 3rem} header.site{padding:1.1rem 1.1rem .1rem} }
-</style></head> <body>  <header class="site"> <a href="/">SilentFam</a> <nav><a href="#philosophy">Philosophy</a><a href="#building">What we build</a><a href="#contact">Contact</a></nav> </header> <main> <p class="kicker">A family-owned initiative</p> <h1>We don't want to be famous.<br>We want to be free.</h1> <p class="lead">SilentFam builds intelligent systems that support freedom, privacy, prosperity and meaningful living — for our family first, and for others who want the same.</p> <h2 id="beginning">Our beginning</h2> <p>SilentFam began with a simple question asked inside our family: what if we could become prosperous without becoming famous? We imagined a family free to travel, learn, create and spend time together, without needing to display its success or prove it to anyone.</p> <p>We believe the systems and businesses we build should serve that life. Not the other way around.</p> <h2 id="philosophy">Inner → Outer</h2> <p>Meaningful change begins within. Our beliefs shape what we think is possible, our values shape our priorities, our choices shape our actions, and our actions shape our experience. Every project we start follows the same path:</p> <p class="flow">WHY → WHAT → HOW → LIFE → Reflection</p> <ul class="grid"> <li><strong>Know Why</strong><span>Purpose, identity and values come first.</span></li> <li><strong>Choose What</strong><span>A clear vision and goals that serve it.</span></li> <li><strong>Learn How</strong><span>Knowledge, systems and deliberate action.</span></li> <li><strong>Live &amp; Reflect</strong><span>Real results, honest review, better next steps.</span></li> </ul> <h2 id="building">What we are building</h2> <ul class="grid"> <li><strong>SilentQuants</strong><span>An evidence-driven companion for systematic trading: research, validation and disciplined operation. <a href="https://silentquants.com">silentquants.com</a></span></li> <li><strong>SilentFam Operations</strong><span>A family and company dashboard connecting purpose and goals to projects, decisions and results.</span></li> <li><strong>Living Memory</strong><span>A local-first knowledge system that keeps decisions, evidence and lessons recoverable, independent of any single tool or AI.</span></li> <li><strong>Writing &amp; reflection</strong><span>Notes on learning, self-observation and building a deliberate life.</span></li> </ul> <h2 id="how">How we work</h2> <ul> <li><strong>Local first.</strong> Our records live with us; cloud services hold copies within defined boundaries.</li> <li><strong>Evidence over opinion.</strong> A result counts when it can be checked.</li> <li><strong>AI-assisted, human-approved.</strong> AI agents research, build and review; people decide.</li> <li><strong>Small, reviewed steps.</strong> Every change is versioned and can be traced back to why it was made.</li> </ul> <h2 id="contact">Contact</h2> <p>Email: <a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p> <p class="note">Privacy: <a href="/privacy">Privacy · 개인정보처리방침</a></p> </main> <footer>© 2026 SilentFam. Early development. · <a href="/privacy">Privacy · 개인정보처리방침</a></footer>  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5b2e1043a145041',t:'MTc5NDc5NDE4NA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5b2e1043a145041',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg2);
+    font-family:"Plus Jakarta Sans","Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:17px; line-height:1.72; letter-spacing:-0.005em;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(70rem 34rem at 50% -14rem, rgba(167,139,250,.13), transparent 70%);
+    background-repeat:no-repeat;
+  }
+  a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent; transition:color .15s,border-color .15s}
+  a:hover{color:var(--accent-soft); border-bottom-color:rgba(167,139,250,.45)}
+  .wrap{max-width:var(--measure); margin:0 auto; padding:0 26px}
+
+  /* ── header ─────────────────────────────── */
+  header.site{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:blur(14px); background:rgba(3,8,10,.82);
+    border-bottom:1px solid var(--line);
+  }
+  .bar{max-width:var(--measure); margin:0 auto; padding:15px 26px; display:flex; align-items:center; gap:24px}
+  .mark{
+    font-weight:800; font-size:16px; letter-spacing:-0.03em; color:var(--fg);
+    border:0; display:inline-flex; align-items:center; gap:8px;
+  }
+  .mark:hover{color:var(--accent); border:0}
+  .mark .dot{width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px rgba(167,139,250,.9)}
+  nav.top{margin-left:auto; display:flex; gap:22px; font-size:14px}
+  nav.top a{color:var(--muted); border:0}
+  nav.top a:hover{color:var(--accent)}
+
+  /* ── hero ───────────────────────────────── */
+  .hero{padding:clamp(44px,8vh,84px) 0 clamp(34px,5vh,52px)}
+  .kicker{
+    font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--dim); margin:0 0 26px; display:flex; align-items:center; gap:10px;
+  }
+  .kicker::before{content:""; width:26px; height:1px; background:var(--line2)}
+  h1{
+    margin:0; font-size:clamp(2.3rem,5.6vw,3.9rem); line-height:1.06;
+    letter-spacing:-0.035em; font-weight:700; color:var(--fg); max-width:19ch;
+  }
+  h1 em{font-style:normal; color:var(--accent)}
+  .lede{margin:26px 0 0; font-size:clamp(1.02rem,1.5vw,1.16rem); color:var(--fg2); max-width:38ch; line-height:1.68}
+  .lede .q{color:var(--muted)}
+
+  /* newsletter — the only ask on this page */
+  .sub{margin-top:38px; max-width:30rem}
+  .sub form{display:flex; gap:8px; flex-wrap:wrap}
+  .sub input{
+    flex:1 1 15rem; min-width:0; padding:13px 15px; font:inherit; font-size:15px;
+    color:var(--fg); background:var(--panel); border:1px solid var(--line2); border-radius:11px; outline:none;
+  }
+  .sub input::placeholder{color:var(--dim)}
+  .sub input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(167,139,250,.14)}
+  .sub button{
+    padding:13px 20px; font:inherit; font-size:15px; font-weight:600; cursor:pointer;
+    color:#0a0710; border:0; border-radius:11px;
+    background:linear-gradient(180deg,#bda8ff,#a78bfa);
+  }
+  .sub button:hover{filter:brightness(1.06)}
+  .sub .fine{font-size:12.5px; color:var(--dim); margin:10px 0 0}
+
+  /* ── section chrome ─────────────────────── */
+  section{padding:clamp(44px,7vh,72px) 0; border-top:1px solid var(--line)}
+  .label{
+    font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
+    margin:0 0 22px; display:flex; align-items:baseline; gap:10px;
+  }
+  .label b{color:var(--accent); font-weight:700; letter-spacing:0}
+  h2{margin:0 0 18px; font-size:clamp(1.35rem,2.6vw,1.72rem); line-height:1.25; letter-spacing:-0.022em; color:var(--fg); font-weight:700}
+  p{margin:0 0 16px}
+  p:last-child{margin-bottom:0}
+
+  /* ladder */
+  .ladder{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .ladder li{display:grid; grid-template-columns:3.1rem 1fr; gap:16px; padding:16px 0; border-top:1px solid var(--line)}
+  .ladder li:first-child{border-top:0}
+  .ladder .n{font-size:12px; color:var(--accent); font-weight:700; letter-spacing:.08em; padding-top:3px}
+  .ladder b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:2px}
+  .ladder span{color:var(--muted); font-size:14.5px; line-height:1.6}
+
+  /* build cards */
+  .cards{display:grid; gap:12px; margin-top:26px}
+  .card{
+    display:block; padding:20px 22px; border:1px solid var(--line); border-radius:14px;
+    background:var(--panel); color:inherit; border-bottom:1px solid var(--line);
+  }
+  .card:hover{border-color:rgba(167,139,250,.55); background:var(--panel2); color:inherit}
+  .card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .card.plain{cursor:default; background:transparent; border-style:dashed; border-color:#202a2e}
+  .card.plain:hover{border-color:#202a2e; background:transparent}
+  .pill{display:inline-block; margin-left:2px; padding:1px 7px; border-radius:999px; border:1px solid #2b3539;
+        font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#8f9499; vertical-align:2px}
+  .card h3{margin:0 0 6px; font-size:16.5px; color:var(--fg); font-weight:650; letter-spacing:-0.015em; display:flex; align-items:center; gap:9px}
+  .card h3 .go{color:var(--accent); font-size:14px; opacity:.7}
+  .card:hover h3 .go{opacity:1}
+  .card p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.62; max-width:52ch}
+  .card .meta{margin-top:12px; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#8f9499}
+
+  /* principles */
+  .rules{display:grid; gap:0; margin-top:24px}
+  .rules div{padding:17px 0; border-top:1px solid var(--line)}
+  .rules div:first-child{border-top:0}
+  .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
+  .rules span{color:var(--muted); font-size:14.5px}
+
+  /* evidence */
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px}
+  .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-0.03em; line-height:1}
+  .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
+
+  /* letters */
+  .letters{margin-top:26px; display:grid; gap:0}
+  .letter{padding:18px 0; border-top:1px solid var(--line); display:block; color:inherit}
+  .letter:hover{color:inherit; border-bottom-color:transparent}
+  .letter time{font-size:12px; color:#8f9499; letter-spacing:.06em}
+  .letter .t{display:block; margin-top:5px; color:var(--fg); font-size:16px; font-weight:600; letter-spacing:-0.015em}
+  .letter:hover .t{color:var(--accent)}
+  .letter p{margin:5px 0 0; color:var(--muted); font-size:14px}
+
+  /* footer */
+  footer{border-top:1px solid var(--line); padding:40px 0 64px; margin-top:8px}
+  .fgrid{display:flex; flex-wrap:wrap; gap:34px; justify-content:space-between}
+  .fcol{font-size:13.5px; line-height:2}
+  .fcol .h{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:10px}
+  .fcol a{color:var(--muted); border:0}
+  .fcol a:hover{color:var(--accent)}
+  .fin{margin-top:34px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--dim); display:flex; flex-wrap:wrap; gap:14px}
+  .fin .r{margin-left:auto}
+
+  @media (max-width:640px){
+    body{font-size:16px}
+    .bar{padding:13px 20px; gap:14px}
+    nav.top{gap:15px; font-size:13px}
+    nav.top a:nth-child(3){display:none}
+    .wrap{padding:0 20px}
+    .ladder li{grid-template-columns:2.4rem 1fr; gap:12px}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="/"><span class="dot"></span>SilentFam</a>
+    <nav class="top">
+      <a href="#why">Why</a>
+      <a href="#build">What we build</a>
+      <a href="#letters">Letters</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <p class="kicker">A family-owned initiative · est. 2025</p>
+    <h1>We don't want to be famous.<br><em>We want to be free.</em></h1>
+    <p class="lede">We build quiet systems — evidence we can check, memory we keep locally, tools that work without an audience.
+      <span class="q">No faces, no names, no noise. Only what can be verified.</span></p>
+
+    <div class="sub">
+      <form action="mailto:hello@silentfam.com" method="post" enctype="text/plain">
+        <input type="email" name="email" placeholder="your email" aria-label="Email address" required>
+        <button type="submit">Get the letter</button>
+      </form>
+      <p class="fine">One letter when there is something worth saying. No tracking, no forwarding.</p>
+    </div>
+  </div>
+
+  <section id="why">
+    <p class="label"><b>01</b> Why</p>
+    <h2>Change starts inside, then moves outward.</h2>
+    <p>SilentFam began with a question asked inside our own family: what if we could become prosperous without becoming public? We imagined a family free to travel, learn, create and spend time together — without displaying its success or proving it to anyone.</p>
+    <p>The systems we build are supposed to serve that life. Not the other way around.</p>
+
+    <ol class="ladder">
+      <li><span class="n">01</span><div><b>Know why</b><span>Purpose, identity and values come first. A goal without a reason is just a distraction with a deadline.</span></div></li>
+      <li><span class="n">02</span><div><b>Choose what</b><span>A clear vision, and goals that actually serve it.</span></div></li>
+      <li><span class="n">03</span><div><b>Learn how</b><span>Knowledge, systems, deliberate action — repeated small steps, not leaps.</span></div></li>
+      <li><span class="n">04</span><div><b>Live and reflect</b><span>Real results, honest review, a better next step. Then the loop runs again.</span></div></li>
+    </ol>
+  </section>
+
+  <section id="build">
+    <p class="label"><b>02</b> What we build</p>
+    <h2>Four things, one direction.</h2>
+
+    <div class="cards">
+      <a class="card" href="https://silentquants.com/">
+        <h3>SilentQuants <span class="go">↗</span></h3>
+        <p>An evidence-driven companion for systematic trading: research, validation and disciplined operation. Every claim carries a source and a date.</p>
+        <span class="meta">silentquants.com</span>
+      </a>
+      <a class="card" href="https://silentquants.com/tools/helix">
+        <h3>Helix <span class="go">↗</span></h3>
+        <p>A master database for prop firm challenges and brokers — what each one actually costs, what its rules really are, and where the answer came from.</p>
+        <span class="meta">Tool · updated weekly</span>
+      </a>
+      <div class="card plain">
+        <h3>Operations <span class="pill">internal</span></h3>
+        <p>A family and company dashboard that connects purpose and goals to projects, decisions and results — so nothing important lives only in someone's head.</p>
+        <span class="meta">Family &amp; company dashboard · in development</span>
+      </div>
+      <div class="card plain">
+        <h3>Living memory <span class="pill">internal</span></h3>
+        <p>A local-first knowledge system that keeps decisions, evidence and lessons recoverable — independent of any single tool, vendor or AI.</p>
+        <span class="meta">Local-first archive · running</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <p class="label"><b>03</b> How we work</p>
+    <h2>Four rules we don't bend.</h2>
+
+    <div class="rules">
+      <div><b>Local first.</b><span>Our records live with us. Cloud services hold copies, inside defined boundaries.</span></div>
+      <div><b>Evidence over opinion.</b><span>A result counts only when someone else can check it. When we don't know, we say so instead of guessing.</span></div>
+      <div><b>AI-assisted, human-approved.</b><span>Agents research, build and review. People decide — and the decision is written down.</span></div>
+      <div><b>Small, reviewed steps.</b><span>Every change is versioned and traceable back to why it was made. No silent rewrites.</span></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="v" data-n="2166">2,166</span><span class="k">challenges catalogued</span></div>
+      <div class="stat"><span class="v">71</span><span class="k">prop firms</span></div>
+      <div class="stat"><span class="v">85%</span><span class="k">grade A evidence</span></div>
+      <div class="stat"><span class="v">99%</span><span class="k">rule coverage</span></div>
+    </div>
+    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">Figures from the Helix database, build of 16 November 2026. Sources and grades are published per row.</p>
+  </section>
+
+  <section id="letters">
+    <p class="label"><b>04</b> Letters</p>
+    <h2>Written occasionally, when there is something to say.</h2>
+
+    <div class="letters">
+      <a class="letter" href="#contact">
+        <time datetime="2026-11-16">16 November 2026</time>
+        <span class="t">We started by removing the audience</span>
+        <p>On why a family business decided to build in silence, and what quietly changes when nobody is watching.</p>
+      </a>
+      <a class="letter" href="#contact">
+        <time datetime="2026-11-02">2 November 2026</time>
+        <span class="t">A record you can check is worth more than a memory you trust</span>
+        <p>What broke in our own bookkeeping, and the small habit that fixed it.</p>
+      </a>
+    </div>
+    <p style="margin-top:22px; font-size:14px; color:var(--dim)">The archive is small on purpose. We publish when a lesson is complete, not when a calendar says so.</p>
+  </section>
+
+  <section id="contact">
+    <p class="label"><b>05</b> Contact</p>
+    <h2>If it matters, write to us.</h2>
+    <p>We answer everything worth answering. We don't do calls, hype or partnerships that need our names on them.</p>
+    <p><a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol">
+        <div class="h">SilentFam</div>
+        <a href="#why">Why</a><br>
+        <a href="#build">What we build</a><br>
+        <a href="#how">How we work</a><br>
+        <a href="#letters">Letters</a>
+      </div>
+      <div class="fcol">
+        <div class="h">Projects</div>
+        <a href="https://silentquants.com/">SilentQuants ↗</a><br>
+        <a href="https://silentquants.com/tools/helix">Helix ↗</a><br>
+        <a href="#build">Operations</a><br>
+        <a href="#build">Living memory</a>
+      </div>
+      <div class="fcol">
+        <div class="h">More</div>
+        <a href="/privacy">Privacy</a><br>
+        <a href="mailto:hello@silentfam.com">Email</a>
+      </div>
+    </div>
+    <div class="fin">
+      <span>© 2026 SilentFam</span>
+      <span>Built quietly. Checked carefully.</span>
+      <span class="r">No cookies. No analytics. No faces.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
