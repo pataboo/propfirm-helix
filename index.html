@@ -319,6 +319,9 @@
   .navpill a{font-size:12.5px;font-weight:600;color:var(--ink2);text-decoration:none;
     padding:6px 13px;border-radius:9999px;white-space:nowrap;transition:.15s}
   .navpill a:hover{color:var(--accent);background:rgba(53,196,174,.14)}
+  .fgroup[draggable="true"]{cursor:grab}
+  .fgroup.dragging{opacity:.5}
+  .fgroup.dragover{box-shadow:inset 0 2px 0 var(--accent)}
   .navpill a.on{color:#0b0f10;background:linear-gradient(90deg,#8fe8d8,#35c4ae);font-weight:700;
     box-shadow:0 0 16px rgba(53,196,174,.4)}
   .statlink{text-decoration:none;color:inherit;display:block;border-radius:12px;transition:.15s;
@@ -674,33 +677,22 @@
   <div class="grow"></div>
   <div class="hsearch" role="search"><span class="dim" aria-hidden="true">⌕</span><input id="gq" autocomplete="off" type="search" aria-label="브랜드·상품 검색 / Search brands and products"></div>
   <div class="navpill" id="subnav" role="navigation" aria-label="주 메뉴 / Main menu">
-    <span class="navitem">
-      <a href="#challenges" data-page="challenges">Challenges <span class="cv">▾</span></a>
-      <div class="dropdown" id="chMenu">
-        <a href="#challenges" data-all="1"><b>전체 챌린지</b><span id="cmAll">—</span></a>
-        <a href="#firms"><b>프랍펌</b><span id="cmFirms">—</span></a>
-        <a href="#discover"><b>둘러보기</b><span>→</span></a>
-        <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
-      </div>
-    </span>
-    <span class="navitem">
-      <a href="#firms" data-page="firms" data-also="brokers" data-ko="프랍펌" data-en="Firms">프랍펌 ▾</a>
-      <div class="dropdown" id="firmsMenu">
-        <a href="#firms"><b>프랍펌 전체</b><span id="fmFirms">—</span></a>
-        <a href="#brokers"><b>브로커</b><span id="fmBrokers">—</span></a>
-        <a href="#rules"><b>규칙 요약</b><span>§</span></a>
-      </div>
-    </span>
+    <a href="#challenges" data-page="challenges" data-also="firms" data-ko="프랍펌 전체" data-en="All firms">프랍펌 전체</a>
+    <a href="#rules" data-page="rules" data-ko="프랍펌 규칙" data-en="Firm rules">프랍펌 규칙</a>
+    <a href="#brokers" data-page="brokers" data-ko="브로커" data-en="Brokers">브로커</a>
     <a href="#offers" data-page="offers" data-ko="프로모션" data-en="Offers">프로모션</a>
-    <a href="#rules" data-page="rules" data-ko="규칙" data-en="Rules">규칙</a>
     <span class="navitem">
-      <a href="#tools" data-page="tools" data-also="plan,spreads,payouts" data-ko="도구" data-en="Tools">도구 ▾</a>
+      <a href="#tools" data-page="tools" data-also="plan,spreads,payouts,compare,discover" data-ko="도구" data-en="Tools">도구 ▾</a>
       <div class="dropdown" id="toolsMenu">
+        <a href="#discover"><b>둘러보기</b><span>→</span></a>
+        <a href="#compare"><b>비교</b><span>⇄</span></a>
         <a href="#plan"><b>가족 플랜</b><span>→</span></a>
         <a href="#spreads"><b>스프레드</b><span>→</span></a>
         <a href="#payouts"><b>지급</b><span>→</span></a>
         <a href="#tools"><b>도구 전체</b><span>→</span></a>
       </div>
+    </span>
+  </div>
     </span>
 
   </div>
@@ -1540,15 +1532,33 @@ function buildFilters(){
     </div></div></details>`);
   parts.push(`<div class="fgroup" style="border:0;padding:2px 0"><button id="favChip" class="chip2 ${favOnly?"on":""}" style="width:100%;justify-content:center">★ ${lang==="ko"?"관심":"Saved"} ${favs.size}</button></div>`);
   parts.push(presetHtml);
-  // 핵심 필터만 먼저 보이고, 나머지는 '고급 필터' 하나로 접는다 (그룹 18개 → 9개)
-  const CORE=["mk","size","price","dd","cycle","flags","ver"];
-  visGroups.filter(id=>CORE.includes(id)).forEach(id=>{ if(H[id]) parts.push(H[id]); });
-  const adv=visGroups.filter(id=>!CORE.includes(id)&&H[id]);
-  if(adv.length){
-    parts.push(`<details class="fgroup" data-g="adv"><summary>${lang==="ko"?"고급 필터":"More filters"} <span class="dim">${adv.length}</span></summary>
-      <div class="body">${adv.map(id=>H[id]).join("")}</div></details>`);
-  }
+  // 그룹은 visGroups 순서 그대로 한 번만 그린다. 각 그룹은 개별 접기/드래그 이동이 가능하다.
+  visGroups.forEach(id=>{
+    if(!H[id]) return;
+    parts.push(H[id].replace('<details class="fgroup"', '<details draggable="true" class="fgroup"'));
+  });
+  const scroller=host.closest(".filters")||host;
+  const keepTop=scroller.scrollTop;
   host.innerHTML=parts.join("");
+  if(scroller) scroller.scrollTop=keepTop;
+
+  // 레일에서 직접 드래그해 순서 변경 (설정 패널과 같은 저장소를 쓴다)
+  let dragId=null;
+  host.querySelectorAll('details.fgroup').forEach(d=>{
+    d.addEventListener("dragstart", e=>{ dragId=d.dataset.g; d.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; });
+    d.addEventListener("dragend", ()=>{ d.classList.remove("dragging"); host.querySelectorAll(".dragover").forEach(x=>x.classList.remove("dragover")); });
+    d.addEventListener("dragover", e=>{ if(!dragId||dragId===d.dataset.g) return; e.preventDefault(); d.classList.add("dragover"); });
+    d.addEventListener("dragleave", ()=>d.classList.remove("dragover"));
+    d.addEventListener("drop", e=>{
+      e.preventDefault(); d.classList.remove("dragover");
+      if(!dragId||dragId===d.dataset.g) return;
+      const from=visGroups.indexOf(dragId), to=visGroups.indexOf(d.dataset.g);
+      if(from<0||to<0) return;
+      visGroups.splice(from,1); visGroups.splice(to,0,dragId);
+      localStorage.setItem("helix-groups",JSON.stringify(visGroups));
+      buildFilters(); buildFilterSettings();
+    });
+  });
 
   host.querySelectorAll(".fgroup").forEach(d=>d.ontoggle=()=>{OPEN[d.dataset.g]=d.open;});
   const fs=el("firmSearch");
