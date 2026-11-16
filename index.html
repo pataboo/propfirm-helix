@@ -819,8 +819,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="ed2b32f3";</script>
-<script src="data.js?v=ed2b32f3"></script>
+<script>window.HELIX_VER="b97d7d79";</script>
+<script src="data.js?v=b97d7d79"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -1872,16 +1872,23 @@ function renderBar(){
 /* ---------- drawer ---------- */
 const RSRC=[["pfm",{ko:"PFM",en:"PFM"}],["tp",{ko:"Trustpilot",en:"Trustpilot"}],["feefo",{ko:"Feefo",en:"Feefo"}]];
 function ratingsOf(firm){ return (DB.ratings||{})[firm]||{}; }
+function ratingURLs(x){
+  return {pfm: (x.pfm&&x.pfm.url)||"#",
+          tp: (x.tp&&x.tp.d)?("https://www.trustpilot.com/review/"+x.tp.d):"#",
+          feefo: (x.feefo&&x.feefo.src)||"#",
+          sj: (x.sj&&x.sj.src)?("https://www.sitejabber.com/reviews/"+x.sj.src):"#"};
+}
 function ratingCell(r){
-  const x=ratingsOf(r.f); const out=[];
-  const pfm=(x.pfm&&x.pfm.r!=null)?`<span class="rtag pfm" title="PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""}">P ${x.pfm.r}</span>`:(r.rt?`<span class="rtag pfm" title="PFM ${esc(r.rt)}">P ${esc(r.rt)}</span>`:"");
-  if(pfm) out.push(pfm);
+  const x=ratingsOf(r.f); const out=[]; const U=ratingURLs(x);
+  const a=(href,cls,txt,tip)=>`<a class="rtag ${cls}" href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(tip)}">${esc(txt)}</a>`;
+  if(x.pfm&&x.pfm.r!=null) out.push(a(U.pfm,"pfm",`P ${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+  else if(r.rt) out.push(`<span class="rtag pfm">P ${esc(r.rt)}</span>`);
   if(x.tp){
     if(x.tp.warn) out.push(`<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page"}">!</a>`);
-    else if(x.tp.r!=null) out.push(`<span class="rtag tp" title="Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""}">T ${x.tp.r}</span>`);
+    else if(x.tp.r!=null) out.push(a(U.tp,"tp",`T ${x.tp.r}`,`Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
   }
-  if(x.sj&&x.sj.r!=null) out.push(`<span class="rtag sj" title="Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""}">SJ ${x.sj.r}</span>`);
-  if(x.feefo&&x.feefo.r!=null) out.push(`<span class="rtag feefo" title="Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본 평균)`:""}">F ${x.feefo.r}</span>`);
+  if(x.sj&&x.sj.r!=null) out.push(a(U.sj,"sj",`SJ ${x.sj.r}`,`Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+  if(x.feefo&&x.feefo.r!=null) out.push(a(U.feefo,"feefo",`F ${x.feefo.r}`,`Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본 평균)`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
   if(!out.length) return '<span class="dim">—</span>';
   return `<span class="rtags">${out.join("")}</span>`;
 }
@@ -1990,7 +1997,18 @@ function openDrawer(id){
       ${r.pn?drawerRow(t("cMin"),esc(r.pn)):""}
       ${drawerRow(t("cRating"),(()=>{
         const x=ratingsOf(r.f), bits=[];
-        if(x.pfm&&x.pfm.r!=null) bits.push(`<span class="rtag pfm">PFM ${x.pfm.r}</span>${x.pfm.n?` <span class="dim">(${x.pfm.n})</span>`:""}`);
+        {
+          const U=ratingURLs(x);
+          const lnk=(href,cls,txt,tip)=>`<a class="rtag ${cls}" href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(tip)}">${esc(txt)}</a>`;
+          if(x.pfm&&x.pfm.r!=null) bits.push(lnk(U.pfm,"pfm",`PFM ${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""}`)+(x.pfm.n?` <span class="dim">(${x.pfm.n})</span>`:""));
+          if(x.tp){
+            if(x.tp.warn) bits.push(`<a class="tpwarn" href="https://www.trustpilot.com/review/${esc(x.tp.d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Trustpilot ⚠</a>`);
+            else if(x.tp.r!=null) bits.push(lnk(U.tp,"tp",`Trustpilot ${x.tp.r}`,`Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""}`)+(x.tp.n?` <span class="dim">(${x.tp.n})</span>`:""));
+          }
+          if(x.sj&&x.sj.r!=null) bits.push(lnk(U.sj,"sj",`Sitejabber ${x.sj.r}`,`Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""}`));
+          if(x.feefo&&x.feefo.r!=null) bits.push(lnk(U.feefo,"feefo",`Feefo ${x.feefo.r}`,`Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본)`:""}`)+(x.feefo.n?` <span class="dim">(${x.feefo.n})</span>`:""));
+          if(!bits.length && r.rt) bits.push(`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`);
+        }
         if(x.tp){
           if(x.tp.warn) bits.push(`<a class="tpwarn" href="https://www.trustpilot.com/review/${esc(x.tp.d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Trustpilot ⚠</a>`);
           else if(x.tp.r!=null) bits.push(`<span class="rtag tp">Trustpilot ${x.tp.r}</span>${x.tp.n?` <span class="dim">(${x.tp.n})</span>`:""}`);
