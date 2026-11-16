@@ -388,6 +388,13 @@
     .pillbar .tools{margin-left:auto}
     .pillbar .cta{display:none}
   }
+  /* fail steps */
+  .steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:12px; margin-top:24px}
+  .step{padding:20px 20px 18px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .step .n{display:block; font-size:11px; letter-spacing:.18em; color:var(--accent); font-weight:700; margin-bottom:10px}
+  .step b{display:block; color:var(--fg); font-size:16px; font-weight:650; margin-bottom:8px; letter-spacing:-.01em}
+  .step p{margin:0 0 10px; color:var(--muted); font-size:14.2px; line-height:1.62}
+  .step .tagline{display:block; font-size:11.5px; letter-spacing:.04em; color:var(--dim)}
   /* odds + objections */
   .odds{margin-top:24px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
   .dots{display:grid; grid-template-columns:repeat(20,1fr); gap:5px; max-width:32rem}
@@ -470,8 +477,37 @@
     </div>
   </section>
 
+  <section id="fail">
+    <p class="label"><b>02</b> If it goes wrong</p>
+    <h2>Three things happen when a challenge fails.</h2>
+    <p>Every firm quotes what you pay. Almost none quote what happens after a failed attempt, which is the part that decides whether you can afford a second one.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="n">01</span>
+        <b>The rule breaks first</b>
+        <p>A daily loss limit, a trailing drawdown, a news window, an expert advisor you were not allowed to run. The breach is usually small — a few percent, one position, one headline.</p>
+        <span class="tagline">Recorded per firm · filterable by drawdown type</span>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <b>The account closes</b>
+        <p>Some firms close it outright. Some reset the balance to zero, including open positions and any profit you had. A few sell you a restart — sometimes at a discount, sometimes at full price.</p>
+        <span class="tagline">Payout and restart terms differ · we record which</span>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <b>The fee is gone, and so is the month</b>
+        <p>The evaluation fee is not refunded. Re-entry means paying again and spending another two to four weeks — which is the larger cost, and the one that never appears on a pricing table.</p>
+        <span class="tagline">Stated on every firm's page · rarely in one place</span>
+      </div>
+    </div>
+
+    <p class="note">Helix records the rule that would trigger step one for every firm it covers — drawdown type, daily loss, news and EA limits, and the payout terms behind step two. Check those before you pay, not after.</p>
+  </section>
+
   <section>
-    <p class="label"><b>02</b> What we will not do</p>
+    <p class="label"><b>03</b> What we will not do</p>
     <h2>No borrowed catalogues, no borrowed codes.</h2>
     <p>Other comparison sites are built on the same handful of scraped feeds and the same affiliate codes. Copying that would make us a worse version of them, and would poison the only thing we can honestly sell: whether a number can be checked.</p>
     <div class="twocol">
@@ -491,7 +527,7 @@
   </section>
 
   <section>
-    <p class="label"><b>03</b> Build order</p>
+    <p class="label"><b>04</b> Build order</p>
     <h2>The order of the decisions.</h2>
     <ol class="buildlist">
       <li><span class="st live">live</span><span><b>01 Where to trade</b> — Helix: cost, rules and break-even per firm</span></li>
