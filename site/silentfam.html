@@ -116,18 +116,18 @@
   .card.plain:hover{border-color:#202a2e; background:transparent}
   .hl{color:var(--accent); font-weight:600}
   .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
-  .buildlist li{display:flex; gap:10px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.5}
-  .st{flex:none; font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; padding:2px 7px; border-radius:999px; border:1px solid var(--line2); color:#8f9499}
-  .st.live{border-color:rgba(167,139,250,.45); color:var(--accent-soft); background:rgba(167,139,250,.1)}
-  .st.wip{border-color:#3a3f45; color:#c9cdd1}
-  .st.plan{border-style:dashed; color:#7d848a}
+  .buildlist li{display:flex; gap:11px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.5}
+  .st{flex:none; min-width:88px; text-align:center; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+      padding:3px 8px; border-radius:999px; border:1px solid var(--line2); color:#a9aeb3}
+  .st.live{border-color:rgba(167,139,250,.5); color:var(--accent-soft); background:rgba(167,139,250,.14)}
+  .st.wip{border-color:#454b51; color:#d2d4d6}
+  .st.plan{border-style:dashed; border-color:#3a4045; color:#9ba0a5}
   .stacknote{margin:0 0 18px; font-size:13.5px; color:var(--dim); letter-spacing:.01em}
   .card .child{
     margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
     border-left:2px solid rgba(167,139,250,.55); border-radius:4px 11px 11px 4px;
     background:rgba(167,139,250,.075); position:relative;
   }
-  .card .child::before{content:"↳"; position:absolute; left:-21px; top:13px; color:var(--accent); font-size:17px; line-height:1}
   .card .child .lab{display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
   .card .child b{display:block; color:var(--fg); font-size:15px; font-weight:650; margin-bottom:4px; letter-spacing:-0.01em}
   .card .child .cp{display:block; color:var(--muted); font-size:13.5px; line-height:1.6}
@@ -244,13 +244,13 @@
 
       <div class="card plain">
         <h3>Tribe <span class="pill">shared</span></h3>
-        <p>Flow, held in common. A group — a family, or a few people who chose each other — sits down and decides its <span class="hl">purpose, vision and goals together</span>, instead of assuming everyone already agrees. Those decisions then become real: broken into tasks, run as <span class="hl">small experiments</span>, measured honestly, kept when they work and dropped when they don't. A <span class="hl">vision canvas</span> in the middle, a <span class="hl">bird's-eye board</span> around it. This is how we run SilentFam.</p>
+        <p>Flow, held in common. A group — a family, or a few people who chose each other — sits down and decides its <span class="hl">purpose, vision and goals together</span>, instead of assuming everyone already agrees. Those decisions then become real: broken into tasks, run as <span class="hl">small experiments</span>, measured honestly, kept when they work and dropped when they don't. A vision canvas in the middle, a bird's-eye board around it. This is how we run SilentFam.</p>
         <span class="meta">Vision canvas · bird's-eye board · experiment loop</span>
       </div>
 
       <div class="card plain">
         <h3>SilentQuants <span class="pill">trading</span></h3>
-        <p>Where we are <span class="hl">going</span> as quantitative traders on prop firm capital and selected brokers: research, validation, rules, cost, and the discipline to operate it. <span class="hl">We are not funded yet.</span> This is the bundle we are building in that order — and Helix is the first piece that stands on its own.</p>
+        <p>Where we are going as quantitative traders on prop firm capital and selected brokers: research, validation, rules, cost, and the discipline to operate it. <span class="hl">We are not funded yet.</span> This is the bundle we are building in that order — and Helix is the first piece that stands on its own.</p>
 
         <div class="child">
           <span class="lab">Inside SilentQuants</span>
