@@ -284,12 +284,12 @@
   .pillbar{
     max-width:52rem; margin:0 auto; display:flex; align-items:center; gap:8px;
     padding:8px 10px 8px 18px; border-radius:999px;
-    background:color-mix(in srgb, var(--bg) 72%, transparent);
-    border:1px solid var(--line2);
+    background:rgba(12,20,23,.86);
+    border:1px solid #303c42;
     box-shadow:0 14px 40px -26px rgba(0,0,0,.95), 0 0 0 1px rgba(255,255,255,.02) inset;
     backdrop-filter:blur(18px) saturate(150%);
   }
-  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.78); box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
+  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
   .pillbar .mark{font-size:15.5px; padding:4px 6px 4px 2px; letter-spacing:-0.028em}
   .pillbar .mark .w1,.pillbar .mark .w2{transition:color .16s ease}
   .pillbar .mark .w2{color:var(--accent)}
@@ -299,9 +299,9 @@
   nav.top{margin-left:auto; gap:4px; font-size:14px; display:flex; align-items:center}
   nav.top a{color:var(--muted); border:0; padding:7px 11px; border-radius:999px; transition:color .15s, background .15s}
   nav.top a:hover{color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent)}
-  .pillbar .tools{margin-left:8px; padding-left:12px; border-left:1px solid var(--line); gap:6px}
+  .pillbar .tools{margin-left:10px; padding-left:14px; border-left:1px solid var(--line); gap:8px}
   .pillbar .lang{padding:6px 9px; border-radius:999px; font-size:12.5px}
-  .pillbar .iconbtn{border:0; width:30px; height:30px; border-radius:999px}
+  .pillbar .iconbtn{border:0; width:32px; height:32px; border-radius:999px; color:var(--fg2); font-size:15px}
   .pillbar .iconbtn:hover{background:color-mix(in srgb, var(--accent) 14%, transparent)}
   .pillbar .cta{
     margin-left:4px; padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:650; border:0;
@@ -312,8 +312,10 @@
   main.wrap{padding-top:clamp(32px,6vh,64px)}
   @media (max-width:760px){
     .pillbar{flex-wrap:wrap; gap:4px; padding:8px 12px; border-radius:24px}
-    nav.top{order:3; width:100%; justify-content:space-between; margin:6px 0 2px; gap:0; font-size:13px}
-    nav.top a{padding:6px 6px}
+    nav.top{order:3; width:100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin:6px 0 2px; gap:2px; font-size:13px; scrollbar-width:none}
+    nav.top::-webkit-scrollbar{display:none}
+    nav.top a{padding:6px 10px; white-space:nowrap}
     .pillbar .tools{margin-left:auto}
     .pillbar .cta{display:none}
   }
