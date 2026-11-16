@@ -1895,8 +1895,7 @@ function ratingURLs(x){
 function ratingCell(r){
   const x=ratingsOf(r.f); const out=[]; const U=ratingURLs(x);
   const a=(href,cls,txt,tip)=>`<a class="rtag ${cls}" href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(tip)}">${esc(txt)}</a>`;
-  if(x.pfm&&x.pfm.r!=null) out.push(a(U.pfm,"pfm",`P${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
-  else if(r.rt) out.push(`<span class="rtag pfm">P${esc(r.rt)}</span>`);
+  /* PFM 평점은 표시하지 않습니다 — 경쟁사가 매긴 점수는 우리 데이터가 아닙니다. */
   if(x.tp){
     if(x.tp.warn){
       // 평점을 지우지 않는다. 있는 값을 보여주고 바로 뒤에 '!'를 붙여 '쓰되 조심하라'로 읽히게 한다.
@@ -2017,7 +2016,7 @@ function openDrawer(id){
         {
           const U=ratingURLs(x);
           const lnk=(href,cls,txt,tip)=>`<a class="rtag ${cls}" href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(tip)}">${esc(txt)}</a>`;
-          if(x.pfm&&x.pfm.r!=null) bits.push(lnk(U.pfm,"pfm",`PFM ${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""}`)+(x.pfm.n?` <span class="dim">(${x.pfm.n})</span>`:""));
+          /* PFM 평점 제외 (경쟁사 점수) */
           if(x.tp){
             if(x.tp.warn) bits.push(`<a class="tpwarn" href="https://www.trustpilot.com/review/${esc(x.tp.d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Trustpilot ⚠</a>`);
             else if(x.tp.r!=null) bits.push(lnk(U.tp,"tp",`Trustpilot ${x.tp.r}`,`Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""}`)+(x.tp.n?` <span class="dim">(${x.tp.n})</span>`:""));
