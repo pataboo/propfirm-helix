@@ -31,8 +31,8 @@
     color-scheme: dark;
   }
   html[data-theme="light"]{
-    --bg:#ffffff; --panel:#ffffff; --panel2:#f6f6f8;
-    --line:#e7e7ec; --line2:#d8d8e0;
+    --bg:#ffffff; --panel:#ffffff; --panel2:#f4f4f7;
+    --line:#dedee6; --line2:#c9c9d4;
     --fg:#111114; --fg2:#3a3a42; --muted:#63636e; --dim:#8a8a95;
     --accent:#6d4aff; --accent-soft:#7f5cff; --btn-ink:#ffffff;
     --glow:rgba(109,74,255,.06);
@@ -131,7 +131,16 @@
 
   .child{margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
     border-left:2px solid rgba(167,139,250,.55); border-radius:4px 11px 11px 4px; background:rgba(167,139,250,.075)}
-  html[data-theme="light"] .child{background:rgba(109,74,255,.055); border-color:rgba(109,74,255,.22)}
+  html[data-theme="light"] .card{border-color:#dedee6; box-shadow:0 1px 2px rgba(17,17,20,.04)}
+  html[data-theme="light"] .card.plain{background:#fff}
+  html[data-theme="light"] .child{background:rgba(109,74,255,.07); border-color:rgba(109,74,255,.3);
+    border-left-color:rgba(109,74,255,.6)}
+  html[data-theme="light"] .pill{border-color:#cfcfda; color:#5b5b66}
+  html[data-theme="light"] .st{color:#4f4f5a}
+  html[data-theme="light"] .st.live{border-color:rgba(109,74,255,.45); color:#5a3aef; background:rgba(109,74,255,.09)}
+  html[data-theme="light"] .st.wip{border-color:#c2c2ce; color:#3f3f49}
+  html[data-theme="light"] .st.plan{border-color:#d2d2dc; color:#5f5f6a}
+  html[data-theme="light"] .stats .stat .v{color:#111114}
   .child .lab{display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
   html[lang="ko"] .child .lab{letter-spacing:.04em; font-size:10.5px}
   .child b{display:block; color:var(--fg); font-size:15px; font-weight:650; margin-bottom:4px}
