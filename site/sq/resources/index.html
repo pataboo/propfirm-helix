@@ -277,6 +277,28 @@
   .rules div:first-child{border-top:0}
   .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
   .rules span{color:var(--muted); font-size:14.5px}
+  .ladder{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .ladder li{display:grid; grid-template-columns:4.2rem 1fr; gap:16px; padding:15px 0; border-top:1px solid var(--line)}
+  .ladder li:first-child{border-top:0}
+  .ladder .ch{font-size:10.5px; letter-spacing:.14em; color:var(--accent); font-weight:700; padding-top:4px}
+  .ladder b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:2px}
+  .ladder span{color:var(--muted); font-size:14.5px; line-height:1.6}
+  .why{display:block; margin-top:9px; padding-left:11px; border-left:2px solid rgba(var(--accent-rgb),.45);
+    font-style:normal; font-size:13.8px; color:var(--accent)}
+  .journey-line{margin:14px 0 4px; font-size:15px; color:var(--accent); letter-spacing:-0.01em}
+  .calc{margin-top:26px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .calc label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
+  .slabel{display:flex; justify-content:space-between; align-items:baseline}
+  .slabel .rng{font-size:11.5px; color:var(--dim); letter-spacing:.04em}
+  .row{display:flex; align-items:center; gap:16px; margin-bottom:18px}
+  .row input[type=range]{flex:1; accent-color:var(--accent); height:22px}
+  .row .val{font-variant-numeric:tabular-nums; font-weight:700; color:var(--fg); min-width:5.5rem; text-align:right}
+  .results{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; padding-top:20px; border-top:1px solid var(--line)}
+  .res .k{display:block; font-size:11.5px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase}
+  .res .v{display:block; margin-top:5px; font-size:clamp(1.4rem,2.6vw,1.8rem); font-weight:750; color:var(--accent); letter-spacing:-.02em}
+  .res .v.plain{color:var(--fg)}
+  .src{margin-top:14px; font-size:12.6px; color:var(--muted); line-height:1.62; max-width:62ch}
+  .src.small{color:var(--dim); font-size:12.2px}
   .note{margin-top:16px; font-size:12.8px; color:var(--dim); line-height:1.6; max-width:62ch}
 
   /* ── floating pill header (tiny.com 문법) ───────────── */
@@ -322,7 +344,7 @@
     .pillbar .cta{display:none}
   }
   @media (max-width:700px){
-    .twocol{grid-template-columns:1fr}
+    .twocol,.results{grid-template-columns:1fr}
     .entry{grid-template-columns:1fr; gap:6px}
     .buildlist li{grid-template-columns:1fr; gap:5px}
     .st{display:inline-block; justify-self:start}
@@ -334,7 +356,7 @@
 <header class="site">
   <div class="pillbar">
     <a class="mark" href="/propfirm-helix/site/sq/" aria-label="SilentQuants home"><span class="dot"></span><span class="wm"><span class="w1">Silent</span><span class="w2">Quants</span></span></a>
-    <nav class="top"><a href="/propfirm-helix/site/sq/">Start</a><a href="/propfirm-helix/site/sq/helix/">Helix</a><a href="/propfirm-helix/site/sq/resources/">Resources</a><a href="/propfirm-helix/site/sq/log/">Log</a><a href="/propfirm-helix/site/sq/method/">Method</a></nav>
+    <nav class="top"><a href="/propfirm-helix/site/sq/#why">Why</a><a href="/propfirm-helix/site/sq/#what">What</a><a href="/propfirm-helix/site/sq/#how">How</a><a href="/propfirm-helix/site/sq/helix/">Helix</a><a href="/propfirm-helix/site/sq/log/">Log</a></nav>
     <div class="tools">
       <a class="lang" href="/propfirm-helix/site/sq/ko/">한국어</a>
       <button class="iconbtn" id="themeBtn" type="button" aria-label="Toggle theme"><span id="themeIcon">☾</span></button>
@@ -346,36 +368,33 @@
 <main class="wrap">
 
   <div class="hero">
-    <p class="kicker">Resources · guides</p>
-    <h1>Explain the rules<br><em>before selling the account.</em></h1>
-    <p class="lede">Short guides on the parts of a prop firm that decide whether an account survives. Written from the database, not from marketing pages.</p>
+    <p class="kicker">Library · status first</p>
+    <h1>What exists,<br><em>and what is only planned.</em></h1>
+    <p class="lede">Nothing on this page is a finished guide until it says so. Where a piece is not written yet, it links to the data it will be built from instead of pretending to be an article.</p>
   </div>
 
   <section>
-    <p class="label"><b>01</b> Published</p>
-    <h2>Available now.</h2>
-    <div class="grid3">
-      <a class="card" href="/propfirm-helix/site/sq/helix/"><h3>Reading a prop firm rule set</h3>
-        <p>Which rules end accounts, which only cost money, and why the evaluation stage and the funded stage can differ.</p>
-        <span class="meta">Guide · uses Helix data</span></a>
-      <a class="card" href="/propfirm-helix/site/sq/helix/"><h3>Drawdown, in six words</h3>
-        <p>Static, EOD static, EOD trailing, intraday trailing, balance-based, not stated. What each one does to a winning position.</p>
-        <span class="meta">Guide · 6 categories</span></a>
-      <a class="card" href="/propfirm-helix/site/sq/helix/"><h3>What a challenge really costs</h3>
-        <p>Fee divided by pass rate, plus the weeks each failed attempt takes. The arithmetic nobody puts on a pricing page.</p>
-        <span class="meta">Guide · calculator</span></a>
+    <p class="label"><b>01</b> Available today</p>
+    <h2>Things you can actually use now.</h2>
+    <div class="rules">
+      <div><b>Helix — the database</b><span>2,166 challenges across 71 firms: price, drawdown type, payout cycle, rule set, grade and source per row. Filter by what you need and open any row for evidence.</span>
+        <span class="note" style="display:block;margin-top:6px"><a href="/propfirm-helix/site/sq/helix/">Open Helix →</a></span></div>
+      <div><b>The cost calculator</b><span>Fee divided by pass rate, with the assumptions printed next to the answer. It sits on the front page because it is the one number that changes a decision.</span>
+        <span class="note" style="display:block;margin-top:6px"><a href="/#math">Use the calculator →</a></span></div>
+      <div><b>The log</b><span>Dated entries on what we tried and what it cost. Not a blog — the working record.</span>
+        <span class="note" style="display:block;margin-top:6px"><a href="/propfirm-helix/site/sq/log/">Read the log →</a></span></div>
     </div>
-    <p class="note">These are being written from the same database the site runs on. Until each one is finished it points at the data it is based on rather than at a page that does not exist yet.</p>
   </section>
 
   <section>
-    <p class="label"><b>02</b> Planned</p>
-    <h2>Next in the queue.</h2>
+    <p class="label"><b>02</b> Being written</p>
+    <h2>Not published yet. Listed so you know what is coming.</h2>
     <div class="rules">
-      <div><b>Payout cycles without the marketing</b><span>On-demand, weekly, bi-weekly and monthly — and the profit split conditions attached to each.</span></div>
-      <div><b>Brokers behind the firms</b><span>Which broker executes which challenge, and what that means for spreads, commissions and platform access.</span></div>
-      <div><b>When a firm changes its rules</b><span>Rule changes are the most under-read risk in prop trading. We keep a dated feed of them.</span></div>
+      <div><b>Reading a rule set before you pay</b><span>Which rules end accounts and which only cost money, and why the evaluation and funded stages can differ. <em class="dim">— draft, built from Helix rule records.</em></span></div>
+      <div><b>Drawdown, six ways</b><span>Static, EOD static, EOD trailing, intraday trailing, balance-based, not stated — and what each one does to a winning position. <em class="dim">— draft, built from Helix drawdown categories.</em></span></div>
+      <div><b>What a challenge really costs</b><span>The arithmetic behind the calculator: attempts, weeks, platform fees. <em class="dim">— draft.</em></span></div>
     </div>
+    <p class="note">No dates are promised. These appear when they are finished, not on a schedule we invent to look busy.</p>
   </section>
 
 </main>
@@ -384,8 +403,8 @@
   <div class="wrap">
     <div class="fgrid">
       <div class="fcol"><div class="h">SilentQuants</div>
-        <a href="/propfirm-helix/site/sq/">Start</a><br><a href="/propfirm-helix/site/sq/helix/">Helix</a><br><a href="/propfirm-helix/site/sq/resources/">Resources</a><br>
-        <a href="/propfirm-helix/site/sq/log/">Log</a><br><a href="/propfirm-helix/site/sq/method/">Method</a>
+        <a href="/propfirm-helix/site/sq/#why">Why</a><br><a href="/propfirm-helix/site/sq/#what">What</a><br><a href="/propfirm-helix/site/sq/#how">How</a><br>
+        <a href="/propfirm-helix/site/sq/helix/">Helix</a><br><a href="/propfirm-helix/site/sq/log/">Log</a><br><a href="/propfirm-helix/site/sq/resources/">Library</a>
       </div>
       <div class="fcol"><div class="h">SilentFam</div>
         <a href="https://silentfam.com/">Why we stay anonymous</a><br><a href="https://silentfam.com/#journey">Journey</a>
