@@ -819,8 +819,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="a3d6cdf0";</script>
-<script src="data.js?v=a3d6cdf0"></script>
+<script>window.HELIX_VER="014ab4bd";</script>
+<script src="data.js?v=014ab4bd"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -1523,7 +1523,7 @@ function buildFilters(){
       <button data-rtsrc="pfm" class="${F.rtsrc.has("pfm")?"on":""}">PFM</button>
       <button data-rtsrc="tp" class="${F.rtsrc.has("tp")?"on":""}">Trustpilot</button>
       <button data-rtsrc="sj" class="${F.rtsrc.has("sj")?"on":""}">Sitejabber</button>
-      <button disabled title="${lang==="ko"?"Feefo는 Cloudflare 차단으로 수집 불가":"Feefo is behind Cloudflare; not collected"}">Feefo</button>
+      <button data-rtsrc="feefo" class="${F.rtsrc.has("feefo")?"on":""}" title="${lang==="ko"?"Feefo는 공식 리뷰 API로 수집합니다(웹 페이지는 차단). 현재 1개사.":"Collected through Feefo's review API (the site itself blocks bots). One firm so far."}">Feefo</button>
       <button disabled title="${lang==="ko"?"Reviews.io에 이 업체들의 프로필이 없습니다":"Reviews.io has no profiles for these firms"}">Reviews.io</button>
     </div>
     <div class="chips2">
@@ -1881,7 +1881,7 @@ function ratingCell(r){
     else if(x.tp.r!=null) out.push(`<span class="rtag tp" title="Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""}">T ${x.tp.r}</span>`);
   }
   if(x.sj&&x.sj.r!=null) out.push(`<span class="rtag sj" title="Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""}">SJ ${x.sj.r}</span>`);
-  if(x.feefo&&x.feefo.r!=null) out.push(`<span class="rtag feefo" title="Feefo ${x.feefo.r}">F ${x.feefo.r}</span>`);
+  if(x.feefo&&x.feefo.r!=null) out.push(`<span class="rtag feefo" title="Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본 평균)`:""}">F ${x.feefo.r}</span>`);
   if(!out.length) return '<span class="dim">—</span>';
   return `<span class="rtags">${out.join("")}</span>`;
 }
@@ -1996,7 +1996,7 @@ function openDrawer(id){
           else if(x.tp.r!=null) bits.push(`<span class="rtag tp">Trustpilot ${x.tp.r}</span>${x.tp.n?` <span class="dim">(${x.tp.n})</span>`:""}`);
         }
         if(x.sj&&x.sj.r!=null) bits.push(`<span class="rtag sj">Sitejabber ${x.sj.r}</span>${x.sj.n!=null?` <span class="dim">(${x.sj.n})</span>`:""}`);
-        if(x.feefo&&x.feefo.r!=null) bits.push(`<span class="rtag feefo">Feefo ${x.feefo.r}</span>`);
+        if(x.feefo&&x.feefo.r!=null) bits.push(`<a class="rtag feefo" href="${esc(x.feefo.src||"#")}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Feefo ${x.feefo.r}</a>${x.feefo.n?` <span class="dim">(${x.feefo.n}${x.feefo.method==="sampled"?` · ${x.feefo.sampled}건 표본`:""})</span>`:""}`);
         if(!bits.length && r.rt) bits.push(`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`);
         return bits.length?bits.join(" · "):'<span class="dim">—</span>';
       })())}
