@@ -51,6 +51,8 @@
     transition:background-color .18s ease, color .18s ease;
   }
   html[lang="ko"] body{font-size:16.5px; line-height:1.78; letter-spacing:-0.01em}
+  html[lang="ko"] p,html[lang="ko"] li,html[lang="ko"] .cp,html[lang="ko"] .lede,
+  html[lang="ko"] .rules span,html[lang="ko"] .ladder span{word-break:keep-all; overflow-wrap:break-word; text-wrap:pretty}
   a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent; transition:color .15s,border-color .15s}
   a:hover{color:var(--accent-soft); border-bottom-color:rgba(167,139,250,.45)}
   .wrap{max-width:var(--measure); margin:0 auto; padding:0 26px}
@@ -123,8 +125,8 @@
   .card .meta{margin-top:12px; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#8f9499}
   html[data-theme="light"] .card .meta{color:#7a7388}
   .pill{display:inline-block; margin-left:3px; padding:2px 8px; border-radius:999px;
-    border:1px solid rgba(167,139,250,.42); background:rgba(167,139,250,.12);
-    font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--accent-soft); vertical-align:2px}
+    border:1px solid var(--line2); background:transparent;
+    font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); vertical-align:2px}
   html[lang="ko"] .pill{letter-spacing:.02em; font-size:11px}
 
   .child{margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
@@ -137,7 +139,9 @@
   .childlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px}
   .childlinks a{font-size:13.5px; font-weight:600; border:0}
 
-  .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
+  .listhead{margin:20px 0 0; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim)}
+  html[lang="ko"] .listhead{letter-spacing:.04em; font-size:11.5px}
+  .buildlist{list-style:none; padding:0; margin:10px 0 0; display:grid; gap:9px}
   .buildlist li{display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:baseline;
     font-size:13.8px; color:var(--muted); line-height:1.55}
   .buildlist b{color:var(--fg2); font-weight:600}
@@ -263,7 +267,8 @@
             <a href="https://silentquants.com/">silentquants.com ↗</a>
           </span>
         </div>
-        <ol class="buildlist"><li><span class="st live">live</span><span><b>01 Where to trade</b> — challenge &amp; broker database, with cost and break-even per firm</span></li><li><span class="st wip">building</span><span><b>02 What you may not break</b> — rule sets turned into per-firm checklists</span></li><li><span class="st wip">building</span><span><b>03 What you actually trade</b> — strategy lab: backtests, walk-forward, what survives</span></li><li><span class="st plan">planned</span><span><b>04 How you execute</b> — tools, checklists, decision journal</span></li><li><span class="st plan">planned</span><span><b>05 What it produced</b> — attempts, fees, payouts, capital ladder</span></li></ol>
+        <p class="listhead">Build order</p>
+        <ol class="buildlist"><li><span class="st live">live</span><span><b>01 Where to trade</b> — Helix — cost, rules and break-even per firm</span></li><li><span class="st wip">building</span><span><b>02 What you may not break</b> — rule sets turned into per-firm checklists</span></li><li><span class="st wip">building</span><span><b>03 What you actually trade</b> — strategy lab: backtests, walk-forward, what survives</span></li><li><span class="st plan">planned</span><span><b>04 How you execute</b> — tools, checklists, decision journal</span></li><li><span class="st plan">planned</span><span><b>05 What it produced</b> — attempts, fees, payouts, capital ladder</span></li></ol>
         <p class="order-note">The order is the order of the decisions, not of our enthusiasm: you cannot size a position before you know the rules, and you cannot judge a result before you have a journal.</p>
       </div>
     </div>

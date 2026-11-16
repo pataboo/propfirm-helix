@@ -51,6 +51,8 @@
     transition:background-color .18s ease, color .18s ease;
   }
   html[lang="ko"] body{font-size:16.5px; line-height:1.78; letter-spacing:-0.01em}
+  html[lang="ko"] p,html[lang="ko"] li,html[lang="ko"] .cp,html[lang="ko"] .lede,
+  html[lang="ko"] .rules span,html[lang="ko"] .ladder span{word-break:keep-all; overflow-wrap:break-word; text-wrap:pretty}
   a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent; transition:color .15s,border-color .15s}
   a:hover{color:var(--accent-soft); border-bottom-color:rgba(167,139,250,.45)}
   .wrap{max-width:var(--measure); margin:0 auto; padding:0 26px}
@@ -123,8 +125,8 @@
   .card .meta{margin-top:12px; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#8f9499}
   html[data-theme="light"] .card .meta{color:#7a7388}
   .pill{display:inline-block; margin-left:3px; padding:2px 8px; border-radius:999px;
-    border:1px solid rgba(167,139,250,.42); background:rgba(167,139,250,.12);
-    font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--accent-soft); vertical-align:2px}
+    border:1px solid var(--line2); background:transparent;
+    font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); vertical-align:2px}
   html[lang="ko"] .pill{letter-spacing:.02em; font-size:11px}
 
   .child{margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
@@ -137,7 +139,9 @@
   .childlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px}
   .childlinks a{font-size:13.5px; font-weight:600; border:0}
 
-  .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
+  .listhead{margin:20px 0 0; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim)}
+  html[lang="ko"] .listhead{letter-spacing:.04em; font-size:11.5px}
+  .buildlist{list-style:none; padding:0; margin:10px 0 0; display:grid; gap:9px}
   .buildlist li{display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:baseline;
     font-size:13.8px; color:var(--muted); line-height:1.55}
   .buildlist b{color:var(--fg2); font-weight:600}
@@ -253,7 +257,7 @@
       </div>
       <div class="card plain">
         <h3>SilentQuants <span class="pill">트레이딩</span></h3>
-        <p>프랍펌 자본과 일부 브로커 위에서 정량 트레이더로 가는 방향입니다. 리서치, 검증, 규칙, 비용, 그리고 그것을 운용하는 규율. <span class="hl">아직 펀딩받지 않았습니다.</span> 이 순서로 만드는 중이고, Helix는 그중 처음으로 혼자 서는 조각입니다.</p>
+        <p>프랍펌 자본과 일부 브로커 위에서 정량 트레이더로 가는 방향입니다. 리서치, 검증, 규칙, 비용, 그리고 그것을 운용하는 규율. <span class="hl">아직 펀딩받지 않았습니다.</span> 이 순서로 만드는 중이고, Helix는 그중 처음으로 스스로 서는 조각입니다.</p>
         <div class="child">
           <span class="lab">SilentQuants 안에</span>
           <b>Helix — 챌린지·브로커 데이터베이스</b>
@@ -263,7 +267,8 @@
             <a href="https://silentquants.com/">silentquants.com ↗</a>
           </span>
         </div>
-        <ol class="buildlist"><li><span class="st live">운영 중</span><span><b>01 어디서 거래할 것인가</b> — 챌린지·브로커 데이터베이스, 업체별 비용과 손익분기</span></li><li><span class="st wip">제작 중</span><span><b>02 무엇을 어겨서는 안 되는가</b> — 업체별 규칙을 체크리스트로</span></li><li><span class="st wip">제작 중</span><span><b>03 실제로 무엇을 거래하는가</b> — 전략 랩: 백테스트, 워크포워드, 살아남는 것</span></li><li><span class="st plan">예정</span><span><b>04 어떻게 실행하는가</b> — 도구, 체크리스트, 결정 일지</span></li><li><span class="st plan">예정</span><span><b>05 무엇을 남겼는가</b> — 응시, 수수료, 페이아웃, 자본 사다리</span></li></ol>
+        <p class="listhead">만드는 순서</p>
+        <ol class="buildlist"><li><span class="st live">운영 중</span><span><b>01 어디서 거래할 것인가</b> — Helix — 업체별 비용·규칙·손익분기</span></li><li><span class="st wip">제작 중</span><span><b>02 무엇을 어겨서는 안 되는가</b> — 업체별 규칙을 체크리스트로</span></li><li><span class="st wip">제작 중</span><span><b>03 실제로 무엇을 거래하는가</b> — 전략 랩: 백테스트, 워크포워드, 살아남는 것</span></li><li><span class="st plan">예정</span><span><b>04 어떻게 실행하는가</b> — 도구, 체크리스트, 결정 일지</span></li><li><span class="st plan">예정</span><span><b>05 무엇을 남겼는가</b> — 응시, 수수료, 페이아웃, 자본 사다리</span></li></ol>
         <p class="order-note">순서는 열정의 순서가 아니라 결정의 순서입니다. 규칙을 모르면 포지션 크기를 정할 수 없고, 일지가 없으면 결과를 판정할 수 없습니다.</p>
       </div>
     </div>
