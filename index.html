@@ -158,6 +158,9 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .tpwarn{display:inline-block;padding:1px 7px;border-radius:9999px;font-size:11px;font-weight:800;color:var(--red);
+    border:1px solid rgba(255,45,85,.5);background:rgba(255,45,85,.10);text-decoration:none}
+  .tpwarn:hover{background:rgba(255,45,85,.18)}
   .pbasis{display:inline-block;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid var(--line2);color:var(--muted)}
   .pbasis.promo{color:var(--amber);border-color:rgba(255,171,0,.45)}
   .pbasis.list{color:var(--green);border-color:rgba(52,223,170,.35)}
@@ -808,8 +811,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="ba0eeb3d";</script>
-<script src="data.js?v=ba0eeb3d"></script>
+<script>window.HELIX_VER="ffc81075";</script>
+<script src="data.js?v=ffc81075"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -831,7 +834,7 @@ const I18N = {
   empty:"조건에 맞는 상품이 없습니다.",
   thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
-  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록", fFresh:"최근 확인(14일)", fStale:"갱신 필요(14일+)", fUnlisted:"공식 목록에 없음",
+  fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록", fFresh:"최근 확인(14일)", fStale:"갱신 필요(14일+)", fUnlisted:"공식 목록에 없음", fTpWarn:"Trustpilot 경고",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
   kTarget:"이익 목표", kDaily:"일일 손실", kMax:"최대 손실", kDays:"최소 거래일",
   sectCost:"비용", sectCond:"거래 조건", sectPay:"지급 조건", sectFloor:"낙폭 구조", sectSrc:"데이터 출처",
@@ -884,7 +887,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   empty:"No products match these filters.",
   thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
-  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded", fFresh:"Checked in 14 days", fStale:"Needs refresh (14d+)", fUnlisted:"Not on official list",
+  fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded", fFresh:"Checked in 14 days", fStale:"Needs refresh (14d+)", fUnlisted:"Not on official list", fTpWarn:"Trustpilot warning",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
   kTarget:"Profit target", kDaily:"Daily loss", kMax:"Max loss", kDays:"Min days",
   sectCost:"Cost", sectCond:"Trading conditions", sectPay:"Payout", sectFloor:"Loss floor", sectSrc:"Data source",
@@ -1059,6 +1062,7 @@ function evCell(r){
   const link=r.ur?` <a href="${esc(r.ur)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="text-decoration:none">↗</a>`:"";
   const q=(r.no||"").slice(0,320);
   const tip=q?` title="${esc(q)}" aria-label="${esc(q)}"`:"";
+  const tp = (DB.tpwarn||{})[r.f];
   const gone = r.gn===true
     ? `<span class="gone" title="${lang==="ko"?"이 브랜드의 공식 가격표에 이 계좌 규모가 없습니다 — 단종·판매중지일 수 있습니다":"This account size is absent from the brand's official price list — it may be discontinued"}">${lang==="ko"?"단종?":"gone?"}</span>`
     : "";
@@ -1466,7 +1470,7 @@ function buildFilters(){
     ${[80,85,90,95].map(v=>`<button data-split="${v}" class="${F.splitMin===v?"on":""}">≥ ${v}%</button>`).join("")}</div></div></details>`);
   add("dd", `<details class="fgroup" data-g="dd" ${OPEN.dd?"open":""}><summary title="${esc((TIPS.dd)[lang])}">${esc(t("ddF"))}</summary><div class="body">
     ${[...DB.dd].sort((a,b)=>(isNA(a)?1:0)-(isNA(b)?1:0)||String(a).localeCompare(String(b))).map(v=>chk(tx(v),F.dd.has(v),"dd",v,rowCount(r=>r.dd===v))).join("")}</div></details>`);
-  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"],["tot","fTot"],["fresh","fFresh"],["stale14","fStale"],["unlisted","fUnlisted"]];
+  const flags=[["promo","fPromo"],["ea","fEa"],["news","fNews"],["on","fOn"],["cp","fCp"],["wk","fWk"],["korea","fKorea"],["tot","fTot"],["fresh","fFresh"],["stale14","fStale"],["unlisted","fUnlisted"],["tpwarn","fTpWarn"]];
   add("flags", `<details class="fgroup" data-g="flags" ${OPEN.flags?"open":""}><summary title="${esc((TIPS.flags)[lang])}">${esc(t("flags"))}</summary><div class="body">
     ${flags.map(([k,lab])=>chk(t(lab),F.flags.has(k),"flags",k)).join("")}</div></details>`);
   add("ver", `<details class="fgroup" data-g="ver" ${OPEN.ver?"open":""}><summary title="${esc((TIPS.ver)[lang])}">${esc(t("ver"))}</summary><div class="body">
@@ -1835,6 +1839,14 @@ function renderBar(){
 }
 
 /* ---------- drawer ---------- */
+function tpWarnBadge(firm){
+  const w=(DB.tpwarn||{})[firm];
+  if(!w) return "";
+  const msg=lang==="ko"
+    ? `Trustpilot이 이 회사의 등급을 산정하지 않습니다 — 가이드라인 위반으로 경고가 표시된 프로필입니다. (trustpilot.com/review/${w.d})`
+    : `Trustpilot does not publish a rating for this company — the profile carries a warning for a breach of their guidelines.`;
+  return `<a class="tpwarn" href="https://www.trustpilot.com/review/${esc(w.d||"")}" target="_blank" rel="noopener" title="${esc(msg)}">⚠ ${lang==="ko"?"Trustpilot 경고":"TP warning"}</a>`;
+}
 function priceBasisBadge(firm){
   const b=(DB.pbasis||{})[firm];
   if(b==="promo-recorded") return ` <span class="pbasis promo" title="${lang==="ko"?"이 브랜드의 가격은 사이트에 표시된 프로모션 가격으로 기록되어 있습니다. 정가와 다를 수 있습니다.":"This brand's fee was recorded as the promotional price the site displays; the list price may differ."}">${lang==="ko"?"프로모가":"promo"}</span>`;
@@ -1913,6 +1925,7 @@ function openDrawer(id){
     </div>
     ${promoBlock(r)}
     <div class="sect">${esc(t("sectCost"))}</div>
+    ${tp?`<div class="kv" style="grid-column:1/-1">${drawerRow("Trustpilot",tpWarnBadge(r.f))}</div>`:""}
     <div class="kv">${drawerRow(t("cPrice"),money(r.pr,r.cu)+(priceBasisBadge(r.f)))}${drawerRow(t("cAct"),money(r.ac,r.cu))}
       ${drawerRow(t("cTotal"),money(r.to,r.cu))}${r.po?drawerRow(t("cPromo"),esc(r.po)):""}
       ${r.co?drawerRow(t("cCode"),`<b>${esc(r.co)}</b>`):""}</div>
@@ -2277,6 +2290,7 @@ function flagOk(r,f){
   if(f==="allrules") return r.ec!=null && r.nc!=null && r.oc!=null && r.wk!=null;
   if(f==="fresh"){ const ag=ageDays(r); return ag!=null && ag<=14; }
   if(f==="unlisted") return r.gn===true;
+  if(f==="tpwarn") return !!(DB.tpwarn||{})[r.f];
   if(f==="stale14"){ const g=ageDays(r); return g==null || g>14; }
   return true;
 }
@@ -3221,7 +3235,7 @@ function renderPayouts(){
         <td class="num">${o.avg!=null?money(o.avg,"USD"):"—"}</td>
         <td class="num">${o.last!=null?money(o.last,"USD"):"—"}</td>
         <td>${o.speed?esc(o.speed):'<span class="dim">—</span>'}</td>
-        <td class="num">${o.rating!=null?esc(o.rating)+(o.reviews?` <span class="dim">(${o.reviews})</span>`:""):'<span class="dim">—</span>'}</td>
+        <td class="num">${(DB.tpwarn||{})[o.brand]?'<span class="tpwarn" title="'+esc(lang==="ko"?"Trustpilot 경고: 가이드라인 위반으로 등급 산정 불가":"Trustpilot warning: rating withheld")+'">⚠</span>':(o.rating!=null?esc(o.rating)+(o.reviews?` <span class="dim">(${o.reviews})</span>`:""):'<span class="dim">—</span>')}</td>
       </tr>`).join("")}</tbody></table></div>
       <div class="srcline">${lang==="ko"?"출처: propfirmmatch.com/payouts (2026-11-15 수집). 업체가 PFM에 신고한 지급 실적입니다.":"Source: propfirmmatch.com/payouts, collected 2026-11-15; payout figures as reported to PFM by each firm."}</div></div>`:"";
   el("payoutsMain").innerHTML=`
@@ -3657,8 +3671,16 @@ function renderFirm(name){
       <div>
         <h1>${esc(name)}</h1>
         <div class="fmeta">
-          ${meta.rating?`<span class="rating">★ ${esc(meta.rating)} <small>${esc(meta.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span>`:""}
-          ${grades.map(g=>`<span class="pill p-${g}">${esc(t("grade"))} ${g}</span>`).join("")}
+          ${(DB.tpwarn||{})[name]?tpWarnBadge(name):(meta.rating?`<span class="rating">★ ${esc(meta.rating)} <small>${esc(meta.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span>`:"")}
+          ${(()=>{
+            const cnt={A:0,B:0,C:0}; rs.forEach(r=>{if(cnt[r.vf]!=null) cnt[r.vf]++;});
+            const gs=["A","B","C"].filter(g=>cnt[g]);
+            if(!gs.length) return "";
+            const best=gs.slice().sort((a,b)=>(cnt[b]-cnt[a])||("ABC".indexOf(a)-"ABC".indexOf(b)))[0];
+            const rest=gs.filter(g=>g!==best).reduce((a,g)=>a+cnt[g],0);
+            const tip=gs.map(g=>`${g} ${cnt[g]}`).join(" · ");
+            return `<span title="${esc(tip)}"><span class="pill p-${best}">${esc(t("grade"))} ${best}</span>`+(rest?`<span class="dim" style="font-size:10px;margin-left:4px">+${rest}</span>`:"")+`</span>`;
+          })()}
           <span>${rs.length} ${esc(t("rows"))}</span>
           <span>${esc(assets.map(mkName).join(" · "))}</span>
         </div>
