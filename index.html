@@ -848,7 +848,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   fPromo:"프로모션 있음",
   fMaxllL:"최대 손실 최대", fSplitL:"분배 최소", fDaysL:"최소일수 최대",
   fCycleL:"지급 주기",
-  navCh:"챌린지", navRules:"규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모션", navCmp:"비교", navTools:"도구", navSpreads:"스프레드", navPayouts:"지급",
+  navCh:"챌린지", navRules:"규칙", navAll:"프랍펌 전체", navFirmRules:"프랍펌 규칙", navHome:"홈", navFirms:"프랍펌", navDocs:"문서", navOffers:"프로모션", navCmp:"비교", navTools:"도구", navSpreads:"스프레드", navPayouts:"지급",
   rulesH1:"회사별 규칙 한눈에 보기", rulesSub:"회사를 클릭하면 해당 회사의 챌린지만 필터링됩니다. 허용/조건부/불가/미확인은 상품 단위 기록을 집계한 값입니다.",
   rFirm:"회사", rN:"상품", rGrade:"검증 등급",
   rEa:"EA", rNews:"뉴스", rOn:"오버나이트", rCp:"카피", rWk:"주말", rKr:"한국 계좌", rM5:"MT5",
@@ -901,7 +901,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   fPromo:"Has promo",
   fDailyL:"Max daily loss", fMaxllL:"Max total loss", fSplitL:"Min split", fDaysL:"Max min-days",
   fCycleL:"Payout cycle",
-  navCh:"Challenges", navRules:"Rules", navHome:"Home", navFirms:"Firms", navDocs:"Docs", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
+  navCh:"Challenges", navRules:"Rules", navAll:"All firms", navFirmRules:"Firm rules", navHome:"Home", navFirms:"Firms", navDocs:"Docs", navOffers:"Offers", navCmp:"Compare", navTools:"Tools", navSpreads:"Spreads", navPayouts:"Payouts",
   rulesH1:"Rules across firms", rulesSub:"Click a firm to filter its challenges. Allowed / conditional / not allowed / unknown aggregated from per-product records.",
   rFirm:"Firm", rN:"Products", rGrade:"Grade",
   rEa:"EA", rNews:"News", rOn:"Overnight", rCp:"Copy", rWk:"Weekend", rKr:"Korea", rM5:"MT5",
@@ -2141,8 +2141,8 @@ function applyStatics(){
    const cg=el("cmpGo"); if(cg) cg.textContent=lang==="ko"?"비교":"Compare";
    const tb=el("tsBtn"); if(tb) tb.title=lang==="ko"?"표 설정":"Table settings";}
   {const _h=el("h1"),_s=el("sub"); if(_h)_h.textContent=t("h1"); if(_s)_s.textContent=t("sub");}
-  {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
-             tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
+  {const NM={home:"navHome",offers:"navOffers",challenges:"navAll",compare:"navCmp",
+             tools:"navTools",rules:"navFirmRules",spreads:"navSpreads",payouts:"navPayouts",
              firms:"navFirms",docs:"navDocs"};
    document.querySelectorAll("#subnav a").forEach(a=>{
      const k=NM[a.dataset.page];
