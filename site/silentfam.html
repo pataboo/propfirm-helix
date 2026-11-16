@@ -114,6 +114,16 @@
   .card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .card.plain{cursor:default; background:transparent; border-style:dashed; border-color:#202a2e}
   .card.plain:hover{border-color:#202a2e; background:transparent}
+  .stacknote{margin:0 0 18px; font-size:13.5px; color:var(--dim); letter-spacing:.01em}
+  .card .child{
+    margin:16px 0 4px; padding:14px 15px; border:1px solid var(--line2); border-radius:11px;
+    background:rgba(167,139,250,.045); position:relative;
+  }
+  .card .child::before{content:"↳"; position:absolute; left:-13px; top:14px; color:var(--accent); font-size:13px}
+  .card .child .lab{display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
+  .card .child b{display:block; color:var(--fg); font-size:14.5px; font-weight:650; margin-bottom:4px}
+  .card .child .cp{display:block; color:var(--muted); font-size:13.5px; line-height:1.6}
+  .card .child .lnk{display:inline-block; margin-top:9px; font-size:13px; border:0}
   .pill{display:inline-block; margin-left:2px; padding:1px 7px; border-radius:999px; border:1px solid #2b3539;
         font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#8f9499; vertical-align:2px}
   .card h3{margin:0 0 6px; font-size:16.5px; color:var(--fg); font-weight:650; letter-spacing:-0.015em; display:flex; align-items:center; gap:9px}
@@ -212,27 +222,34 @@
     <p class="label"><b>02</b> What we build</p>
     <h2>Four things, one direction.</h2>
 
+    <p class="stacknote">One system, three layers: what you run personally, what we run together, and how we trade.</p>
+
     <div class="cards">
+
+      <div class="card plain">
+        <h3>Flow <span class="pill">personal</span></h3>
+        <p>A personal operating system. You set the purpose, vision and goals once, and everything else flows outward from them — days, projects, decisions, review. Change starts inside; the system only makes the outward part visible.</p>
+        <span class="meta">Working name · running internally</span>
+      </div>
+
+      <div class="card plain">
+        <h3>Operations <span class="pill">shared</span></h3>
+        <p>Flow, extended to a group — the same purpose, vision and goals held in common instead of alone. One board where everything is visible and trackable: a vision canvas at the centre and a bird's-eye view around it. This is what we use to operate SilentFam.</p>
+        <span class="meta">Vision canvas · bird's-eye board</span>
+      </div>
+
       <a class="card" href="https://silentquants.com/">
         <h3>SilentQuants <span class="go">↗</span></h3>
-        <p>An evidence-driven companion for systematic trading: research, validation and disciplined operation. Every claim carries a source and a date.</p>
+        <p>The bundle of everything we do as quantitative traders on prop firm capital and selected brokers — research, validation, rules, cost, and the discipline to operate it.</p>
+        <div class="child">
+          <span class="lab">Inside SilentQuants</span>
+          <b>Helix — challenge &amp; broker database</b>
+          <span class="cp">2,166 challenges across 71 prop firms. What each one costs, what its rules really are, and where the answer came from.</span>
+          <a class="lnk" href="https://silentquants.com/tools/helix">Open Helix ↗</a>
+        </div>
         <span class="meta">silentquants.com</span>
       </a>
-      <a class="card" href="https://silentquants.com/tools/helix">
-        <h3>Helix <span class="go">↗</span></h3>
-        <p>A master database for prop firm challenges and brokers — what each one actually costs, what its rules really are, and where the answer came from.</p>
-        <span class="meta">Tool · updated weekly</span>
-      </a>
-      <div class="card plain">
-        <h3>Operations <span class="pill">internal</span></h3>
-        <p>A family and company dashboard that connects purpose and goals to projects, decisions and results — so nothing important lives only in someone's head.</p>
-        <span class="meta">Family &amp; company dashboard · in development</span>
-      </div>
-      <div class="card plain">
-        <h3>Living memory <span class="pill">internal</span></h3>
-        <p>A local-first knowledge system that keeps decisions, evidence and lessons recoverable — independent of any single tool, vendor or AI.</p>
-        <span class="meta">Local-first archive · running</span>
-      </div>
+
     </div>
   </section>
 
@@ -253,7 +270,7 @@
       <div class="stat"><span class="v">85%</span><span class="k">grade A evidence</span></div>
       <div class="stat"><span class="v">99%</span><span class="k">rule coverage</span></div>
     </div>
-    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">Figures from the Helix database, build of 16 November 2026. Sources and grades are published per row.</p>
+    <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">Figures from Helix, the database inside SilentQuants — build of 16 November 2026. Sources and grades are published per row.</p>
   </section>
 
   <section id="letters">
@@ -296,11 +313,11 @@
         <a href="#letters">Letters</a>
       </div>
       <div class="fcol">
-        <div class="h">Projects</div>
-        <a href="https://silentquants.com/">SilentQuants ↗</a><br>
-        <a href="https://silentquants.com/tools/helix">Helix ↗</a><br>
+        <div class="h">What we build</div>
+        <a href="#build">Flow</a><br>
         <a href="#build">Operations</a><br>
-        <a href="#build">Living memory</a>
+        <a href="https://silentquants.com/">SilentQuants ↗</a><br>
+        <a href="https://silentquants.com/tools/helix">└ Helix ↗</a>
       </div>
       <div class="fcol">
         <div class="h">More</div>
