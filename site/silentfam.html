@@ -170,6 +170,16 @@
   .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
   .rules span{color:var(--muted); font-size:14.5px}
 
+  .rules .why{display:block; margin-top:7px; font-style:normal; font-size:13.8px; color:var(--accent); opacity:.9}
+  .journey{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .journey li{display:grid; grid-template-columns:7.4rem 1fr; gap:18px; padding:20px 0; border-top:1px solid var(--line)}
+  .journey li:first-child{border-top:0}
+  .journey time{font-size:11.5px; letter-spacing:.06em; color:var(--dim); padding-top:3px}
+  .journey b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:5px}
+  .journey p{margin:0 0 9px; color:var(--muted); font-size:14.5px; line-height:1.62; max-width:56ch}
+  .journey code{display:inline-block; padding:5px 9px; border:1px solid var(--line); border-radius:7px;
+    background:var(--panel); color:var(--fg2); font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  html[data-theme="light"] .journey code{background:#fff}
   .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px}
   .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-0.03em; line-height:1}
   .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
@@ -204,6 +214,7 @@
     .wrap{padding:0 18px}
     .ladder li{grid-template-columns:2.4rem 1fr; gap:12px}
     .buildlist li{grid-template-columns:1fr; gap:5px}
+    .journey li{grid-template-columns:1fr; gap:6px}
     .st{display:inline-block; justify-self:start}
   }
 </style>
@@ -216,7 +227,7 @@
     <nav class="top">
       <a href="#why">Why</a>
       <a href="#build">What we build</a>
-      <a href="#letters">Letters</a>
+      <a href="#journey">Journey</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="tools">
@@ -286,13 +297,20 @@
   <section id="how">
     <p class="label"><b>03</b> How we work</p>
     <h2>Four rules we don't bend.</h2>
-    <div class="rules"><div><b>Local first.</b><span>Our records live with us. Cloud services hold copies, inside defined boundaries.</span></div><div><b>Evidence over opinion.</b><span>A result counts only when someone else can check it. When we don't know, we say so instead of guessing.</span></div><div><b>AI-assisted, human-approved.</b><span>Agents research, build and review. People decide — and the decision is written down.</span></div><div><b>Small, reviewed steps.</b><span>Every change is versioned and traceable back to why it was made. No silent rewrites.</span></div></div>
+    <div class="rules"><div><b>Local first.</b><span>Our records live with us. Cloud services hold copies, inside defined boundaries.</span><em class="why">Because a record you cannot open offline is rented, not owned.</em></div><div><b>Evidence over opinion.</b><span>A result counts only when someone else can check it. When we don't know, we say so instead of guessing.</span><em class="why">Because an unchecked number feels exactly like a checked one.</em></div><div><b>AI-assisted, human-approved.</b><span>Agents research, build and review. People decide — and the decision is written down.</span><em class="why">Because a machine can move very fast in the wrong direction.</em></div><div><b>Small, reviewed steps.</b><span>Every change is versioned and traceable back to why it was made. No silent rewrites.</span><em class="why">Because a large change hides the one mistake that caused it.</em></div></div>
     <div class="stats"><div class="stat"><span class="v">2,166</span><span class="k">challenges catalogued</span></div><div class="stat"><span class="v">71</span><span class="k">prop firms</span></div><div class="stat"><span class="v">85%</span><span class="k">grade A evidence</span></div><div class="stat"><span class="v">99%</span><span class="k">rule coverage</span></div></div>
     <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">Figures from Helix, the database inside SilentQuants — build of 16 November 2026. Sources and grades are published per row.</p>
   </section>
 
+  <section id="journey">
+    <p class="label"><b>04</b> Journey</p>
+    <h2>Short so far. Every step is checkable.</h2>
+    <p>No photographs, no founding myth. What follows is what can be pointed at.</p>
+    <ol class="journey"><li><time>30 Oct 2026</time><div><b>Two domains, nothing else</b><p>We bought the names before we had anything to put on them. That was the whole plan: name it, then earn the name.</p><code>silentfam.com · silentquants.com — both live</code></div></li><li><time>3 Nov 2026</time><div><b>We sealed the test cases</b><p>Before we judged any model or method, we locked away twenty-four cases we were not allowed to tune against. Verification reproduced them exactly.</p><code>24 cases sealed · reproduction check: no mismatch</code></div></li><li><time>15 Nov 2026</time><div><b>2,166 challenges, and the holes</b><p>The database stopped pretending. Where a firm does not publish a number, the cell stays empty and says so.</p><code>2,166 challenges · 71 firms · rules recorded 99% · grade A evidence 85%</code></div></li><li><time>16 Nov 2026</time><div><b>Eighteen filters became nine</b><p>The page was correct and unusable. We merged what meant the same thing, hid the rest behind one control, and kept every original wording in a tooltip.</p><code>commit 65cacc9 — 18 groups → 9</code></div></li><li><time>16 Nov 2026</time><div><b>This page, in two languages</b><p>English is the source. Korean is a translation we can read ourselves, not a machine output we hope is right.</p><code>EN · KO — one template, two dictionaries</code></div></li></ol>
+  </section>
+
   <section id="letters">
-    <p class="label"><b>04</b> Letters</p>
+    <p class="label"><b>05</b> Letters</p>
     <h2>We will write when we have learned something.</h2>
     <p>Not a newsletter with a schedule. A letter goes out when a lesson is finished — what we tried, what it cost, what we kept. <span class="hl">We don’t know what the first one will be about yet</span>, and we would rather tell you honestly than promise a topic and miss it.</p>
     <div class="letterbox">
@@ -308,7 +326,7 @@
   </section>
 
   <section id="contact">
-    <p class="label"><b>05</b> Contact</p>
+    <p class="label"><b>06</b> Contact</p>
     <h2>If it matters, write to us.</h2>
     <p>We answer everything worth answering. We don't do calls, hype or partnerships that need our names on them.</p>
     <p><a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p>
@@ -324,7 +342,7 @@
         <a href="#why">Why</a><br>
         <a href="#build">What we build</a><br>
         <a href="#how">How we work</a><br>
-        <a href="#letters">Letters</a>
+        <a href="#letters">Journey</a>
       </div>
       <div class="fcol">
         <div class="h">What we build</div>
@@ -342,7 +360,7 @@
     <div class="fin">
       <span>© 2026 SilentFam</span>
       <span>Built quietly. Checked carefully.</span>
-      <span class="r">No cookies. No analytics. No faces.</span>
+      <span class="r">No cookies. No tracking. No faces.</span>
     </div>
   </div>
 </footer>

@@ -170,6 +170,16 @@
   .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
   .rules span{color:var(--muted); font-size:14.5px}
 
+  .rules .why{display:block; margin-top:7px; font-style:normal; font-size:13.8px; color:var(--accent); opacity:.9}
+  .journey{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .journey li{display:grid; grid-template-columns:7.4rem 1fr; gap:18px; padding:20px 0; border-top:1px solid var(--line)}
+  .journey li:first-child{border-top:0}
+  .journey time{font-size:11.5px; letter-spacing:.06em; color:var(--dim); padding-top:3px}
+  .journey b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:5px}
+  .journey p{margin:0 0 9px; color:var(--muted); font-size:14.5px; line-height:1.62; max-width:56ch}
+  .journey code{display:inline-block; padding:5px 9px; border:1px solid var(--line); border-radius:7px;
+    background:var(--panel); color:var(--fg2); font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  html[data-theme="light"] .journey code{background:#fff}
   .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px}
   .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-0.03em; line-height:1}
   .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
@@ -204,6 +214,7 @@
     .wrap{padding:0 18px}
     .ladder li{grid-template-columns:2.4rem 1fr; gap:12px}
     .buildlist li{grid-template-columns:1fr; gap:5px}
+    .journey li{grid-template-columns:1fr; gap:6px}
     .st{display:inline-block; justify-self:start}
   }
 </style>
@@ -216,7 +227,7 @@
     <nav class="top">
       <a href="#why">이유</a>
       <a href="#build">만드는 것</a>
-      <a href="#letters">서한</a>
+      <a href="#journey">여정</a>
       <a href="#contact">연락</a>
     </nav>
     <div class="tools">
@@ -286,13 +297,20 @@
   <section id="how">
     <p class="label"><b>03</b> 일하는 방식</p>
     <h2>굽히지 않는 네 가지 원칙.</h2>
-    <div class="rules"><div><b>기록은 우리 곁에.</b><span>기록은 우리와 함께 있습니다. 클라우드는 정해진 경계 안에서 사본을 보관합니다.</span></div><div><b>의견보다 증거.</b><span>다른 사람이 확인할 수 있어야 결과입니다. 모르면 추측하지 않고 모른다고 말합니다.</span></div><div><b>AI 보조, 사람 승인.</b><span>에이전트가 조사하고 만들고 검토합니다. 결정은 사람이 하고, 그 결정은 기록됩니다.</span></div><div><b>작고 검토된 걸음.</b><span>모든 변경은 버전으로 남고 왜 그렇게 했는지 추적할 수 있습니다. 조용한 덮어쓰기는 없습니다.</span></div></div>
+    <div class="rules"><div><b>기록은 우리 곁에.</b><span>기록은 우리와 함께 있습니다. 클라우드는 정해진 경계 안에서 사본을 보관합니다.</span><em class="why">오프라인에서 열 수 없는 기록은 소유가 아니라 임대이기 때문입니다.</em></div><div><b>의견보다 증거.</b><span>다른 사람이 확인할 수 있어야 결과입니다. 모르면 추측하지 않고 모른다고 말합니다.</span><em class="why">확인하지 않은 숫자는 확인한 숫자와 똑같이 그럴듯해 보이기 때문입니다.</em></div><div><b>AI 보조, 사람 승인.</b><span>에이전트가 조사하고 만들고 검토합니다. 결정은 사람이 하고, 그 결정은 기록됩니다.</span><em class="why">기계는 아주 빠르게, 아주 확신 있게 틀린 방향으로 갈 수 있기 때문입니다.</em></div><div><b>작고 검토된 걸음.</b><span>모든 변경은 버전으로 남고 왜 그렇게 했는지 추적할 수 있습니다. 조용한 덮어쓰기는 없습니다.</span><em class="why">큰 변경은 원인이 된 그 하나의 실수를 숨기기 때문입니다.</em></div></div>
     <div class="stats"><div class="stat"><span class="v">2,166</span><span class="k">수록된 챌린지</span></div><div class="stat"><span class="v">71</span><span class="k">프랍펌</span></div><div class="stat"><span class="v">85%</span><span class="k">A등급 증거</span></div><div class="stat"><span class="v">99%</span><span class="k">규칙 커버리지</span></div></div>
     <p style="margin-top:18px; font-size:13.5px; color:var(--dim)">수치는 SilentQuants 안의 데이터베이스 Helix, 2026년 11월 16일 빌드 기준입니다. 출처와 등급은 행마다 공개됩니다.</p>
   </section>
 
+  <section id="journey">
+    <p class="label"><b>04</b> 여정</p>
+    <h2>아직 짧습니다. 모든 걸음은 확인할 수 있습니다.</h2>
+    <p>사진도, 창업 신화도 없습니다. 아래는 가리킬 수 있는 것들입니다.</p>
+    <ol class="journey"><li><time>2026년 10월 30일</time><div><b>도메인 두 개, 그게 전부</b><p>올릴 것이 없을 때 이름부터 샀습니다. 계획은 그것뿐이었습니다. 이름을 먼저 갖고, 그 이름에 걸맞은 것을 나중에 만들기.</p><code>silentfam.com · silentquants.com — 둘 다 열림</code></div></li><li><time>2026년 11월 3일</time><div><b>테스트 케이스를 봉인했습니다</b><p>모델이나 방법을 판정하기 전에, 우리가 손댈 수 없는 케이스 24개를 잠가뒀습니다. 재현 검증에서 원본과 정확히 일치했습니다.</p><code>24개 케이스 봉인 · 재현 검증: 불일치 없음</code></div></li><li><time>2026년 11월 15일</time><div><b>2,166개 챌린지, 그리고 빈칸</b><p>데이터베이스가 꾸미기를 그만뒀습니다. 업체가 공개하지 않은 숫자는 비워두고, 비었다고 말합니다.</p><code>2,166개 챌린지 · 71개 브랜드 · 규칙 기록 99% · A등급 증거 85%</code></div></li><li><time>2026년 11월 16일</time><div><b>필터 18개가 9개가 되었습니다</b><p>정확하지만 쓸 수 없는 페이지였습니다. 같은 뜻을 합치고, 나머지는 하나의 컨트롤 뒤로 접고, 원문 표기는 툴팁에 남겼습니다.</p><code>커밋 65cacc9 — 그룹 18 → 9</code></div></li><li><time>2026년 11월 16일</time><div><b>이 페이지, 두 개의 언어</b><p>영어가 원본입니다. 한국어는 기계 번역이 아니라 우리가 직접 읽고 확인할 수 있는 번역입니다.</p><code>EN · KO — 하나의 템플릿, 두 개의 사전</code></div></li></ol>
+  </section>
+
   <section id="letters">
-    <p class="label"><b>04</b> 서한</p>
+    <p class="label"><b>05</b> 서한</p>
     <h2>배운 것이 생기면 씁니다.</h2>
     <p>일정에 맞춰 나가는 뉴스레터가 아닙니다. 하나의 교훈이 끝났을 때 서한이 나갑니다 — 무엇을 시도했고, 무엇을 치렀고, 무엇을 남겼는지. <span class="hl">첫 서한이 무엇에 관한 것이 될지는 아직 모릅니다.</span> 주제를 약속하고 어기는 것보다 솔직한 편이 낫다고 생각합니다.</p>
     <div class="letterbox">
@@ -308,7 +326,7 @@
   </section>
 
   <section id="contact">
-    <p class="label"><b>05</b> 연락</p>
+    <p class="label"><b>06</b> 연락</p>
     <h2>중요한 일이면 메일 주세요.</h2>
     <p>답할 가치가 있는 것에는 모두 답합니다. 통화, 과장, 우리 이름을 걸어야 하는 제휴는 하지 않습니다.</p>
     <p><a href="mailto:hello@silentfam.com">hello@silentfam.com</a></p>
@@ -324,7 +342,7 @@
         <a href="#why">이유</a><br>
         <a href="#build">만드는 것</a><br>
         <a href="#how">일하는 방식</a><br>
-        <a href="#letters">서한</a>
+        <a href="#letters">여정</a>
       </div>
       <div class="fcol">
         <div class="h">만드는 것</div>
@@ -342,7 +360,7 @@
     <div class="fin">
       <span>© 2026 SilentFam</span>
       <span>조용히 짓고, 꼼꼼히 확인합니다.</span>
-      <span class="r">쿠키 없음. 분석 없음. 얼굴 없음.</span>
+      <span class="r">쿠키 없음. 추적 없음. 얼굴 없음.</span>
     </div>
   </div>
 </footer>
