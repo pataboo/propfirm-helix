@@ -706,7 +706,6 @@
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
   <div class="lang" role="group" aria-label="언어 / Language"><button data-lang="ko" class="on" lang="ko" aria-pressed="true" aria-label="한국어로 보기">KO</button><button data-lang="en" lang="en" aria-pressed="false" aria-label="View in English">EN</button></div>
-  <button class="iconbtn" id="theme" title="theme" aria-label="테마 전환 / Toggle theme" aria-pressed="false">☾</button>
 </div>
 </div>
 
@@ -2068,10 +2067,14 @@ function closeDrawer(){const wasOpen=el("drawer").classList.contains("on");
   if(wasOpen&&drawerReturn&&document.contains(drawerReturn)){try{drawerReturn.focus({preventScroll:true});}catch(e){}}
   drawerReturn=null;}
 
-function applyTheme(){document.documentElement.setAttribute("data-theme",theme);
-  const b=el("theme"); b.textContent=theme==="dark"?"☾":"☀";
-  b.setAttribute("aria-pressed",theme==="light"?"true":"false");
-  b.setAttribute("aria-label",theme==="dark"?"밝은 테마로 전환 / Switch to light theme":"어두운 테마로 전환 / Switch to dark theme");}
+function applyTheme(){
+  // helix는 항상 검정+보라. 라이트 모드는 존재하지 않는다 (OS 설정·저장값 모두 무시).
+  theme="dark";
+  document.documentElement.setAttribute("data-theme","dark");
+  document.documentElement.style.colorScheme="dark";
+  const b=el("theme"); if(b) b.remove();
+  try{ localStorage.removeItem("helix-theme"); }catch(e){}
+}
 let pageSuffix="";
 function setTitle(sfx){ pageSuffix=sfx||""; document.title=sfx?("helix — "+sfx):"helix"; }
 const Tset=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
