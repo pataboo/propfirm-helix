@@ -1539,7 +1539,14 @@ function buildFilters(){
     </div></div></details>`);
   parts.push(`<div class="fgroup" style="border:0;padding:2px 0"><button id="favChip" class="chip2 ${favOnly?"on":""}" style="width:100%;justify-content:center">★ ${lang==="ko"?"관심":"Saved"} ${favs.size}</button></div>`);
   parts.push(presetHtml);
-  visGroups.forEach(id=>{ if(H[id]) parts.push(H[id]); });
+  // 핵심 필터만 먼저 보이고, 나머지는 '고급 필터' 하나로 접는다 (그룹 18개 → 9개)
+  const CORE=["mk","size","price","dd","cycle","flags","ver"];
+  visGroups.filter(id=>CORE.includes(id)).forEach(id=>{ if(H[id]) parts.push(H[id]); });
+  const adv=visGroups.filter(id=>!CORE.includes(id)&&H[id]);
+  if(adv.length){
+    parts.push(`<details class="fgroup" data-g="adv"><summary>${lang==="ko"?"고급 필터":"More filters"} <span class="dim">${adv.length}</span></summary>
+      <div class="body">${adv.map(id=>H[id]).join("")}</div></details>`);
+  }
   host.innerHTML=parts.join("");
 
   host.querySelectorAll(".fgroup").forEach(d=>d.ontoggle=()=>{OPEN[d.dataset.g]=d.open;});
