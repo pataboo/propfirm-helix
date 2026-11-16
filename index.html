@@ -160,8 +160,8 @@
   .stale{color:var(--amber);font-weight:700}
   .tpwarn.sq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;
     border-radius:50%;font-size:12px;font-weight:900;line-height:1}
-  .rtags{display:inline-flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-  .rtag{display:inline-block;padding:1px 5px;border-radius:4px;font-size:10.5px;font-weight:800;border:1px solid var(--line2)}
+  .rtags{display:inline-flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
+  .rtag{display:inline-block;padding:1px 4px;border-radius:4px;font-size:10.5px;font-weight:800;border:1px solid var(--line2)}
   .rtag.pfm{color:var(--ink2)}
   .rtag.tp{color:#00b67a;border-color:rgba(0,182,122,.4)}
   .rtag.sj{color:#00a0d2;border-color:rgba(0,160,210,.4)}
@@ -186,7 +186,7 @@
   .rnote{margin-top:6px;font-size:11.5px;color:var(--muted);line-height:1.6}
   .srcnote2{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.6}
   .sitefoot{border-top:1px solid var(--line);background:var(--panel);margin-top:40px}
-  .sitefoot .in{max-width:1500px;margin:0 auto;padding:26px 22px;display:grid;grid-template-columns:1.6fr .7fr .7fr .7fr;gap:24px}
+  .sitefoot .in{max-width:1500px;margin:0 auto;padding:26px 22px;display:grid;grid-template-columns:1.6fr .7fr .7fr .7fr .7fr;gap:24px}
   .sitefoot .fabout b{font-size:15px;letter-spacing:-.02em}
   .sitefoot p{color:var(--muted);font-size:12px;line-height:1.7;margin:6px 0 0;max-width:52ch}
   .sitefoot .fcol h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
@@ -1881,14 +1881,17 @@ function ratingURLs(x){
 function ratingCell(r){
   const x=ratingsOf(r.f); const out=[]; const U=ratingURLs(x);
   const a=(href,cls,txt,tip)=>`<a class="rtag ${cls}" href="${esc(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(tip)}">${esc(txt)}</a>`;
-  if(x.pfm&&x.pfm.r!=null) out.push(a(U.pfm,"pfm",`P ${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
-  else if(r.rt) out.push(`<span class="rtag pfm">P ${esc(r.rt)}</span>`);
+  if(x.pfm&&x.pfm.r!=null) out.push(a(U.pfm,"pfm",`P${x.pfm.r}`,`PropFirmMatch ${x.pfm.r}${x.pfm.n?` · ${x.pfm.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+  else if(r.rt) out.push(`<span class="rtag pfm">P${esc(r.rt)}</span>`);
   if(x.tp){
-    if(x.tp.warn) out.push(`<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page"}">!</a>`);
-    else if(x.tp.r!=null) out.push(a(U.tp,"tp",`T ${x.tp.r}`,`Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+    if(x.tp.warn){
+      // 평점을 지우지 않는다. 있는 값을 보여주고 바로 뒤에 '!'를 붙여 '쓰되 조심하라'로 읽히게 한다.
+      out.push(`<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${lang==="ko"?"Trustpilot 등급 산정 거부(가이드라인 위반) — 눌러서 상세 확인":"Trustpilot withholds this firm's rating — open the detail"}">!</a>`);
+    }
+    else if(x.tp.r!=null) out.push(a(U.tp,"tp",`T${x.tp.r}`,`Trustpilot ${x.tp.r}${x.tp.n?` · ${x.tp.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
   }
-  if(x.sj&&x.sj.r!=null) out.push(a(U.sj,"sj",`SJ ${x.sj.r}`,`Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
-  if(x.feefo&&x.feefo.r!=null) out.push(a(U.feefo,"feefo",`F ${x.feefo.r}`,`Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본 평균)`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+  if(x.sj&&x.sj.r!=null) out.push(a(U.sj,"sj",`SJ${x.sj.r}`,`Sitejabber ${x.sj.r}${x.sj.n!=null?` · ${x.sj.n} reviews`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
+  if(x.feefo&&x.feefo.r!=null) out.push(a(U.feefo,"feefo",`F${x.feefo.r}`,`Feefo ${x.feefo.r}${x.feefo.n?` · ${x.feefo.n} reviews`:""}${x.feefo.method==="sampled"?` (${x.feefo.sampled}건 표본 평균)`:""} — ${lang==="ko"?"출처로 이동":"open source"}`));
   if(!out.length) return '<span class="dim">—</span>';
   return `<span class="rtags">${out.join("")}</span>`;
 }
@@ -3412,6 +3415,10 @@ function renderSiteFoot(){
     ${col(T("데이터","Data"),[["challenges",T("챌린지","Challenges")],["firms",T("프랍펌","Firms")],["brokers",T("브로커","Brokers")],["rules",T("규칙","Rules")],["offers",T("프로모션","Offers")]])}
     ${col(T("도구","Tools"),[["goal",T("목표로 찾기","Goal finder")],["plan",T("가족 플랜","Family plan")],["compare",T("비교","Compare")],["spreads",T("스프레드","Spreads")],["payouts",T("지급","Payouts")]])}
     ${col(T("정보","About"),[["method",T("방법론·필드","Method")],["docs",T("문서","Docs")],["sitemap",T("사이트맵","Site map")]])}
+    <div class="fcol"><h4>SilentFam</h4>
+      <a href="https://silentquants.com/" target="_blank" rel="noopener">SilentQuants ↗</a>
+      <a href="https://silentquants.com/tools/helix/" target="_blank" rel="noopener">${T("헬릭스 소개 페이지","Helix in SilentQuants")} ↗</a>
+    </div>
   </div>
   <div class="in fbot"><span>${T("개인 프로젝트입니다. 투자 권유가 아니며, 표시된 값은 각 업체 페이지의 기록입니다.","A personal project. Not investment advice; every figure is a record of what a firm publishes.")}</span></div>`;
 }
