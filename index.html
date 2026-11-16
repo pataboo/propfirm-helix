@@ -158,6 +158,8 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .tpwarn.sq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;
+    border-radius:50%;font-size:12px;font-weight:900;line-height:1}
   .tpwarn{display:inline-block;padding:1px 7px;border-radius:9999px;font-size:11px;font-weight:800;color:var(--red);
     border:1px solid rgba(255,45,85,.5);background:rgba(255,45,85,.10);text-decoration:none}
   .tpwarn:hover{background:rgba(255,45,85,.18)}
@@ -1568,7 +1570,9 @@ function vsRowHtml(r,idx){
       <td>${payCell(r.pc)}</td>
       <td>${payCell(r.pf)}</td>
       <td class="num">${r.sp?`<span class="mono">${esc(r.sp)}%</span>`:'<span class="dim">—</span>'}</td>
-      <td class="num">${r.rt?esc(r.rt):'<span class="dim">—</span>'}</td>
+      <td class="num">${(DB.tpwarn||{})[r.f]
+        ? `<a class="tpwarn sq" href="#firm/${encodeURIComponent(r.f)}" onclick="event.stopPropagation()" title="${esc(lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page for the rating")}">!</a>`
+        : (r.rt?esc(r.rt):'<span class="dim">—</span>')}</td>
       <td>${r.m5===true?'<span class="yes">✓</span>':r.m5===false?'<span class="no">✕</span>':'<span class="dim">—</span>'}</td>
       <td class="rulesCell">${rulesCell(r)}</td>
       <td class="num">${money(r.pr,r.cu)}</td>
@@ -1942,7 +1946,7 @@ function openDrawer(id){
       ${drawerRow(t("cCycle"),r.pc?esc(tx(r.pc)):'<span class="dim">—</span>')}
       ${drawerRow(t("cFirst"),r.pf?esc(r.pf):'<span class="dim">—</span>')}
       ${r.pn?drawerRow(t("cMin"),esc(r.pn)):""}
-      ${drawerRow(t("cRating"),r.rt?`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`:'<span class="dim">—</span>')}
+      ${drawerRow(t("cRating"),(r.rt?`${esc(r.rt)} ★ <span class="dim">(${esc(r.rn||"—")})</span>`:'<span class="dim">—</span>')+((DB.tpwarn||{})[r.f]?` <a class="tpwarn" href="https://www.trustpilot.com/review/${esc(((DB.tpwarn||{})[r.f]||{}).d||"")}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(lang==="ko"?"Trustpilot이 이 회사 평점을 산정하지 않습니다 — 가이드라인 위반":"Trustpilot withholds this firm's rating")}">Trustpilot ⚠</a>`:""))}
       ${r.yk!=null?drawerRow(t("cCap"),r.yk===0?esc("무제한"):money(r.yk,r.cu)+(r.ykn?` <span class="dim">${esc(r.ykn)}</span>`:"")):""}
       ${r.ym!=null?drawerRow(t("cMinPay"),money(r.ym,r.cu)):""}</div>
     <div class="sect">${esc(t("sectMore"))}</div>
@@ -3235,7 +3239,9 @@ function renderPayouts(){
         <td class="num">${o.avg!=null?money(o.avg,"USD"):"—"}</td>
         <td class="num">${o.last!=null?money(o.last,"USD"):"—"}</td>
         <td>${o.speed?esc(o.speed):'<span class="dim">—</span>'}</td>
-        <td class="num">${(DB.tpwarn||{})[o.brand]?'<span class="tpwarn" title="'+esc(lang==="ko"?"Trustpilot 경고: 가이드라인 위반으로 등급 산정 불가":"Trustpilot warning: rating withheld")+'">⚠</span>':(o.rating!=null?esc(o.rating)+(o.reviews?` <span class="dim">(${o.reviews})</span>`:""):'<span class="dim">—</span>')}</td>
+        <td class="num">${(DB.tpwarn||{})[o.brand]
+          ? `<a class="tpwarn sq" href="#firm/${encodeURIComponent(o.brand)}" title="${esc(lang==="ko"?"Trustpilot 경고 — 눌러서 상세에서 평점 확인":"Trustpilot warning — open the detail page for the rating")}">!</a>`
+          : (o.rating!=null?esc(o.rating)+(o.reviews?` <span class="dim">(${o.reviews})</span>`:""):'<span class="dim">—</span>')}</td>
       </tr>`).join("")}</tbody></table></div>
       <div class="srcline">${lang==="ko"?"출처: propfirmmatch.com/payouts (2026-11-15 수집). 업체가 PFM에 신고한 지급 실적입니다.":"Source: propfirmmatch.com/payouts, collected 2026-11-15; payout figures as reported to PFM by each firm."}</div></div>`:"";
   el("payoutsMain").innerHTML=`
@@ -3671,7 +3677,8 @@ function renderFirm(name){
       <div>
         <h1>${esc(name)}</h1>
         <div class="fmeta">
-          ${(DB.tpwarn||{})[name]?tpWarnBadge(name):(meta.rating?`<span class="rating">★ ${esc(meta.rating)} <small>${esc(meta.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span>`:"")}
+          ${meta.rating?`<span class="rating">★ ${esc(meta.rating)} <small>${esc(meta.reviews||"")} ${lang==="ko"?"리뷰":"reviews"}</small></span>`:""}
+          ${(DB.tpwarn||{})[name]?tpWarnBadge(name):""}
           ${(()=>{
             const cnt={A:0,B:0,C:0}; rs.forEach(r=>{if(cnt[r.vf]!=null) cnt[r.vf]++;});
             const gs=["A","B","C"].filter(g=>cnt[g]);
