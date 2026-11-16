@@ -755,7 +755,7 @@
       <th scope="col" data-sort="pr" class="num" id="thPrice"></th><th scope="col" data-sort="ac" class="num" id="thAct"></th>
       <th scope="col" data-sort="to" class="num" id="thTotal"></th><th scope="col" data-sort="mk" id="thMkt"></th>
       <th scope="col" data-sort="ml" class="num" id="thMax"></th><th scope="col" data-sort="vf" id="thVer"></th>
-      <th scope="col" id="thEv"></th><th scope="col" data-sort="ao" id="thUpd"></th>
+      <th scope="col" id="thEv"></th><th scope="col" data-sort="ao" id="thUpd"></th><th scope="col" id="thLev"></th>
     </tr></thead><tbody id="tb"></tbody></table></div>
     <div class="empty" id="empty" style="display:none"></div></div>
     <footer id="foot"></footer>
@@ -840,7 +840,7 @@ const I18N = {
   search:"회사 · 상품 검색…", filters:"필터", firm:"회사", mkt:"자산군", step:"단계", ddF:"낙폭 방식",
   ver:"검증 등급", flags:"규칙", size:"계좌 규모", price:"최대 참가비", reset:"필터 초기화",
   empty:"조건에 맞는 상품이 없습니다.",
-  thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수",
+  thFirm:"회사", thPlan:"상품", thCycle:"지급주기", thFirstPay:"첫지급", thRating:"평점", thMt5:"MT5", thRules:"규칙", thTotal:"총액", thDaily:"일일손실", thEv:"근거", thUpd:"갱신일", thMax:"최대손실", thMkt:"자산", thSize:"규모", thPrice:"참가비", thAct:"활성화비", thSplit:"분배", thDays:"최소일수", thLev:"레버리지",
   thDaily:"일일손실", thMax:"최대손실", thTarget:"목표", thDd:"낙폭", thEa:"EA", thVer:"검증",
   fEa:"EA", fNews:"뉴스", fKorea:"한국", fOn:"오버나이트", fCp:"카피", fWk:"주말", fTot:"총액 기록", fAllrules:"규칙 4종 기록", fFresh:"최근 확인(14일)", fStale:"갱신 필요(14일+)", fUnlisted:"공식 목록에 없음", fTpWarn:"Trustpilot 경고",
   any:"전체", yes:"가능", no:"불가", grade:"등급", visit:"공식 사이트",
@@ -893,7 +893,7 @@ pNoCode:"코드 미표기", pCopy:"복사", pCopied:"복사됨",
   search:"Search firm, product…", filters:"Filters", firm:"Firm", mkt:"Asset", step:"Step", ddF:"Drawdown",
   ver:"Grade", flags:"Rules", size:"Account size", price:"Max entry fee", reset:"Reset filters",
   empty:"No products match these filters.",
-  thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days",
+  thFirm:"Firm", thPlan:"Product", thCycle:"Payout", thFirstPay:"First payout", thRating:"Rating", thMt5:"MT5", thRules:"Rules", thTotal:"Total", thDaily:"Daily loss", thEv:"Evidence", thUpd:"Updated", thMax:"Max loss", thMkt:"Asset", thSize:"Size", thPrice:"Fee", thAct:"Activation", thSplit:"Split", thDays:"Min days", thLev:"Leverage",
   thDaily:"Daily loss", thMax:"Max loss", thTarget:"Target", thDd:"Drawdown", thEa:"EA", thVer:"Grade",
   fEa:"EA", fNews:"News", fKorea:"Korea", fOn:"Overnight", fCp:"Copy", fWk:"Weekend", fTot:"Total known", fAllrules:"4 rules recorded", fFresh:"Checked in 14 days", fStale:"Needs refresh (14d+)", fUnlisted:"Not on official list", fTpWarn:"Trustpilot warning",
   any:"Any", yes:"Allowed", no:"Not allowed", grade:"Grade", visit:"Official site",
@@ -945,7 +945,7 @@ let urlReady=false,
     favOnly=false, favs=new Set(JSON.parse(localStorage.getItem("helix-favs")||"[]")),
     unitMode=localStorage.getItem("helix-unit")||"auto",
     q="", sortKey="to", sortDir=1, activeId=null, view="table", compareBest=false, compareDiffOnly=false, compareSearch="", offersFilter="all",
-     colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols-v2")||"null"); const n=20; if(!v) return [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0]; const o=v.slice(0,n); while(o.length<n) o.push(0); return o;})(),
+     colVis=(()=>{const v=JSON.parse(localStorage.getItem("helix-cols-v2")||"null"); const n=21; if(!v) return [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1]; const o=v.slice(0,n); while(o.length<n) o.push(0); return o;})(),
      dense=localStorage.getItem("helix-dense")==="1";
 const ALL_GROUPS=["st","dd","cycle","paym","plat","split","rating","price","days","mk","size","firm","target","lev","flags","ver","fee"];
 let visGroups=JSON.parse(localStorage.getItem("helix-groups")||"null")||ALL_GROUPS.slice();
@@ -1627,7 +1627,16 @@ function vsRowHtml(r,idx){
       <td class="num">${lossCell(r.ml, r.mlT, r)}</td>
       <td><span class="pill p-${esc(g)}">${esc(g)}</span></td>
       <td class="evc">${evCell(r)}</td>
-      <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td></tr>`;
+      <td class="num">${esc(dateLabel(r))}${freshBadge(r)}</td>
+      <td class="num">${leverCell(r)}</td></tr>`;
+}
+function leverCell(r){
+  const v=r.lv||r.lvp;
+  if(!v) return '<span class="dim">—</span>';
+  const tip = r.lg==="C"
+    ? (lang==="ko"?"3자 출처(PFM)에서 옮긴 값 — 업체 공식 페이지 확인 전":"Third-party value (PFM) — not yet verified on the firm's own page")
+    : (lang==="ko"?"업체 공식 페이지에서 확인":"Read from the firm's own page");
+  return `<span title="${esc(tip)}">${esc(v)}${r.lg==="C"?'<sup class="gC">C</sup>':""}</span>`;
 }
 function vsMetrics(){
   const sc=vsScrollEl(); if(!sc) return null;
@@ -2956,7 +2965,7 @@ function renderDiscover(){
 }
 
 /* ---------- table preferences ---------- */
-const COLKEYS=["thFirm","thPlan","thSize","thTarget","thDaily","thDays","thCycle","thFirstPay","thSplit","thRating","thMt5","thRules","thPrice","thAct","thTotal","thMkt","thMax","thVer","thEv","thUpd"];
+const COLKEYS=["thFirm","thPlan","thSize","thTarget","thDaily","thDays","thCycle","thFirstPay","thSplit","thRating","thMt5","thRules","thPrice","thAct","thTotal","thMkt","thMax","thVer","thEv","thUpd","thLev"];
 function applyTablePrefs(){
   let st=document.getElementById("colStyle");
   if(!st){ st=document.createElement("style"); st.id="colStyle"; document.head.appendChild(st); }
@@ -2983,7 +2992,7 @@ function buildTableSettings(){
     unitMode=rb.value; localStorage.setItem("helix-unit",unitMode); render();});
   const d=el("denseChk"); if(d) d.onchange=()=>{dense=d.checked;applyTablePrefs();};
   const r=el("tsReset"); if(r) r.onclick=e=>{e.preventDefault();
-    colVis=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0]; dense=false; applyTablePrefs(); buildTableSettings();};
+    colVis=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1]; dense=false; applyTablePrefs(); buildTableSettings();};
 }
 
 /* ---------- Docs ---------- */
