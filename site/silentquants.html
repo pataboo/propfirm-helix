@@ -245,6 +245,8 @@
 
   .calc{margin-top:26px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
   .calc label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
+  .slabel{display:flex; justify-content:space-between; align-items:baseline}
+  .slabel .rng{font-size:11.5px; color:var(--dim); letter-spacing:.04em}
   .row{display:flex; align-items:center; gap:16px; margin-bottom:18px}
   .row input[type=range]{flex:1; accent-color:var(--accent); height:22px}
   .row .val{font-variant-numeric:tabular-nums; font-weight:700; color:var(--fg); min-width:5.5rem; text-align:right}
@@ -252,7 +254,8 @@
   .res .k{display:block; font-size:11.5px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase}
   .res .v{display:block; margin-top:5px; font-size:clamp(1.4rem,2.6vw,1.8rem); font-weight:750; color:var(--accent); letter-spacing:-.02em}
   .res .v.plain{color:var(--fg)}
-  .src{margin-top:16px; font-size:12.3px; color:var(--dim); line-height:1.6}
+  .src{margin-top:14px; font-size:12.6px; color:var(--muted); line-height:1.62; max-width:62ch}
+  .src.small{color:var(--dim); font-size:12.2px}
 
   .faq list-style:none;
   details.q{border-top:1px solid var(--line); padding:16px 0}
@@ -328,12 +331,12 @@
     <p>At a 14% pass rate, the average trader buys about seven challenges before one passes. The fee is the smallest part of what you are risking.</p>
 
     <div class="calc">
-      <label for="fee">Challenge fee</label>
+      <div class="slabel"><label for="fee">Challenge fee</label><span class="rng">$25 – $1,000</span></div>
       <div class="row">
         <input type="range" id="fee" min="25" max="1000" step="1" value="99">
         <span class="val" id="feeVal">$99</span>
       </div>
-      <label for="rate">Pass rate</label>
+      <div class="slabel"><label for="rate">Pass rate</label><span class="rng">5% – 40%</span></div>
       <div class="row">
         <input type="range" id="rate" min="5" max="40" step="1" value="14">
         <span class="val" id="rateVal">14%</span>
@@ -342,8 +345,8 @@
         <div class="res"><span class="k">Expected attempts</span><span class="v plain" id="outAttempts">7.1</span></div>
         <div class="res"><span class="k">Expected spend before one pass</span><span class="v" id="outSpend">$703</span></div>
       </div>
-      <p class="src">Expected value assumes independent attempts and a pass rate you can keep. Neither is guaranteed.</p>
-      <p class="src">Pass rate source: published aggregate of ~300,000 accounts at ten firms (thepropfirmguide.com, 2026). Firm-level rates differ widely.</p>
+      <p class="src">Attempts are shown to one decimal; spend is the fee divided by the pass rate. The estimate assumes independent attempts and a pass rate you can keep — neither is guaranteed. It also excludes monthly platform fees and the two to four weeks each failed attempt costs you.</p>
+      <p class="src small">Pass rate source: published aggregate of ~300,000 accounts at ten firms (thepropfirmguide.com, 2026). Firm-level rates differ widely.</p>
     </div>
   </section>
 
