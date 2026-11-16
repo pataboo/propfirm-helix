@@ -388,6 +388,25 @@
     .pillbar .tools{margin-left:auto}
     .pillbar .cta{display:none}
   }
+  /* odds + objections */
+  .odds{margin-top:24px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .dots{display:grid; grid-template-columns:repeat(20,1fr); gap:5px; max-width:32rem}
+  .dots i{aspect-ratio:1/1; border-radius:2px; background:rgba(255,255,255,.07); display:block}
+  html[data-theme="light"] .dots i{background:rgba(20,10,40,.08)}
+  .dots i.passed{background:rgba(var(--accent-rgb),.38)}
+  .dots i.paid{background:var(--accent)}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:18px; font-size:13px; color:var(--muted)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .legend b{color:var(--fg); font-weight:700}
+  .legend .sw{width:11px; height:11px; border-radius:2px; display:inline-block; background:rgba(255,255,255,.07)}
+  html[data-theme="light"] .legend .sw{background:rgba(20,10,40,.08)}
+  .legend .sw.paid{background:var(--accent)}
+  .legend .sw.passed{background:rgba(var(--accent-rgb),.38)}
+  .objections{display:grid; gap:0; margin-top:22px}
+  .obj{padding:18px 0; border-top:1px solid var(--line)}
+  .obj:first-child{border-top:0}
+  .obj b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:6px}
+  .obj p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.65; max-width:62ch}
   /* compact footer */
   footer{border-top:1px solid var(--line); padding:26px 0 34px; margin-top:10px}
   .frow{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
@@ -399,6 +418,7 @@
     display:flex; flex-wrap:wrap; gap:14px}
   .fin .r{margin-left:auto}
   @media (max-width:700px){
+    .dots{grid-template-columns:repeat(10,1fr)}
     .flinks{margin-left:0; gap:12px; font-size:12.5px}
     .fin .r{margin-left:0}
     .twocol,.results{grid-template-columns:1fr}
