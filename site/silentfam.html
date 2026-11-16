@@ -114,6 +114,13 @@
   .card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .card.plain{cursor:default; background:transparent; border-style:dashed; border-color:#202a2e}
   .card.plain:hover{border-color:#202a2e; background:transparent}
+  .hl{color:var(--accent); font-weight:600}
+  .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
+  .buildlist li{display:flex; gap:10px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.5}
+  .st{flex:none; font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; padding:2px 7px; border-radius:999px; border:1px solid var(--line2); color:#8f9499}
+  .st.live{border-color:rgba(167,139,250,.45); color:var(--accent-soft); background:rgba(167,139,250,.1)}
+  .st.wip{border-color:#3a3f45; color:#c9cdd1}
+  .st.plan{border-style:dashed; color:#7d848a}
   .stacknote{margin:0 0 18px; font-size:13.5px; color:var(--dim); letter-spacing:.01em}
   .card .child{
     margin:16px 0 6px 20px; padding:15px 16px 15px 18px; border:1px solid rgba(167,139,250,.28);
@@ -231,19 +238,20 @@
 
       <div class="card plain">
         <h3>Flow <span class="pill">personal</span></h3>
-        <p>A personal operating system. You set the purpose, vision and goals once, and everything else flows outward from them — days, projects, decisions, review. Change starts inside; the system only makes the outward part visible.</p>
+        <p>A personal operating system. You name your <span class="hl">purpose</span>, <span class="hl">vision</span> and <span class="hl">goals</span> once, and everything else <span class="hl">flows outward</span> from them — days, projects, decisions, review. Change starts inside; the system only makes the outward part visible.</p>
         <span class="meta">Working name · running internally</span>
       </div>
 
       <div class="card plain">
-        <h3>Operations <span class="pill">shared</span></h3>
-        <p>Flow, extended to a group — the same purpose, vision and goals held in common instead of alone. One board where everything is visible and trackable: a vision canvas at the centre and a bird's-eye view around it. This is what we use to operate SilentFam.</p>
-        <span class="meta">Vision canvas · bird's-eye board</span>
+        <h3>Tribe <span class="pill">shared</span></h3>
+        <p>Flow, held in common. A group — a family, or a few people who chose each other — sits down and decides its <span class="hl">purpose, vision and goals together</span>, instead of assuming everyone already agrees. Those decisions then become real: broken into tasks, run as <span class="hl">small experiments</span>, measured honestly, kept when they work and dropped when they don't. A <span class="hl">vision canvas</span> in the middle, a <span class="hl">bird's-eye board</span> around it. This is how we run SilentFam.</p>
+        <span class="meta">Vision canvas · bird's-eye board · experiment loop</span>
       </div>
 
       <div class="card plain">
         <h3>SilentQuants <span class="pill">trading</span></h3>
-        <p>The bundle of everything we do as quantitative traders on prop firm capital and selected brokers — research, validation, rules, cost, and the discipline to operate it.</p>
+        <p>Where we are <span class="hl">going</span> as quantitative traders on prop firm capital and selected brokers: research, validation, rules, cost, and the discipline to operate it. <span class="hl">We are not funded yet.</span> This is the bundle we are building in that order — and Helix is the first piece that stands on its own.</p>
+
         <div class="child">
           <span class="lab">Inside SilentQuants</span>
           <b>Helix — challenge &amp; broker database</b>
@@ -253,8 +261,17 @@
             <a href="https://silentquants.com/">silentquants.com ↗</a>
           </span>
         </div>
+
+        <ul class="buildlist">
+          <li><span class="st live">live</span> Challenge &amp; broker database</li>
+          <li><span class="st live">live</span> Rule sets turned into checklists per firm</li>
+          <li><span class="st wip">in progress</span> Strategy lab — backtests, walk-forward, what survives</li>
+          <li><span class="st wip">in progress</span> Broker &amp; cost map — what a trade actually costs</li>
+          <li><span class="st plan">planned</span> Evaluation tracker — attempts, fees, payouts</li>
+          <li><span class="st plan">planned</span> Decision journal — why we took it, what we learned</li>
+        </ul>
       </div>
-    </div>
+
   </section>
 
   <section id="how">
@@ -319,7 +336,7 @@
       <div class="fcol">
         <div class="h">What we build</div>
         <a href="#build">Flow</a><br>
-        <a href="#build">Operations</a><br>
+        <a href="#build">Tribe</a><br>
         <a href="https://silentquants.com/">SilentQuants ↗</a><br>
         <a href="https://silentquants.com/tools/helix">└ Helix ↗</a>
       </div>
