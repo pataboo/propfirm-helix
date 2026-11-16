@@ -116,8 +116,8 @@
   .card.plain:hover{border-color:#202a2e; background:transparent}
   .hl{color:var(--accent); font-weight:600}
   .buildlist{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
-  .buildlist li{display:flex; gap:11px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.5}
-  .st{flex:none; min-width:88px; text-align:center; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  .buildlist li{display:grid; grid-template-columns:96px 1fr; gap:12px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.5}
+  .st{display:block; text-align:center; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
       padding:3px 8px; border-radius:999px; border:1px solid var(--line2); color:#a9aeb3}
   .st.live{border-color:rgba(167,139,250,.5); color:var(--accent-soft); background:rgba(167,139,250,.14)}
   .st.wip{border-color:#454b51; color:#d2d4d6}
