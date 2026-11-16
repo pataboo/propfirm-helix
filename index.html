@@ -677,24 +677,35 @@
   <div class="grow"></div>
   <div class="hsearch" role="search"><span class="dim" aria-hidden="true">⌕</span><input id="gq" autocomplete="off" type="search" aria-label="브랜드·상품 검색 / Search brands and products"></div>
   <div class="navpill" id="subnav" role="navigation" aria-label="주 메뉴 / Main menu">
-    <a href="#challenges" data-page="challenges" data-also="firms" data-ko="프랍펌 전체" data-en="All firms">프랍펌 전체</a>
-    <a href="#rules" data-page="rules" data-ko="프랍펌 규칙" data-en="Firm rules">프랍펌 규칙</a>
+    <span class="navitem">
+      <a href="#challenges" data-page="challenges">챌린지 <span class="cv">▾</span></a>
+      <div class="dropdown" id="chMenu">
+        <a href="#challenges" data-all="1"><b>전체 챌린지</b><span id="cmAll">—</span></a>
+        <a href="#firms"><b>프랍펌</b><span id="cmFirms">—</span></a>
+        <a href="#discover"><b>둘러보기</b><span>→</span></a>
+        <a href="#compare" data-cmp="1"><b>비교</b><span>⇄</span></a>
+      </div>
+    </span>
+    <span class="navitem">
+      <a href="#firms" data-page="firms" data-also="brokers" data-ko="프랍펌" data-en="Firms">프랍펌 ▾</a>
+      <div class="dropdown" id="firmsMenu">
+        <a href="#firms"><b>프랍펌 전체</b><span id="fmFirms">—</span></a>
+        <a href="#rules"><b>프랍펌 규칙</b><span>§</span></a>
+        <a href="#spreads"><b>스프레드</b><span>→</span></a>
+      </div>
+    </span>
     <a href="#brokers" data-page="brokers" data-ko="브로커" data-en="Brokers">브로커</a>
     <a href="#offers" data-page="offers" data-ko="프로모션" data-en="Offers">프로모션</a>
     <span class="navitem">
-      <a href="#tools" data-page="tools" data-also="plan,spreads,payouts,compare,discover" data-ko="도구" data-en="Tools">도구 ▾</a>
+      <a href="#tools" data-page="tools" data-also="plan,payouts,compare,discover" data-ko="도구" data-en="Tools">도구 ▾</a>
       <div class="dropdown" id="toolsMenu">
-        <a href="#discover"><b>둘러보기</b><span>→</span></a>
-        <a href="#compare"><b>비교</b><span>⇄</span></a>
         <a href="#plan"><b>가족 플랜</b><span>→</span></a>
-        <a href="#spreads"><b>스프레드</b><span>→</span></a>
         <a href="#payouts"><b>지급</b><span>→</span></a>
+        <a href="#compare"><b>비교</b><span>⇄</span></a>
+        <a href="#discover"><b>둘러보기</b><span>→</span></a>
         <a href="#tools"><b>도구 전체</b><span>→</span></a>
       </div>
     </span>
-  </div>
-    </span>
-
   </div>
   <div class="meta"><span><b id="mRows">—</b> <span id="lRows"></span></span>
     <span><b id="mFirms">—</b> <span id="lFirms"></span></span></div>
@@ -2141,8 +2152,8 @@ function applyStatics(){
    const cg=el("cmpGo"); if(cg) cg.textContent=lang==="ko"?"비교":"Compare";
    const tb=el("tsBtn"); if(tb) tb.title=lang==="ko"?"표 설정":"Table settings";}
   {const _h=el("h1"),_s=el("sub"); if(_h)_h.textContent=t("h1"); if(_s)_s.textContent=t("sub");}
-  {const NM={home:"navHome",offers:"navOffers",challenges:"navAll",compare:"navCmp",
-             tools:"navTools",rules:"navFirmRules",spreads:"navSpreads",payouts:"navPayouts",
+  {const NM={home:"navHome",offers:"navOffers",challenges:"navCh",compare:"navCmp",
+             tools:"navTools",rules:"navRules",spreads:"navSpreads",payouts:"navPayouts",
              firms:"navFirms",docs:"navDocs"};
    document.querySelectorAll("#subnav a").forEach(a=>{
      const k=NM[a.dataset.page];
