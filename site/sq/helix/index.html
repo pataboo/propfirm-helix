@@ -290,7 +290,9 @@
     backdrop-filter:blur(18px) saturate(150%);
   }
   html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
-  .pillbar .mark{font-size:15.5px; padding:4px 6px 4px 2px; letter-spacing:-0.028em}
+  .pillbar .mark{font-size:15.5px; padding:4px 6px 4px 2px; letter-spacing:-0.03em; gap:6px}
+  .pillbar .mark .wm{display:inline-block; white-space:nowrap}
+  .pillbar .mark .w1,.pillbar .mark .w2{display:inline; letter-spacing:inherit}
   .pillbar .mark .w1,.pillbar .mark .w2{transition:color .16s ease}
   .pillbar .mark .w2{color:var(--accent)}
   .pillbar .mark:hover .w1{color:var(--accent)}
@@ -331,7 +333,7 @@
 
 <header class="site">
   <div class="pillbar">
-    <a class="mark" href="/propfirm-helix/site/sq/" aria-label="SilentQuants home"><span class="dot"></span><span class="w1">Silent</span><span class="w2">Quants</span></a>
+    <a class="mark" href="/propfirm-helix/site/sq/" aria-label="SilentQuants home"><span class="dot"></span><span class="wm"><span class="w1">Silent</span><span class="w2">Quants</span></span></a>
     <nav class="top"><a href="/propfirm-helix/site/sq/">Start</a><a href="/propfirm-helix/site/sq/helix/">Helix</a><a href="/propfirm-helix/site/sq/resources/">Resources</a><a href="/propfirm-helix/site/sq/log/">Log</a><a href="/propfirm-helix/site/sq/method/">Method</a></nav>
     <div class="tools">
       <a class="lang" href="/propfirm-helix/site/sq/ko/">한국어</a>
