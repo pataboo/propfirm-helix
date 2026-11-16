@@ -223,6 +223,9 @@
     .st{display:inline-block; justify-self:start}
   }
 
+  h1{max-width:22ch; text-wrap:balance}
+  html[lang="ko"] h1{max-width:20ch}
+  .herobtns{display:flex; gap:12px; flex-wrap:wrap; margin-top:26px}
   .answer{margin-top:30px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
   .answer .q{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 10px}
   .answer .a{font-size:clamp(1.05rem,1.7vw,1.2rem); color:var(--fg); line-height:1.55; margin:0 0 16px; max-width:44ch}
@@ -298,6 +301,10 @@
     <p class="kicker">SilentQuants · since 2025</p>
     <h1>We are not funded traders yet.<br><em>This is the record of getting there.</em></h1>
     <p class="lede">A method, a database and an honest ledger. No signals, no account screenshots, no promises — every number here has a source and a date.</p>
+    <div class="herobtns">
+      <a class="btn primary" href="https://silentquants.com/helix">Open Helix ↗</a>
+      <a class="btn ghost" href="#math">The math</a>
+    </div>
 
     <div class="answer">
       <p class="q">Short answer</p>
@@ -323,7 +330,7 @@
     <div class="calc">
       <label for="fee">Challenge fee</label>
       <div class="row">
-        <input type="range" id="fee" min="25" max="1000" step="5" value="99">
+        <input type="range" id="fee" min="25" max="1000" step="1" value="99">
         <span class="val" id="feeVal">$99</span>
       </div>
       <label for="rate">Pass rate</label>
