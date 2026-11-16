@@ -158,6 +158,7 @@
   .srow{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
   .srow b{color:var(--accent);font-size:13px}
   .stale{color:var(--amber);font-weight:700}
+  .gC{color:var(--amber); font-size:9.5px; font-weight:700; margin-left:1px; cursor:help}
   .tpwarn.sq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;
     border-radius:50%;font-size:12px;font-weight:900;line-height:1}
   .rtags{display:inline-flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
@@ -818,8 +819,8 @@
 </div></div>
 
 
-<script>window.HELIX_VER="8339326e";</script>
-<script src="data.js?v=8339326e"></script>
+<script>window.HELIX_VER="7f8ecc4b";</script>
+<script src="data.js?v=7f8ecc4b"></script>
 <script>
 const DB = window.HELIX_DB;
 const rows = DB.rows;
@@ -3452,7 +3453,13 @@ const CMP_ROWS=[
  ["fTarget", r=>(r.tg===null||r.tg===undefined||r.tg===""||Number(r.tg)===0)?0:Number(r.tg), "min"],
  ["fDays", r=>(r.mf??r.md)!=null?Number(r.mf??r.md):0, "min"],
  ["fDd", r=>r.dc?`<span title="${esc(r.dd||"")}">${esc(ddcLabel(r.dc))}</span>`:esc(tx(r.dd)||"—"), null],
- ["fLev", r=>esc(r.lv||r.lvp||"—"), null],
+ ["fLev", r=>{
+      const v=r.lv||r.lvp;
+      if(!v) return '—';
+      return r.lg==="C"
+        ? `<span title="${lang==="ko"?"3자 출처(PFM)에서 옮긴 값 — 업체 공식 페이지 확인 전":"Third-party value (PFM) — not yet verified on the firm's own page"}">${esc(v)}<sup class="gC">C</sup></span>`
+        : esc(v);
+    }, null],
  ["fCycle", r=>esc(tx(r.pc)||"—"), null],
  ["fFirst", r=>r.pf?esc(tx(r.pf)):"—", null],
  ["fMinPay", r=>r.ym!=null?"$"+Number(r.ym).toLocaleString('en-US'):"—", "min"],
