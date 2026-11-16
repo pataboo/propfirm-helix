@@ -2157,7 +2157,7 @@ function applyStatics(){
   if(target){ if(!target.hasAttribute("tabindex")) target.setAttribute("tabindex","0");
     target.focus(); target.scrollIntoView({block:"center"}); }
 };}
-el("theme").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setItem("helix-theme",theme);applyTheme();};
+/* 테마 토글 없음 — helix는 항상 다크 */
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{
   lang=b.dataset.lang;localStorage.setItem("helix-lang",lang);
   applyStatics();render();if(activeId)openDrawer(activeId);route();});
