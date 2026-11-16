@@ -345,7 +345,19 @@
     .pillbar .tools{margin-left:auto}
     .pillbar .cta{display:none}
   }
+  /* compact footer */
+  footer{border-top:1px solid var(--line); padding:26px 0 34px; margin-top:10px}
+  .frow{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .fw{font-weight:750; font-size:14px; color:var(--fg); letter-spacing:-0.02em}
+  .flinks{display:flex; gap:18px; flex-wrap:wrap; margin-left:auto; font-size:13px}
+  .flinks a{color:var(--muted); border:0}
+  .flinks a:hover{color:var(--accent)}
+  .fin{margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; color:var(--dim);
+    display:flex; flex-wrap:wrap; gap:14px}
+  .fin .r{margin-left:auto}
   @media (max-width:700px){
+    .flinks{margin-left:0; gap:12px; font-size:12.5px}
+    .fin .r{margin-left:0}
     .twocol,.results{grid-template-columns:1fr}
     .entry{grid-template-columns:1fr; gap:6px}
     .buildlist li{grid-template-columns:1fr; gap:5px}
@@ -396,14 +408,17 @@
 
 <footer>
   <div class="wrap">
-    <div class="fgrid">
-      <div class="fcol"><div class="h">SilentQuants</div>
-        <a href="/propfirm-helix/site/sq/#why">Why</a><br><a href="/propfirm-helix/site/sq/#what">What</a><br><a href="/propfirm-helix/site/sq/#how">How</a><br>
-        <a href="/propfirm-helix/site/sq/helix/">Helix</a><br><a href="/propfirm-helix/site/sq/log/">Log</a><br><a href="/propfirm-helix/site/sq/resources/">Library</a>
-      </div>
-      <div class="fcol"><div class="h">SilentFam</div>
-        <a href="https://silentfam.com/">Why we stay anonymous</a><br><a href="https://silentfam.com/#journey">Journey</a>
-      </div>
+    <div class="frow">
+      <span class="fw">SilentQuants</span>
+      <nav class="flinks">
+        <a href="/propfirm-helix/site/sq/#why">Why</a>
+        <a href="/propfirm-helix/site/sq/#what">What</a>
+        <a href="/propfirm-helix/site/sq/#how">How</a>
+        <a href="/propfirm-helix/site/sq/helix/">Helix</a>
+        <a href="/propfirm-helix/site/sq/log/">Log</a>
+        <a href="/propfirm-helix/site/sq/resources/">Library</a>
+        <a href="https://silentfam.com/">SilentFam ↗</a>
+      </nav>
     </div>
     <div class="fin">
       <span>© 2026 SilentQuants</span>
