@@ -3,17 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Helix — prop firm &amp; broker database | SilentQuants</title>
-<meta name="description" content="2,166 challenges across 71 prop firms, with a grade and a source on every row.">
+<title>Privacy — what we collect | SilentQuants</title>
+<meta name="description" content="No cookies, no analytics, no third-party scripts. What happens to a request, in detail.">
 <meta name="theme-color" content="#03080a">
-<link rel="canonical" href="https://silentquants.com/helix/">
+<link rel="canonical" href="https://silentquants.com/privacy/">
+<link rel="alternate" hreflang="ko" href="/propfirm-helix/site/sq/ko/privacy/">
+<link rel="alternate" hreflang="en" href="https://silentquants.com/privacy/">
 <script>
   // dark is the default; only an explicit choice changes it
   (function(){try{var t=localStorage.getItem("sf-theme");if(t==="light"){document.documentElement.setAttribute("data-theme","light");}}catch(e){}})();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/plus-jakarta-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:"Plus Jakarta Sans";font-style:italic;font-weight:300 700;font-display:swap;src:url("/fonts/plus-jakarta-italic-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:"Plus Jakarta Sans";font-style:italic;font-weight:300 700;font-display:swap;src:url("/fonts/plus-jakarta-italic-latin.woff2") format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:300 800;font-display:swap;src:url("/fonts/plus-jakarta-normal-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:300 800;font-display:swap;src:url("/fonts/plus-jakarta-normal-latin.woff2") format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}</style>
 <style>
   :root{
     --bg:#03080a; --panel:#050b0d; --panel2:#0b1215;
@@ -435,6 +439,191 @@
     .buildlist li{grid-template-columns:1fr; gap:5px}
     .st{display:inline-block; justify-self:start}
   }
+
+  /* 접근성: 터치 타깃 44px · 모션 최소화 */
+  @media (max-width: 1024px){
+    header.site a, header.site button, nav.top a, .tools a, .tools button{min-height:44px;display:inline-flex;align-items:center}
+    .pillbar{padding-top:6px;padding-bottom:6px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
+
+
+  h1{max-width:22ch; text-wrap:balance}
+  .herobtns{display:flex; gap:12px; flex-wrap:wrap; margin-top:26px}
+  .btn{display:inline-block; padding:12px 20px; border-radius:11px; font-weight:600; font-size:15px; border:1px solid transparent}
+  .btn.primary{background:linear-gradient(180deg,var(--accent-soft),var(--accent)); color:#0a0710}
+  /* SilentQuants: pastel teal — cool analogue of the family violet, away from profit-green */
+  :root{--accent:#5fe0c8; --accent-soft:#9af3e4; --accent-rgb:95,224,200; --glow:rgba(95,224,200,.13)}
+  html[data-theme="light"]{--accent:#0e8b79; --accent-soft:#12a892; --accent-rgb:14,139,121; --glow:rgba(14,139,121,.08)}
+  .btn.primary{background:linear-gradient(180deg,var(--accent-soft),var(--accent)); color:#04201c}
+  html[data-theme="light"] .btn.primary{color:#fff}
+  .st.live{border-color:rgba(95,224,200,.5); color:var(--accent-soft); background:rgba(95,224,200,.14)}
+  .btn.ghost{border-color:var(--line2); color:var(--fg2)}
+  .btn:hover{filter:brightness(1.05)}
+  .proof{display:flex; flex-wrap:wrap; gap:18px; margin-top:20px; font-size:12.8px; color:var(--dim)}
+  .proof b{color:var(--fg2); font-weight:700; margin-right:4px}
+  .answer{margin-top:30px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .answer .q{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 10px}
+  .answer .a{font-size:clamp(1.05rem,1.7vw,1.2rem); color:var(--fg); line-height:1.55; margin:0 0 16px; max-width:46ch}
+  .answer ul{list-style:none; padding:0; margin:0; display:grid; gap:12px}
+  .answer li{padding-left:18px; position:relative; font-size:14.5px; color:var(--muted); line-height:1.6}
+  .answer li::before{content:""; position:absolute; left:0; top:.62em; width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:.75}
+  .answer li b{color:var(--fg2)}
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px}
+  .panel{padding:18px 20px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .panel h3{margin:0 0 12px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-weight:700}
+  .panel ul{list-style:none; padding:0; margin:0; display:grid; gap:9px}
+  .panel li{font-size:14.3px; color:var(--muted); line-height:1.6; padding-left:18px; position:relative}
+  .panel li::before{position:absolute; left:0; top:0; font-size:13px}
+  .panel.yes li::before{content:"+"; color:var(--accent); font-weight:700}
+  .panel.no li::before{content:"–"; color:var(--dim); font-weight:700}
+  .grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:12px; margin-top:24px}
+  .card{display:block; padding:20px 22px; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:inherit}
+  .card:hover{border-color:rgba(var(--accent-rgb),.55); background:var(--panel2); color:inherit}
+  .card h3{margin:0 0 6px; font-size:16.5px; color:var(--fg); font-weight:650; display:flex; gap:9px; align-items:center; flex-wrap:wrap}
+  .card p{margin:0; color:var(--muted); font-size:14.3px; line-height:1.6; max-width:46ch}
+  .card .meta{margin-top:12px; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:#8f9499}
+  .entry{display:grid; grid-template-columns:7.6rem 1fr; gap:18px; padding:20px 0; border-top:1px solid var(--line2)}
+  .entry:first-child{border-top:0}
+  .entry time{font-size:11.8px; color:var(--muted); letter-spacing:.05em; padding-top:3px}
+  .entry b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:5px}
+  .entry p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.62; max-width:58ch}
+  .entry .tag{display:inline-block; margin-top:9px; padding:3px 9px; border-radius:999px; border:1px solid var(--line2);
+    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .statuskey{margin:22px 0 0; font-size:12.4px; color:var(--dim); letter-spacing:.02em}
+  .statuskey b{color:var(--fg2); font-weight:700; letter-spacing:.08em; font-size:11px}
+  .listhead{margin:14px 0 0; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim)}
+  .buildlist{list-style:none; padding:0; margin:10px 0 0; display:grid; gap:9px}
+  .buildlist li{display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:baseline; font-size:13.8px; color:var(--muted); line-height:1.55}
+  .buildlist b{color:var(--fg2); font-weight:600}
+  .st{display:block; white-space:nowrap; text-align:center; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    padding:3px 8px; border-radius:999px; border:1px solid var(--line2); color:#a9aeb3}
+  .st.live{border-color:rgba(var(--accent-rgb),.5); color:var(--accent-soft); background:rgba(var(--accent-rgb),.14)}
+  .st.wip{border-color:#454b51; color:#d2d4d6}
+  .st.plan{border-style:dashed; border-color:#3a4045; color:#9ba0a5}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr)); gap:18px; margin-top:26px;
+    padding-top:24px; border-top:1px solid var(--line)}
+  .stat .v{font-size:clamp(1.5rem,3vw,1.95rem); font-weight:750; color:var(--fg); letter-spacing:-.03em; line-height:1}
+  .stat .k{display:block; margin-top:7px; font-size:12px; color:var(--dim); letter-spacing:.06em}
+  .rules div{padding:17px 0; border-top:1px solid var(--line)}
+  .rules div:first-child{border-top:0}
+  .rules b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:3px}
+  .rules span{color:var(--muted); font-size:14.5px}
+  .ladder{list-style:none; padding:0; margin:26px 0 0; display:grid; gap:0}
+  .ladder li{display:grid; grid-template-columns:4.2rem 1fr; gap:16px; padding:15px 0; border-top:1px solid var(--line)}
+  .ladder li:first-child{border-top:0}
+  .ladder .ch{font-size:10.5px; letter-spacing:.14em; color:var(--accent); font-weight:700; padding-top:4px}
+  .ladder b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:2px}
+  .ladder span{color:var(--muted); font-size:14.5px; line-height:1.6}
+  .why{display:block; margin-top:9px; padding-left:11px; border-left:2px solid rgba(var(--accent-rgb),.45);
+    font-style:normal; font-size:13.8px; color:var(--accent)}
+  .journey-line{margin:14px 0 4px; font-size:15px; color:var(--accent); letter-spacing:-0.01em}
+  .calc{margin-top:26px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .calc label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
+  .slabel{display:flex; justify-content:space-between; align-items:baseline}
+  .slabel .rng{font-size:11.5px; color:var(--dim); letter-spacing:.04em}
+  .row{display:flex; align-items:center; gap:16px; margin-bottom:18px}
+  .row input[type=range]{flex:1; accent-color:var(--accent); height:22px}
+  .row .val{font-variant-numeric:tabular-nums; font-weight:700; color:var(--fg); min-width:5.5rem; text-align:right}
+  .results{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; padding-top:20px; border-top:1px solid var(--line)}
+  .res .k{display:block; font-size:11.5px; letter-spacing:.08em; color:var(--dim); text-transform:uppercase}
+  .res .v{display:block; margin-top:5px; font-size:clamp(1.4rem,2.6vw,1.8rem); font-weight:750; color:var(--accent); letter-spacing:-.02em}
+  .res .v.plain{color:var(--fg)}
+  .src{margin-top:14px; font-size:12.6px; color:var(--muted); line-height:1.62; max-width:62ch}
+  .src.small{color:var(--dim); font-size:12.2px}
+  .note{margin-top:16px; font-size:12.8px; color:var(--dim); line-height:1.6; max-width:62ch}
+
+  /* ── floating pill header (tiny.com 문법) ───────────── */
+  header.site{position:sticky; top:0; z-index:40; background:transparent; border:0; backdrop-filter:none; padding:14px 16px 0}
+  .pillbar{
+    max-width:52rem; margin:0 auto; display:flex; align-items:center; gap:8px;
+    padding:8px 10px 8px 18px; border-radius:999px;
+    background:rgba(12,20,23,.86);
+    border:1px solid #303c42;
+    box-shadow:0 14px 40px -26px rgba(0,0,0,.95), 0 0 0 1px rgba(255,255,255,.02) inset;
+    backdrop-filter:blur(18px) saturate(150%);
+  }
+  html[data-theme="light"] .pillbar{background:rgba(255,255,255,.86); border-color:#ddd6ec; box-shadow:0 14px 36px -26px rgba(58,40,110,.35)}
+  .pillbar .mark{font-size:15.5px; padding:4px 6px 4px 2px; letter-spacing:-0.03em; gap:6px}
+  .pillbar .mark .wm{display:inline-block; white-space:nowrap}
+  .pillbar .mark .w1,.pillbar .mark .w2{display:inline; letter-spacing:inherit}
+  .pillbar .mark .w1,.pillbar .mark .w2{transition:color .16s ease}
+  .pillbar .mark .w2{color:var(--accent)}
+  .pillbar .mark:hover .w1{color:var(--accent)}
+  .pillbar .mark:hover .w2{color:var(--fg)}
+  .pillbar .mark:hover{border:0}
+  nav.top{margin-left:auto; gap:4px; font-size:14px; display:flex; align-items:center}
+  nav.top a{color:var(--muted); border:0; padding:7px 11px; border-radius:999px; transition:color .15s, background .15s}
+  nav.top a:hover{color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent)}
+  .pillbar .tools{margin-left:10px; padding-left:14px; border-left:1px solid var(--line); gap:8px}
+  .pillbar .lang{padding:6px 9px; border-radius:999px; font-size:12.5px}
+  .pillbar .iconbtn{border:0; width:32px; height:32px; border-radius:999px; color:var(--fg2); font-size:15px}
+  .pillbar .iconbtn:hover{background:color-mix(in srgb, var(--accent) 14%, transparent)}
+  .pillbar .cta{
+    margin-left:4px; padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:650; border:0;
+    color:#04201c; background:linear-gradient(180deg,var(--accent-soft),var(--accent)); white-space:nowrap;
+  }
+  html[data-theme="light"] .pillbar .cta{color:#fff}
+  .pillbar .cta:hover{filter:brightness(1.05); border:0}
+  main.wrap{padding-top:clamp(32px,6vh,64px)}
+  @media (max-width:760px){
+    .pillbar{flex-wrap:wrap; gap:4px; padding:8px 12px; border-radius:24px}
+    nav.top{order:3; width:100%; flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+      margin:6px 0 2px; gap:2px; font-size:13px; scrollbar-width:none}
+    nav.top::-webkit-scrollbar{display:none}
+    nav.top a{padding:6px 10px; white-space:nowrap}
+    .pillbar .tools{margin-left:auto}
+    .pillbar .cta{display:none}
+  }
+  /* fail steps */
+  .steps{display:grid; gap:0; margin-top:22px}
+  .step{display:grid; grid-template-columns:3.4rem 1fr; gap:16px; padding:20px 0; border-top:1px solid var(--line2)}
+  .step:first-child{border-top:0}
+  .step .n{font-size:11.5px; letter-spacing:.16em; color:var(--accent); font-weight:700; padding-top:4px}
+  .step b{display:block; color:var(--fg); font-size:16.5px; font-weight:650; margin-bottom:7px; letter-spacing:-.01em}
+  .step p{margin:0 0 10px; color:var(--muted); font-size:14.2px; line-height:1.62}
+  .step .tagline{display:block; font-size:11.8px; letter-spacing:.04em; color:var(--dim); margin-top:2px}
+  /* odds + objections */
+  .odds{margin-top:24px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--panel)}
+  .dots{display:grid; grid-template-columns:repeat(20,1fr); gap:5px; max-width:32rem}
+  .dots i{aspect-ratio:1/1; border-radius:2px; background:rgba(255,255,255,.07); display:block}
+  html[data-theme="light"] .dots i{background:rgba(20,10,40,.08)}
+  .dots i.passed{background:rgba(var(--accent-rgb),.62)}
+  .dots i.paid{background:var(--accent)}
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:18px; font-size:13px; color:var(--muted)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .legend b{color:var(--fg); font-weight:700}
+  .legend .sw{width:11px; height:11px; border-radius:2px; display:inline-block; background:rgba(255,255,255,.07)}
+  html[data-theme="light"] .legend .sw{background:rgba(20,10,40,.08)}
+  .legend .sw.paid{background:var(--accent)}
+  .legend .sw.passed{background:rgba(var(--accent-rgb),.62)}
+  .objections{display:grid; gap:0; margin-top:22px}
+  .obj{padding:18px 0; border-top:1px solid var(--line)}
+  .obj:first-child{border-top:0}
+  .obj b{display:block; color:var(--fg); font-weight:650; font-size:15.5px; margin-bottom:6px}
+  .obj p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.65; max-width:62ch}
+  /* compact footer */
+  footer{border-top:1px solid var(--line); padding:26px 0 34px; margin-top:10px}
+  .frow{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .fw{font-weight:750; font-size:14px; color:var(--fg); letter-spacing:-0.02em}
+  .flinks{display:flex; gap:18px; flex-wrap:wrap; margin-left:auto; font-size:13px}
+  .flinks a{color:var(--muted); border:0}
+  .flinks a:hover{color:var(--accent)}
+  .fin{margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; color:var(--dim);
+    display:flex; flex-wrap:wrap; gap:14px}
+  .fin .r{margin-left:auto}
+  @media (max-width:700px){
+    .dots{grid-template-columns:repeat(10,1fr)}
+    .step{grid-template-columns:2.4rem 1fr; gap:10px}
+    .flinks{margin-left:0; gap:12px; font-size:12.5px}
+    .fin .r{margin-left:0}
+    .twocol,.results{grid-template-columns:1fr}
+    .entry{grid-template-columns:1fr; gap:6px}
+    .buildlist li{grid-template-columns:1fr; gap:5px}
+    .st{display:inline-block; justify-self:start}
+  }
 </style>
 </head>
 <body>
@@ -442,11 +631,11 @@
 <header class="site">
   <div class="pillbar">
     <a class="mark" href="/propfirm-helix/site/sq/" aria-label="SilentQuants home"><span class="dot"></span><span class="wm"><span class="w1">Silent</span><span class="w2">Quants</span></span></a>
-    <nav class="top"><a href="/propfirm-helix/site/sq/#why">Why</a><a href="/propfirm-helix/site/sq/#what">What</a><a href="/propfirm-helix/site/sq/#how">How</a><a href="/propfirm-helix/site/sq/helix/">Helix</a><a href="/propfirm-helix/site/sq/log/">Log</a></nav>
+    <nav class="top"><a href="/propfirm-helix/site/sq/#why">Why</a><a href="/propfirm-helix/site/sq/#what">What</a><a href="/propfirm-helix/site/sq/#how">How</a><a href="/helix/?lang=en">Helix</a><a href="/propfirm-helix/site/sq/log/">Log</a><a href="/propfirm-helix/site/sq/support/">Support</a></nav>
     <div class="tools">
-      <a class="lang" href="/propfirm-helix/site/sq/ko/">한국어</a>
+      <a class="lang" href="/propfirm-helix/site/sq/ko/privacy/" hreflang="ko">한국어</a>
       <button class="iconbtn" id="themeBtn" type="button" aria-label="Toggle theme"><span id="themeIcon">☾</span></button>
-      <a class="cta" href="/propfirm-helix/site/sq/helix/">Open Helix ↗</a>
+      <a class="cta" href="/helix/?lang=en">Open Helix ↗</a>
     </div>
   </div>
 </header>
@@ -454,96 +643,54 @@
 <main class="wrap">
 
   <div class="hero">
-    <p class="kicker">Helix · prop firm &amp; broker database</p>
-    <h1>What each firm actually requires.<br><em>And how well we know it.</em></h1>
-    <p class="lede">2,166 challenges across 71 prop firms. Price, drawdown, payout cycle, rule set — every row carrying a grade and a source, and an empty cell where the firm publishes nothing.</p>
-    <div class="herobtns">
-      <a class="btn primary" href="https://silentquants.com/tools/helix">Open the database ↗</a>
-      <a class="btn ghost" href="/propfirm-helix/site/sq/method/">How we grade</a>
-    </div>
+    <p class="kicker">Privacy · what we do and do not collect</p>
+    <h1>We collect nothing.<br><em>Here is the detail.</em></h1>
+    <p class="lede">Short version: no cookies, no analytics, no third-party scripts, no accounts. The longer version below says exactly what happens to a request when you open one of these pages.</p>
   </div>
 
   <section>
-    <p class="label"><b>01</b> What is inside</p>
-    <h2>Three kinds of fact, kept apart.</h2>
+    <p class="label"><b>01</b> What we do not do</p>
+    <h2>No tracking. Ever.</h2>
     <div class="rules">
-      <div><b>Price and structure.</b><span>Account sizes, evaluation fee, profit target, maximum loss, daily loss, minimum trading days, payout cycle and split.</span></div>
-      <div><b>Rules that end accounts.</b><span>Expert advisors, copy trading, news trading, overnight and weekend holds — per firm, and where the firm differs between evaluation and funded stage, both are shown.</span></div>
-      <div><b>Provenance.</b><span>Every row carries a grade (A when read from the firm's own page, C when it comes from a third party) and the date it was last checked.</span></div>
-    </div>
-    <div class="stats">
-      <div class="stat"><span class="v">2,166</span><span class="k">challenges</span></div>
-      <div class="stat"><span class="v">71</span><span class="k">firms</span></div>
-      <div class="stat"><span class="v">99%</span><span class="k">rule coverage</span></div>
-      <div class="stat"><span class="v">85%</span><span class="k">grade A rows</span></div>
-    </div>
-  </section>
-
-  <section id="fail">
-    <p class="label"><b>02</b> If it goes wrong</p>
-    <h2>Three things happen when a challenge fails.</h2>
-    <p>Every firm quotes what you pay. Almost none quote what happens after a failed attempt, which is the part that decides whether you can afford a second one.</p>
-
-    <div class="steps">
-      <div class="step">
-        <span class="n">01</span>
-        <div class="sb">
-          <b>The rule breaks first</b>
-          <p>A daily loss limit, a trailing drawdown, a news window, an expert advisor you were not allowed to run. The breach is usually small — a few percent, one position, one headline.</p>
-          <span class="tagline">Recorded per firm · filterable by drawdown type</span>
-        </div>
-      </div>
-      <div class="step">
-        <span class="n">02</span>
-        <div class="sb">
-          <b>The account closes</b>
-          <p>Some firms close it outright. Some reset the balance to zero, including open positions and any profit you had. A few sell you a restart — sometimes at a discount, sometimes at full price.</p>
-          <span class="tagline">Payout and restart terms differ · we record which</span>
-        </div>
-      </div>
-      <div class="step">
-        <span class="n">03</span>
-        <div class="sb">
-          <b>The fee is gone, and so is the month</b>
-          <p>The evaluation fee is not refunded. Re-entry means paying again and spending another two to four weeks — which is the larger cost, and the one that never appears on a pricing table.</p>
-          <span class="tagline">Stated on every firm's page · rarely in one place</span>
-        </div>
-      </div>
-    </div>
-
-    <p class="note">Helix records what each step costs: the drawdown and rule limits behind step one, the payout and restart terms behind step two, and the fee you paid behind step three. Check them before you pay, not after.</p>
-  </section>
-
-  <section>
-    <p class="label"><b>03</b> What we will not do</p>
-    <h2>No borrowed catalogues, no borrowed codes.</h2>
-    <p>Other comparison sites are built on the same handful of scraped feeds and the same affiliate codes. Copying that would make us a worse version of them, and would poison the only thing we can honestly sell: whether a number can be checked.</p>
-    <div class="twocol">
-      <div class="panel yes"><h3>We do</h3><ul>
-        <li>Read the firm's own page first, and say when we could not.</li>
-        <li>Keep empty cells empty.</li>
-        <li>Print the date of every check.</li>
-        <li>Show our own commission policy when we have one.</li>
-      </ul></div>
-      <div class="panel no"><h3>We do not</h3><ul>
-        <li>Republish another site's promo-code list as ours.</li>
-        <li>Copy ratings we did not collect.</li>
-        <li>Rank firms by payout to us.</li>
-        <li>Fill a gap with a guess.</li>
-      </ul></div>
+      <div><b>No cookies are set.</b><span>Not first-party, not third-party. There is no consent banner because there is nothing to consent to.</span></div>
+      <div><b>No analytics platform.</b><span>No Google Analytics, no Plausible, no Cloudflare Web Analytics. We turned the last one off on 17 November 2026.</span></div>
+      <div><b>No third-party scripts.</b><span>Every script on this site is one of ours. Fonts are served from this domain, not from Google.</span></div>
+      <div><b>No accounts, no forms that post anywhere.</b><span>There is nothing to sign up for, so there is no password, no profile, no stored email.</span></div>
     </div>
   </section>
 
   <section>
-    <p class="label"><b>04</b> Build order</p>
-    <h2>The order of the decisions.</h2>
-    <ol class="buildlist">
-      <li><span class="st live">live</span><span><b>01 Where to trade</b> — Helix: cost, rules and break-even per firm</span></li>
-      <li><span class="st live">live</span><span><b>02 What you may not break</b> — rule sets turned into per-firm checklists</span></li>
-      <li><span class="st wip">building</span><span><b>03 What you actually trade</b> — strategy lab: backtests, walk-forward, what survives</span></li>
-      <li><span class="st plan">planned</span><span><b>04 How you execute</b> — tools, checklists, decision journal</span></li>
-      <li><span class="st plan">planned</span><span><b>05 What it produced</b> — attempts, fees, payouts, capital ladder</span></li>
-    </ol>
+    <p class="label"><b>02</b> What is stored on your device</p>
+    <h2>Three preferences, in localStorage.</h2>
+    <p>Helix remembers your language, your column layout and your favourites. They live in your browser and are never sent to us. Clearing site data removes them.</p>
+    <p>Nothing else is saved. No fingerprinting, no session identifier, no hidden identifier in the page.</p>
+  </section>
+
+  <section>
+    <p class="label"><b>03</b> What the servers see</p>
+    <h2>Ordinary request logs.</h2>
+    <p>The site is hosted on GitHub Pages and proxied by Cloudflare. Like every web host, they see the request itself: IP address, user agent, requested URL, time. Cloudflare uses this to deliver pages and block attacks, and keeps logs for a limited period under its own policy.</p>
+    <p>We do not read those logs. We have no dashboard that shows individual visitors, and we do not build profiles from them.</p>
+  </section>
+
+  <section>
+    <p class="label"><b>04</b> If you email us</p>
+    <h2>One inbox, no list.</h2>
+    <p>If you write to hello@silentfam.com, we keep the email so we can reply. We do not add you to a list, we do not enrich it, and we do not sell or share it. Ask us to delete a thread and it is deleted.</p>
+    <p>The letter list on SilentFam is a plain text file of addresses, mailed from a normal mailbox. No tracking pixels, no open rates.</p>
+  </section>
+
+  <section>
+    <p class="label"><b>05</b> Money, if it ever exists</p>
+    <h2>Commissions will be printed, not hidden.</h2>
+    <p>Today no page earns a commission. If that changes, the page it applies to will say so in plain text, and it will never change a grade, a sort order or whether a blank stays blank.</p>
+    <p>We do not sell data, because we do not have any.</p>
+  </section>
+
+  <section>
+    <p class="label"><b>06</b> Questions</p>
+    <h2>Ask, and we answer.</h2>
+    <p>If something here is unclear or looks wrong, write to <a href="mailto:hello@silentfam.com">hello@silentfam.com</a>. This page was last changed on 17 November 2026.</p>
   </section>
 
 </main>
@@ -556,9 +703,11 @@
         <a href="/propfirm-helix/site/sq/#why">Why</a>
         <a href="/propfirm-helix/site/sq/#what">What</a>
         <a href="/propfirm-helix/site/sq/#how">How</a>
-        <a href="/propfirm-helix/site/sq/helix/">Helix</a>
+        <a href="/helix/?lang=en">Helix</a>
         <a href="/propfirm-helix/site/sq/log/">Log</a>
         <a href="/propfirm-helix/site/sq/resources/">Library</a>
+        <a href="/propfirm-helix/site/sq/privacy/">Privacy</a>
+        <a href="/propfirm-helix/site/sq/support/">Support</a>
         <a href="https://silentfam.com/">SilentFam ↗</a>
       </nav>
     </div>
